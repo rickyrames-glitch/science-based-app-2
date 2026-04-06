@@ -1,0 +1,2773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Formulation — Science Based App</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+
+:root {
+  --bg:#050508;--s1:#07070f;--s2:#0d0d1a;--s3:#111122;
+  --border:#181830;--border2:#20203a;
+  --text:#d8ddf0;--muted:#52527a;--dim:#34345a;--white:#eef0ff;
+  --green:#10b981;--yellow:#f59e0b;--orange:#f97316;--red:#ef4444;
+  --blue:#3b82f6;--purple:#a855f7;--pink:#ec4899;--teal:#14b8a6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh;}
+
+/* ── Header ── */
+header{padding:36px 32px 24px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+header::before{content:'WFM';position:absolute;right:-8px;top:-12px;font-family:'Barlow Condensed',sans-serif;font-size:180px;font-weight:800;color:rgba(255,255,255,0.018);line-height:1;pointer-events:none;letter-spacing:-8px;}
+.nav-back{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);text-decoration:none;margin-bottom:18px;transition:color 0.2s;}
+.nav-back:hover{color:var(--blue);}
+.header-tag{font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:8px;opacity:0.8;}
+header h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);font-weight:800;letter-spacing:-1px;line-height:0.92;color:var(--white);text-transform:uppercase;}
+header h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.18);}
+header .sub{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:12px;}
+
+/* ── Layout ── */
+.main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 180px);}
+@media(max-width:900px){.main{grid-template-columns:1fr;}}
+
+/* ── Sidebar ── */
+.sidebar{border-right:1px solid var(--border);padding:22px 18px;overflow-y:auto;}
+.section-tag{font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.input-group{margin-bottom:12px;}
+label{display:block;font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px;}
+input[type="number"],select{width:100%;background:var(--s1);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:7px 9px;outline:none;transition:border-color 0.15s;appearance:none;}
+input:focus,select:focus{border-color:var(--blue);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* Goal sliders */
+.goal-bar-row{margin-bottom:10px;}
+.goal-bar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.goal-bar-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;font-weight:500;}
+.goal-bar-val{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:500;}
+.goal-slider{width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;}
+.goal-slider::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border-radius:50%;cursor:pointer;}
+.slider-lbm::-webkit-slider-thumb{background:var(--blue);}
+.slider-bf::-webkit-slider-thumb{background:var(--orange);}
+.slider-vo2::-webkit-slider-thumb{background:var(--green);}
+.slider-str::-webkit-slider-thumb{background:var(--purple);}
+.weight-pie{display:flex;height:5px;border-radius:3px;overflow:hidden;margin:8px 0 3px;}
+.pie-seg{height:100%;transition:width 0.3s ease;}
+
+/* Injury toggle grid */
+.injury-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.injury-card{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 9px;display:flex;align-items:center;justify-content:space-between;}
+.injury-muscle{font-family:'JetBrains Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:1px;}
+.injury-toggle{display:flex;gap:5px;}
+.itog{font-family:'JetBrains Mono',monospace;font-size:0.52rem;padding:3px 8px;border-radius:2px;border:1px solid var(--border);background:var(--s3);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.itog.active-ok{background:rgba(16,185,129,0.15);border-color:#10b981;color:#10b981;}
+.itog.active-flag{background:rgba(239,68,68,0.15);border-color:#ef4444;color:#ef4444;}
+
+/* Level display */
+.level-box{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:9px 11px;margin-bottom:10px;}
+
+/* Strength log */
+.str-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.str-card{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 9px;}
+.str-muscle{font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;}
+.str-fields{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.str-input{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.75rem;padding:5px 6px;outline:none;}
+.str-sublabel{font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:var(--dim);margin-top:1px;}
+
+/* Generate button */
+.generate-btn{width:100%;background:var(--white);color:var(--bg);border:none;border-radius:3px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-top:14px;}
+.generate-btn:hover{background:var(--blue);color:white;}
+
+/* ── Output panel ── */
+.output{padding:24px 24px 60px;overflow-y:auto;}
+.empty-state{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:60px 20px;}
+.empty-state .icon{font-size:2.6rem;margin-bottom:14px;opacity:0.22;}
+.empty-state p{font-family:'JetBrains Mono',monospace;font-size:0.66rem;letter-spacing:1px;text-transform:uppercase;line-height:1.9;}
+
+/* ── Master budget meter ── */
+.master-meter-wrap{height:50px;background:var(--s2);border:1px solid var(--border);border-radius:5px;overflow:hidden;position:relative;margin-bottom:8px;}
+.master-meter-fill{position:absolute;top:0;left:0;bottom:0;border-radius:5px;transition:width 0.7s cubic-bezier(0.16,1,0.3,1);display:flex;align-items:center;padding:0 14px;overflow:hidden;}
+.master-meter-gradient{position:absolute;inset:0;background:linear-gradient(90deg,#3b82f6 0%,#10b981 40%,#f59e0b 75%,#ef4444 100%);opacity:0.88;}
+.master-meter-text{position:relative;z-index:1;font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:2px;color:#000;white-space:nowrap;}
+.master-landmark-line{position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,0.22);}
+.master-landmark-tag{position:absolute;bottom:3px;font-family:'JetBrains Mono',monospace;font-size:0.44rem;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,0.45);transform:translateX(-50%);}
+.efficiency-badge{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:2px;}
+
+/* ── Muscle meters grid ── */
+.muscle-meters-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;}
+@media(max-width:900px){.muscle-meters-grid{grid-template-columns:1fr 1fr 1fr;}}
+@media(max-width:600px){.muscle-meters-grid{grid-template-columns:1fr 1fr;}}
+
+.muscle-meter-card{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:11px 12px;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.mm-bg-fill{position:absolute;bottom:0;left:0;right:0;border-radius:0 0 4px 4px;transition:height 0.6s cubic-bezier(0.16,1,0.3,1);z-index:0;opacity:0.1;}
+.mm-content{position:relative;z-index:1;}
+.mm-name{font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.mm-pts{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;line-height:1;margin-bottom:2px;}
+.mm-reps{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);margin-bottom:6px;}
+.mm-bar-wrap{background:var(--border);border-radius:2px;height:4px;overflow:hidden;position:relative;margin-bottom:3px;}
+.mm-bar{height:100%;border-radius:2px;transition:width 0.6s cubic-bezier(0.16,1,0.3,1);}
+.mm-ticks{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:var(--muted);margin-bottom:5px;}
+.mm-hyp{font-family:'JetBrains Mono',monospace;font-size:0.44rem;text-transform:uppercase;letter-spacing:1px;padding:2px 6px;border-radius:8px;display:inline-block;margin-bottom:5px;}
+.mm-stepper{display:flex;align-items:center;gap:4px;}
+.mm-stepper button{width:20px;height:20px;border-radius:50%;border:1px solid var(--border);background:var(--s3);color:var(--text);font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:'Barlow Condensed',sans-serif;font-weight:700;flex-shrink:0;}
+.mm-stepper button:hover{border-color:var(--blue);color:var(--blue);}
+.mm-stepper-info{font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:var(--muted);flex:1;text-align:center;line-height:1.5;}
+
+/* ── Session cards ── */
+.week-map{display:grid;gap:10px;margin-bottom:20px;}
+.session-card{background:var(--s1);border:1px solid var(--border);border-radius:5px;overflow:hidden;animation:slideUp 0.3s ease both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.session-header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 14px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+.session-header:hover{background:var(--s2);}
+.session-day{font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);min-width:32px;}
+.session-muscles{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.muscle-pill{font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:8px;font-weight:500;}
+.interference-score{display:inline-flex;align-items:center;gap:3px;font-family:'JetBrains Mono',monospace;font-size:0.54rem;padding:2px 7px;border-radius:2px;}
+.session-meta-right{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:var(--muted);text-align:right;line-height:1.7;}
+
+/* Exercise table */
+.ex-table-wrap{padding:0 14px 12px;}
+.ex-table{width:100%;border-collapse:collapse;}
+.ex-table th{text-align:left;padding:7px 9px;font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);}
+.ex-table td{padding:9px 9px;border-bottom:1px solid var(--s2);vertical-align:middle;}
+.ex-table tr:last-child td{border-bottom:none;}
+.ex-table tr:hover td{background:rgba(255,255,255,0.012);}
+.ex-order-dot{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:0.68rem;font-weight:700;flex-shrink:0;}
+.ex-name-cell{font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:600;letter-spacing:0.5px;color:var(--white);}
+.ex-muscle-sub{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);margin-top:1px;}
+.presc-val{font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;color:var(--white);letter-spacing:0.5px;}
+.presc-sub{font-family:'JetBrains Mono',monospace;font-size:0.46rem;color:var(--muted);}
+
+/* Leg block */
+.leg-session-card{background:var(--s1);border:1px solid #a855f733;border-radius:5px;overflow:hidden;margin-top:10px;}
+
+/* Volume section divider */
+.vol-section-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin:22px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+/* Recovery compact row */
+.rec-compact{display:grid;grid-template-columns:100px 1fr 52px 52px 52px 60px;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);}
+.rec-compact:last-child{border-bottom:none;}
+.rec-compact:hover{background:var(--s2);}
+.rec-bar-wrap{background:var(--border);border-radius:2px;height:4px;overflow:hidden;}
+.rec-bar{height:100%;border-radius:2px;}
+
+/* PO cards */
+.po-card{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:8px;}
+.po-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.po-label{font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.po-val{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;}
+.po-progress-wrap{background:var(--border);border-radius:2px;height:4px;overflow:hidden;margin-top:5px;}
+.po-progress{height:100%;border-radius:2px;transition:width 0.6s ease;}
+
+/* Realloc note */
+.realloc-note{background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:0 4px 4px 0;padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--dim);line-height:1.75;margin-bottom:14px;}
+.realloc-note strong{color:var(--text);font-weight:500;}
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:18px 20px;margin-bottom:16px;}
+
+/* ── BF Picker overlay (injected) ──*/
+
+
+
+/* ── BF Picker Overlay ── */
+#bfPickerOverlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,3,6,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;}
+#bfPickerOverlay.open{display:flex !important;}
+#bfPickerModal{background:#07070f;border:1px solid #1e1e38;border-radius:8px;width:100%;max-width:760px;max-height:94vh;overflow-y:auto;display:flex;flex-direction:column;animation:bfpSlide 0.2s ease;}
+@keyframes bfpSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.bfp-header{padding:16px 20px 12px;border-bottom:1px solid #161628;display:flex;align-items:center;justify-content:space-between;}
+.bfp-title{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#eaecff;}
+.bfp-subtitle{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:#4a4a72;margin-top:3px;}
+.bfp-close{width:28px;height:28px;border-radius:50%;border:1px solid #1e1e38;background:#0b0b18;color:#4a4a72;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.bfp-close:hover{border-color:#ef4444;color:#ef4444;}
+.bfp-body{display:grid;grid-template-columns:220px 1fr;gap:0;flex:1;}
+@media(max-width:560px){.bfp-body{grid-template-columns:1fr;}}
+.bfp-silhouette{background:#050508;border-right:1px solid #161628;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 10px;position:relative;min-height:320px;}
+#bfpBodySvg{width:160px;height:auto;}
+.bfp-pct-on-body{position:absolute;bottom:16px;font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:#eaecff;line-height:1;}
+.bfp-tier-label{position:absolute;top:12px;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;}
+.bfp-controls{padding:16px 18px;display:flex;flex-direction:column;gap:12px;}
+.bfp-sex-row{display:flex;gap:6px;}
+.bfp-sex-btn{flex:1;padding:6px;border-radius:2px;border:1px solid #1e1e38;background:#0b0b18;color:#4a4a72;font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
+.bfp-sex-btn.active{border-color:#f97316;color:#f97316;background:rgba(249,115,22,0.1);}
+.bfp-slider-section{display:flex;flex-direction:column;gap:6px;}
+.bfp-track-wrap{position:relative;padding-bottom:18px;}
+.bfp-slider{width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,#f97316 0%,#1e1e38 0%);}
+.bfp-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#f97316;border:2px solid #fff;cursor:pointer;}
+.bfp-ticks{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:#2a2a50;}
+.bfp-tier-desc{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:#4a4a72;line-height:1.6;min-height:40px;}
+.bfp-bars{display:flex;flex-direction:column;gap:6px;}
+.bfp-bar-row{display:flex;align-items:center;gap:8px;}
+.bfp-bar-label{font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:#52527a;min-width:88px;}
+.bfp-bar-wrap{flex:1;background:#1e1e38;border-radius:2px;height:4px;overflow:hidden;}
+.bfp-bar-fill{height:100%;border-radius:2px;transition:width 0.3s ease;}
+.bfp-bar-val{font-family:'JetBrains Mono',monospace;font-size:0.5rem;min-width:36px;text-align:right;}
+.bfp-footer{padding:12px 18px;border-top:1px solid #161628;display:flex;gap:8px;justify-content:flex-end;}
+.bfp-cancel{font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:1.5px;padding:7px 14px;border-radius:2px;border:1px solid #1e1e38;background:transparent;color:#4a4a72;cursor:pointer;}
+.bfp-confirm{font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:7px 18px;border-radius:2px;border:none;background:#f97316;color:#fff;cursor:pointer;}
+.bfp-confirm:hover{background:#ea580c;}
+
+
+/* ── TDEE Modal ── */
+#tdeeModal{display:none;position:fixed;inset:0;z-index:9100;background:rgba(3,3,6,0.9);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:12px;}
+#tdeeModal.open{display:flex !important;}
+
+
+/* ── Goal priority slider tracks ── */
+input[type="range"].goal-slider { -webkit-appearance:none; appearance:none; height:4px; border-radius:2px; outline:none; cursor:pointer; width:100%; }
+input[type="range"].goal-slider::-webkit-slider-runnable-track { height:4px; border-radius:2px; }
+input[type="range"].goal-slider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; margin-top:-5px; cursor:pointer; border:2px solid var(--bg); }
+input[type="range"].goal-slider.lbm::-webkit-slider-thumb { background: var(--blue); }
+input[type="range"].goal-slider.bf::-webkit-slider-thumb  { background: var(--orange); }
+input[type="range"].goal-slider.vo2::-webkit-slider-thumb { background: var(--green); }
+input[type="range"].goal-slider.str::-webkit-slider-thumb { background: var(--purple); }
+
+
+/* ── Days since last trained cards ── */
+.doms-card{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 9px;display:flex;flex-direction:column;align-items:center;}
+.doms-muscle{font-family:'JetBrains Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:1px;}
+
+
+/* ── Module nav ── */
+.module-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.module-nav a{font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;padding:5px 12px;border-radius:2px;border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:all 0.15s;}
+.module-nav a:hover{border-color:var(--blue);color:var(--blue);}
+.module-nav a.active{color:var(--white);border-color:var(--white);background:rgba(255,255,255,0.05);}
+
+</style>
+</head>
+<body>
+
+<!-- BF Picker Overlay -->
+<div id="bfPickerOverlay" style="display:none">
+  <div id="bfPickerModal">
+    <div class="bfp-header">
+      <div>
+        <div class="bfp-title">Match Your Body</div>
+        <div class="bfp-subtitle">Slide until the silhouette matches your physique → confirm to set BF%</div>
+      </div>
+      <button class="bfp-close" data-picker-action="close">✕</button>
+    </div>
+    <div class="bfp-body">
+      <div class="bfp-silhouette">
+        <svg id="bfpBodySvg" viewBox="0 0 220 480" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="bfp-pct-on-body" id="bfpPctBig"></div>
+        <div class="bfp-tier-label" id="bfpTierLabel"></div>
+      </div>
+      <div class="bfp-controls">
+        <div class="bfp-sex-row">
+          <button class="bfp-sex-btn active" id="bfpBtnMale" data-picker-sex="male">Male</button>
+          <button class="bfp-sex-btn" id="bfpBtnFemale" data-picker-sex="female">Female</button>
+        </div>
+        <div class="bfp-slider-section">
+          <div class="bfp-track-wrap">
+            <input type="range" id="bfpSlider" class="bfp-slider" oninput="bfpOnSlide(this.value)" min="4" max="45" value="14" step="0.5">
+            <div class="bfp-ticks" id="bfpTicks"></div>
+          </div>
+        </div>
+        <div class="bfp-tier-desc" id="bfpTierDesc"></div>
+        <div class="bfp-bars">
+          <div class="bfp-bar-row">
+            <span class="bfp-bar-label" style="color:#a855f7">Hormonal</span>
+            <div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarH" style="width:60%;background:#a855f7"></div></div>
+            <span class="bfp-bar-val" id="bfpValH" style="color:#a855f7"></span>
+          </div>
+          <div class="bfp-bar-row">
+            <span class="bfp-bar-label" style="color:#ef4444">Cardiovascular</span>
+            <div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarC" style="width:60%;background:#ef4444"></div></div>
+            <span class="bfp-bar-val" id="bfpValC" style="color:#ef4444"></span>
+          </div>
+          <div class="bfp-bar-row">
+            <span class="bfp-bar-label" style="color:#3b82f6">Metabolic</span>
+            <div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarM" style="width:60%;background:#3b82f6"></div></div>
+            <span class="bfp-bar-val" id="bfpValM" style="color:#3b82f6"></span>
+          </div>
+          <div class="bfp-bar-row">
+            <span class="bfp-bar-label" style="color:#10b981">Mortality risk</span>
+            <div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarMort" style="width:60%;background:#10b981"></div></div>
+            <span class="bfp-bar-val" id="bfpValMort" style="color:#10b981"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bfp-footer">
+      <button class="bfp-cancel" data-picker-action="close">Cancel</button>
+      <button class="bfp-confirm" data-picker-action="confirm">Set <span id="bfpConfirmVal">14</span>%</button>
+    </div>
+  </div>
+</div>
+
+<!-- TDEE Modal -->
+<div id="tdeeModal" style="display:none">
+  <div id="tdeeModalBox" style="background:#07070f;border:1px solid #1e1e38;border-radius:8px;width:100%;max-width:720px;max-height:94vh;overflow-y:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 20px 12px;border-bottom:1px solid #161628;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#eaecff;">TDEE Calculator</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:#4a4a72;margin-top:3px;">Katch-McArdle BMR · EAT · TEF · NEAT → weekly average</div>
+      </div>
+      <button data-tdee-action="close" style="width:30px;height:30px;border-radius:50%;border:1px solid #1e1e38;background:#0b0b18;color:#4a4a72;cursor:pointer;font-size:0.9rem;">✕</button>
+    </div>
+    <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="grid-column:1/-1;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;padding-top:4px;">Resistance Training</div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Training days / week</span>
+        <select class="tm-inp" id="tm_trainDays" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="2">2 days</option><option value="3" selected>3 days</option><option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Session duration</span>
+        <select class="tm-inp" id="tm_sessionDur" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="0.75">45 min</option><option value="1">1 hr</option><option value="1.5">1.5 hrs</option><option value="2" selected>2 hrs</option><option value="2.5">2.5 hrs</option><option value="3">3 hrs</option>
+        </select></div>
+      <div style="grid-column:1/-1;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;padding-top:8px;border-top:1px solid #161628;margin-top:4px;">Cardio / Endurance</div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Cardio days / week</span>
+        <select id="tm_cardioDays" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="0" selected>None</option><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Duration per session</span>
+        <select id="tm_cardioDur" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="0.5">30 min</option><option value="0.75">45 min</option><option value="1" selected>1 hr</option><option value="1.5">1.5 hrs</option><option value="2">2 hrs</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Zone / Intensity</span>
+        <select id="tm_zone" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="z1">Zone 1 — Recovery</option><option value="z2" selected>Zone 2 — Aerobic base</option><option value="z3">Zone 3 — Tempo</option><option value="z4">Zone 4 — Threshold</option><option value="z5">Zone 5 — VO₂ max</option><option value="intermittent">Sport / Intermittent</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Modality</span>
+        <select id="tm_modality" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="running">Running</option><option value="cycling">Cycling</option><option value="rowing">Rowing</option><option value="sport" selected>Sport (basketball etc.)</option><option value="swimming">Swimming</option><option value="hiit">HIIT</option><option value="elliptical">Elliptical</option><option value="stairmaster">Stairmaster</option>
+        </select></div>
+      <div style="grid-column:1/-1;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;padding-top:8px;border-top:1px solid #161628;margin-top:4px;">NEAT</div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Daily steps</span>
+        <select id="tm_steps" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="3000">~3,000 — sedentary</option><option value="6000">~6,000 — light</option><option value="8000" selected>~8,000 — moderate</option><option value="10000">~10,000 — active</option><option value="14000">~14,000 — very active</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Occupation type</span>
+        <select id="tm_occupation" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="seated" selected>Seated — desk / study</option><option value="mixed">Mixed — standing + moving</option><option value="standing">Mostly standing</option><option value="active">Active — physical labor</option>
+        </select></div>
+      <div id="tmResult" style="display:none;background:#0b0b18;border:1px solid #1e1e38;border-radius:4px;padding:14px 16px;grid-column:1/-1;margin-top:4px;">
+        <div id="tmResultNum" style="font-family:'Barlow Condensed',sans-serif;font-size:3.2rem;font-weight:800;color:#3b82f6;line-height:1;">—</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:#4a4a72;margin-top:4px;">kcal / day — weekly average</div>
+        <div id="tmResultBd" style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:#2a2a50;margin-top:8px;line-height:1.9;"></div>
+      </div>
+    </div>
+    <div style="padding:12px 20px 16px;border-top:1px solid #161628;display:flex;gap:8px;justify-content:flex-end;align-items:center;">
+      <button data-tdee-action="close" style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:1.5px;padding:8px 14px;border-radius:3px;border:1px solid #1e1e38;background:transparent;color:#4a4a72;cursor:pointer;">Cancel</button>
+      <button data-tdee-action="calc" style="font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:3px;border:none;background:#3b82f6;color:#fff;cursor:pointer;">Calculate</button>
+      <button id="tmConfirmBtn" data-tdee-action="confirm" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:3px;border:none;background:#eaecff;color:#030306;cursor:pointer;">Use <span id="tmConfirmVal">—</span> kcal</button>
+    </div>
+  </div>
+</div>
+
+
+<header>
+<div class="module-nav">
+  <a href="workout-formulation.html" class="active">Workout Formulation</a>
+  <a href="nutrition-formulation.html">Nutrition Formulation</a>
+  <a href="milestone-tracker.html">Milestone Tracker</a>
+</div>
+  <div class="header-tag">Science Based App · Module 02</div>
+  <h1>Workout<br><em>Formulation</em></h1>
+  <div class="sub">Non-competing pairs · Recovery-weighted volume · Interference-ordered · Progressive overload</div>
+</header>
+
+<div class="main">
+
+<!-- ── SIDEBAR ─────────────────────────────────────── -->
+<div class="sidebar">
+
+  <div class="section-tag">01 — Profile</div>
+  <div class="grid-2" style="margin-bottom:10px">
+    <div class="input-group">
+      <label>Years Trained</label>
+      <input type="number" id="yearsTraining" value="5" min="0" max="40" step="0.5">
+    </div>
+    <div class="input-group">
+      <label>Bodyweight (lbs)</label>
+      <input type="number" id="bodyweight" value="180" min="80" max="400">
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:10px">
+    <div class="input-group">
+      <label>Training Days / Week</label>
+      <select id="sessionDays">
+        <option value="2">2 days</option>
+        <option value="3" selected>3 days</option>
+        <option value="4">4 days</option>
+        <option value="5">5 days</option>
+        <option value="6">6 days</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Session Duration</label>
+      <select id="sessionTime">
+        <option value="60">60 min</option>
+        <option value="90">90 min</option>
+        <option value="120">120 min</option>
+        <option value="180" selected>180 min</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="level-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)">Training Level</span>
+      <span id="levelLabel" style="font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:2px;color:var(--blue)">ADVANCED</span>
+    </div>
+    <div style="background:var(--border);border-radius:2px;height:3px;overflow:hidden">
+      <div id="levelBar" style="height:100%;background:var(--blue);border-radius:2px;width:75%;transition:width 0.4s ease"></div>
+    </div>
+    <div id="levelNote" style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:var(--muted);margin-top:4px">5yr → Advanced · MEV/MAV/MRV calibrated</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">02 — Goal Priority Weights</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:var(--muted);margin-bottom:10px;line-height:1.6">
+    Drag sliders to weight goals. Volume allocation adjusts proportionally.
+  </div>
+  <div style="margin-bottom:6px">
+    <div class="goal-bar-header">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)">LBM / Muscle</span>
+      <span id="lbl_lbm" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;color:var(--blue)">4</span>
+    </div>
+    <input type="range" id="pri_lbm" class="goal-slider lbm" min="0" max="10" value="4" style="width:100%;margin-bottom:2px;accent-color:var(--blue)" oninput="updateSliders()">
+  </div>
+  <div style="margin-bottom:6px">
+    <div class="goal-bar-header">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)">Fat Loss</span>
+      <span id="lbl_bf" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;color:var(--orange)">3</span>
+    </div>
+    <input type="range" id="pri_bf"  class="goal-slider bf"  min="0" max="10" value="3" style="width:100%;margin-bottom:2px;accent-color:var(--orange)" oninput="updateSliders()">
+  </div>
+  <div style="margin-bottom:6px">
+    <div class="goal-bar-header">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)">VO₂ / Cardio</span>
+      <span id="lbl_vo2" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;color:var(--green)">2</span>
+    </div>
+    <input type="range" id="pri_vo2" class="goal-slider vo2" min="0" max="10" value="2" style="width:100%;margin-bottom:2px;accent-color:var(--green)" oninput="updateSliders()">
+  </div>
+  <div style="margin-bottom:6px">
+    <div class="goal-bar-header">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)">Strength</span>
+      <span id="lbl_str" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;color:var(--purple)">1</span>
+    </div>
+    <input type="range" id="pri_str" class="goal-slider str" min="0" max="10" value="1" style="width:100%;margin-bottom:2px;accent-color:var(--purple)" oninput="updateSliders()">
+  </div>
+  <div class="weight-pie" id="weightPie">
+    <div class="pie-seg" style="background:var(--blue);height:100%;border-radius:2px 0 0 2px"></div>
+    <div class="pie-seg" style="background:var(--orange);height:100%"></div>
+    <div class="pie-seg" style="background:var(--green);height:100%"></div>
+    <div class="pie-seg" style="background:var(--purple);height:100%;border-radius:0 2px 2px 0"></div>
+  </div>
+  <div id="weightLabels" style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);margin-top:4px;line-height:1.6;display:flex;gap:8px;flex-wrap:wrap"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">03 — Physiological Targets</div>
+  <div class="grid-2">
+    <div class="input-group">
+      <label>Current BF%</label>
+      <div style="display:flex;gap:4px;align-items:center">
+        <input type="number" id="cur_bf" value="14" min="4" max="45" step="0.5" style="flex:1">
+        <button type="button" style="flex-shrink:0;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.4);border-radius:2px;color:rgba(249,115,22,0.9);font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:1px;text-transform:uppercase;padding:4px 6px;cursor:pointer;white-space:nowrap" onclick="window.bfPickerOpen && window.bfPickerOpen('cur_bf', parseFloat(document.getElementById('cur_bf').value)||14, 'male')">⬡ match</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Target BF%</label>
+      <div style="display:flex;gap:4px;align-items:center">
+        <input type="number" id="goal_bf" value="12" min="4" max="40" step="0.5" style="flex:1">
+        <button type="button" style="flex-shrink:0;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.4);border-radius:2px;color:rgba(249,115,22,0.9);font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:1px;text-transform:uppercase;padding:4px 6px;cursor:pointer;white-space:nowrap" onclick="window.bfPickerOpen && window.bfPickerOpen('goal_bf', parseFloat(document.getElementById('goal_bf').value)||14, 'male')">⬡ match</button>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="input-group">
+      <label>Current LBM (lbs)</label>
+      <input type="number" id="cur_lbm" value="155" min="60" max="300">
+    </div>
+    <div class="input-group">
+      <label>Target LBM (lbs)</label>
+      <input type="number" id="goal_lbm" value="165" min="60" max="300">
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="input-group">
+      <label>Current VO₂ Max</label>
+      <select id="cur_vo2">
+        <option value="35">Poor (&lt;35)</option>
+        <option value="42">Below Avg (35–45)</option>
+        <option value="50" selected>Good (46–55)</option>
+        <option value="58">Excellent (56–62)</option>
+        <option value="65">Superior (63–70)</option>
+        <option value="72">Elite (70+)</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Target VO₂ Max</label>
+      <input type="number" id="goal_vo2" value="55" min="20" max="90" step="1">
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="input-group">
+      <label>Current Strength (×BW)</label>
+      <input type="number" id="cur_str" value="1.5" min="0.3" max="4" step="0.05">
+    </div>
+    <div class="input-group">
+      <label>Target Strength (×BW)</label>
+      <input type="number" id="goal_str_target" value="1.8" min="0.3" max="4" step="0.05">
+    </div>
+  </div>
+  <div id="gapSummary" style="background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:9px 11px;margin-top:4px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px">Goal Gaps</div>
+    <div id="gapRows" style="display:grid;grid-template-columns:1fr 1fr;gap:4px"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">04 — Recovery State</div>
+  <div id="domsGrid" style="display:grid;gap:5px;margin-bottom:10px"></div>
+  <div class="input-group">
+    <label>Hours Slept (last night)</label>
+    <input type="number" id="sleepHrs" value="7.5" min="3" max="12" step="0.5">
+  </div>
+  <div class="input-group">
+    <label>Sleep Quality (last night)</label>
+    <select id="sleepQuality">
+      <option value="0.5">Poor (≤5hr / restless)</option>
+      <option value="0.75">Fair (6hr)</option>
+      <option value="1.0" selected>Good (7–8hr)</option>
+      <option value="1.1">Excellent (8hr+ / deep)</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">05 — Days Since Last Trained</div>
+  <div id="daysGrid" style="display:grid;gap:5px;margin-bottom:10px"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">06 — Strength Log (last set: weight × reps)</div>
+  <div id="strengthGrid" style="display:grid;gap:5px;margin-bottom:10px"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">07 — Leg Block</div>
+  <div class="input-group">
+    <label>Include Leg Block</label>
+    <select id="legBlock">
+      <option value="none">Not this week</option>
+      <option value="append_any">Append to every session</option>
+      <option value="standalone">Standalone session (own day)</option>
+      <option value="append_first" selected>Append to first session only</option>
+    </select>
+  </div>
+  <div class="input-group">
+    <label>Leg Focus</label>
+    <select id="legFocus">
+      <option value="full" selected>Full lower (quads + hams + glutes)</option>
+      <option value="quads">Quad dominant</option>
+      <option value="posterior">Posterior (hams + glutes)</option>
+      <option value="power">Power / plyometric</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">08 — TDEE Reference</div>
+  <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+    <input type="number" id="tdee_ref" value="3200" min="1200" max="6000" style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:7px 9px;outline:none;">
+    <button type="button" style="flex-shrink:0;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.5);border-radius:2px;color:rgba(59,130,246,0.9);font-family:'JetBrains Mono',monospace;font-size:0.48rem;letter-spacing:1px;text-transform:uppercase;padding:7px 9px;cursor:pointer;white-space:nowrap" onclick="window._tdeeOpen && window._tdeeOpen()">⬡ calculate</button>
+  </div>
+
+  <button class="generate-btn" onclick="generate()">Generate Plan</button>
+</div>
+
+<!-- ── OUTPUT ──────────────────────────────────────── -->
+<div class="output" id="output">
+  <div class="empty-state">
+    <div class="icon">⬡</div>
+    <p>Configure your profile,<br>goals, and recovery state,<br>then generate your plan.</p>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<script>
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA — MUSCLES, EXERCISES, INTERFERENCE, LANDMARKS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const UPPER_MUSCLES = {
+  lats:             { label:'Lats',              color:'#3b82f6', goals:{lbm:0.90,bf:0.50,vo2:0.22,str:0.68} },
+  mid_back:         { label:'Mid Back',          color:'#60a5fa', goals:{lbm:0.88,bf:0.50,vo2:0.22,str:0.65} },
+  upper_back:       { label:'Upper Back',        color:'#93c5fd', goals:{lbm:0.82,bf:0.48,vo2:0.20,str:0.60} },
+  rear_delt:        { label:'Rear Delt',         color:'#6366f1', goals:{lbm:0.65,bf:0.38,vo2:0.12,str:0.42} },
+  chest:            { label:'Chest',             color:'#f97316', goals:{lbm:0.90,bf:0.50,vo2:0.25,str:0.95} },
+  front_delt:       { label:'Front Delt',        color:'#fb923c', goals:{lbm:0.85,bf:0.45,vo2:0.20,str:0.85} },
+  side_delt:        { label:'Side Delt',         color:'#fbbf24', goals:{lbm:0.80,bf:0.50,vo2:0.15,str:0.40} },
+  biceps:           { label:'Biceps',            color:'#10b981', goals:{lbm:0.80,bf:0.38,vo2:0.12,str:0.52} },
+  triceps_long:     { label:'Tricep Long Head',  color:'#34d399', goals:{lbm:0.82,bf:0.38,vo2:0.12,str:0.55} },
+  triceps_lateral:  { label:'Tricep Lat Head',   color:'#6ee7b7', goals:{lbm:0.78,bf:0.38,vo2:0.12,str:0.50} },
+  triceps_medial:   { label:'Tricep Med Head',   color:'#a7f3d0', goals:{lbm:0.76,bf:0.38,vo2:0.12,str:0.48} },
+  abs:              { label:'Abs',               color:'#f59e0b', goals:{lbm:0.62,bf:0.60,vo2:0.40,str:0.55} },
+};
+
+const LEG_MUSCLES = {
+  quads:      { label:'Quads',      color:'#a855f7', goals:{lbm:0.92,bf:0.60,vo2:0.30,str:0.85} },
+  hamstrings: { label:'Hamstrings', color:'#c084fc', goals:{lbm:0.80,bf:0.52,vo2:0.22,str:0.55} },
+  glutes:     { label:'Glutes',     color:'#d946ef', goals:{lbm:0.85,bf:0.58,vo2:0.22,str:0.72} },
+};
+
+const ALL_MUSCLES = { ...UPPER_MUSCLES, ...LEG_MUSCLES };
+
+const INTERFERENCE = {
+  lats_mid_back:0.55, lats_upper_back:0.50, lats_rear_delt:0.40, lats_biceps:0.65,
+  mid_back_upper_back:0.60, mid_back_rear_delt:0.45, mid_back_biceps:0.60,
+  upper_back_rear_delt:0.50, upper_back_biceps:0.55,
+  chest_front_delt:0.55, chest_triceps:0.50, chest_biceps:0.25,
+  front_delt_side_delt:0.35, front_delt_triceps:0.45,
+  side_delt_triceps:0.15,
+  chest_lats:0.10, chest_mid_back:0.10, chest_rear_delt:0.10,
+  triceps_biceps:0.20, triceps_lats:0.20, triceps_mid_back:0.15,
+  abs_lats:0.20, abs_chest:0.10, abs_biceps:0.05, abs_triceps:0.05,
+  rear_delt_biceps:0.35,
+};
+
+function getInterference(a,b) {
+  return INTERFERENCE[a+'_'+b] ?? INTERFERENCE[b+'_'+a] ?? 0.08;
+}
+
+const EXERCISES = {
+  // ── BACK ─────────────────────────────────────────────────────────────────
+  // Lats
+  back_pullup:            { name:'Pull-Up / Chin-Up',               muscle:'lats',       type:'compound',  exp:'intermediate', maxSets:4, goals:{lbm:0.92,bf:0.62,vo2:0.48,str:0.98}, note:'Compound — full lat stretch + max strength' },
+  back_lat_pulldown:      { name:'Lat Pulldown',                     muscle:'lats',       type:'isolation', exp:'novice',       maxSets:4, goals:{lbm:0.90,bf:0.52,vo2:0.22,str:0.68}, note:'Full lat stretch, adjustable load' },
+  back_straight_pulldown: { name:'Straight-Arm Cable Pulldown',      muscle:'lats',       type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.85,bf:0.50,vo2:0.18,str:0.55}, note:'Lat isolation, no bicep involvement' },
+  back_single_pulldown:   { name:'Single-Arm Cable Pulldown',        muscle:'lats',       type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.88,bf:0.50,vo2:0.20,str:0.60}, note:'Unilateral lat focus' },
+  // Mid Back
+  back_row_close:         { name:'Seated Row (Close Grip)',           muscle:'mid_back',   type:'compound',  exp:'novice',       maxSets:4, goals:{lbm:0.88,bf:0.50,vo2:0.22,str:0.65}, note:'Mid back / rhomboids — horizontal pull' },
+  back_row_chest_sup:     { name:'Chest-Supported Row (Machine)',     muscle:'mid_back',   type:'compound',  exp:'novice',       maxSets:4, goals:{lbm:0.90,bf:0.50,vo2:0.20,str:0.70}, note:'Removes lower back from equation' },
+  back_cable_row_mid:     { name:'Cable Row (Neutral Grip)',          muscle:'mid_back',   type:'compound',  exp:'novice',       maxSets:3, goals:{lbm:0.85,bf:0.48,vo2:0.20,str:0.62}, note:'Constant tension through ROM' },
+  // Upper Back
+  back_row_wide:          { name:'Seated Row (Wide / Overhand)',      muscle:'upper_back', type:'compound',  exp:'novice',       maxSets:4, goals:{lbm:0.82,bf:0.48,vo2:0.20,str:0.60}, note:'Upper back / traps — horizontal pull' },
+  back_face_pull:         { name:'Face Pull (Rope)',                  muscle:'upper_back', type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.78,bf:0.45,vo2:0.18,str:0.45}, note:'Rear delt + external rotation, injury prevention' },
+  back_shrug_cable:       { name:'Cable Shrug',                      muscle:'upper_back', type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.80,bf:0.45,vo2:0.15,str:0.55}, note:'Trap isolation — constant tension' },
+  back_meadow_row:        { name:'Meadows Row (Landmine)',            muscle:'upper_back', type:'compound',  exp:'intermediate', maxSets:3, goals:{lbm:0.85,bf:0.50,vo2:0.22,str:0.72}, note:'High lat + upper back involvement' },
+  // Rear Delt
+  rear_delt_cable_fly:    { name:'Single Arm Rear Delt Cable Fly',    muscle:'rear_delt',  type:'isolation', exp:'beginner',     maxSets:3, goals:{lbm:0.65,bf:0.38,vo2:0.12,str:0.42}, note:'270–360° ROM arc' },
+  rear_delt_machine:      { name:'Rear Delt Machine Fly',             muscle:'rear_delt',  type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.68,bf:0.40,vo2:0.12,str:0.40}, note:'Bilateral, easy to load progressively' },
+  rear_delt_bent_over:    { name:'Bent-Over Lateral Raise',           muscle:'rear_delt',  type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.62,bf:0.38,vo2:0.14,str:0.38}, note:'Gravity-loaded, strict form required' },
+
+  // ── CHEST ────────────────────────────────────────────────────────────────
+  chest_flat_press:       { name:'Flat Barbell / DB Press',           muscle:'chest',      type:'compound',  exp:'beginner',     maxSets:4, goals:{lbm:0.90,bf:0.50,vo2:0.25,str:1.00}, note:'Primary chest mass builder' },
+  chest_incline_press:    { name:'Incline Press (BB or DB)',          muscle:'chest',      type:'compound',  exp:'beginner',     maxSets:4, goals:{lbm:0.88,bf:0.50,vo2:0.22,str:0.92}, note:'Upper pec emphasis' },
+  chest_machine_press:    { name:'Chest Press (Machine)',             muscle:'chest',      type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.85,bf:0.50,vo2:0.20,str:0.70}, note:'Fixed ROM, safe high rep' },
+  chest_cable_fly:        { name:'Cable Fly (Low-to-High)',           muscle:'chest',      type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.75,bf:0.45,vo2:0.15,str:0.40}, note:'Constant tension, peak contraction' },
+  chest_pec_deck:         { name:'Pec Deck Machine',                  muscle:'chest',      type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.78,bf:0.45,vo2:0.15,str:0.42}, note:'Adduction isolation, no shoulder stress' },
+  chest_dips:             { name:'Weighted Dips (Forward Lean)',      muscle:'chest',      type:'compound',  exp:'intermediate', maxSets:3, goals:{lbm:0.85,bf:0.52,vo2:0.28,str:0.88}, note:'Lower pec + tricep compound' },
+
+  // ── TRICEPS — all 3 heads ─────────────────────────────────────────────────
+  // Long head (overhead stretch)
+  tri_overhead_ext:       { name:'Overhead Tricep Extension (Cable)', muscle:'triceps_long',   type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.85,bf:0.38,vo2:0.12,str:0.55}, note:'Long head fully stretched overhead' },
+  tri_skull_crusher:      { name:'Skull Crusher (EZ Bar)',            muscle:'triceps_long',   type:'isolation', exp:'beginner',     maxSets:3, goals:{lbm:0.82,bf:0.38,vo2:0.12,str:0.60}, note:'Long head emphasis, heavy loading' },
+  // Lateral head (pushdown)
+  tri_pushdown_bar:       { name:'Tricep Pushdown (Straight Bar)',    muscle:'triceps_lateral', type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.78,bf:0.38,vo2:0.12,str:0.52}, note:'Lateral head, high peak contraction' },
+  tri_pushdown_single:    { name:'Single Arm Cable Pushdown',         muscle:'triceps_lateral', type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.76,bf:0.38,vo2:0.12,str:0.50}, note:'Unilateral lateral head isolation' },
+  // Medial head (close-grip / dip variation)
+  tri_close_grip_press:   { name:'Close-Grip Bench Press',            muscle:'triceps_medial',  type:'compound',  exp:'beginner',     maxSets:3, goals:{lbm:0.80,bf:0.40,vo2:0.14,str:0.72}, note:'Medial head + strength carryover' },
+  tri_dip_upright:        { name:'Tricep Dip (Upright)',              muscle:'triceps_medial',  type:'compound',  exp:'intermediate', maxSets:3, goals:{lbm:0.78,bf:0.42,vo2:0.16,str:0.68}, note:'Medial + lateral, bodyweight overload' },
+
+  // ── BICEPS ───────────────────────────────────────────────────────────────
+  biceps_incline_curl:    { name:'Incline Seated DB Curl',            muscle:'biceps',     type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.85,bf:0.38,vo2:0.12,str:0.50}, note:'Long head peak stretch' },
+  biceps_ez_cable_curl:   { name:'EZ Bar Cable Curl',                 muscle:'biceps',     type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.80,bf:0.38,vo2:0.12,str:0.55}, note:'Constant tension through ROM' },
+  biceps_hammer_curl:     { name:'Hammer Curl (DB)',                  muscle:'biceps',     type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.75,bf:0.38,vo2:0.12,str:0.55}, note:'Brachialis + brachioradialis' },
+  biceps_spider_curl:     { name:'Spider Curl (Incline Bench)',       muscle:'biceps',     type:'isolation', exp:'beginner',     maxSets:3, goals:{lbm:0.82,bf:0.38,vo2:0.12,str:0.48}, note:'Short head peak contraction' },
+  biceps_machine_curl:    { name:'Preacher Curl (Machine)',           muscle:'biceps',     type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.80,bf:0.38,vo2:0.12,str:0.52}, note:'Elbow stabilised, isolated curl' },
+
+  // ── SIDE DELTS ───────────────────────────────────────────────────────────
+  side_delt_cable:        { name:'Cable Lateral Raise',               muscle:'side_delt',  type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.80,bf:0.50,vo2:0.15,str:0.40}, note:'Constant tension, peak abduction' },
+  side_delt_db:           { name:'DB Lateral Raise',                  muscle:'side_delt',  type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.78,bf:0.48,vo2:0.15,str:0.38}, note:'Classic medial delt isolation' },
+  side_delt_machine:      { name:'Lateral Raise (Machine)',           muscle:'side_delt',  type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.76,bf:0.48,vo2:0.14,str:0.36}, note:'Fixed arc, easy to overload' },
+
+  // ── FRONT DELTS ──────────────────────────────────────────────────────────
+  front_delt_press:       { name:'Overhead Press (BB or DB)',         muscle:'front_delt', type:'compound',  exp:'beginner',     maxSets:3, goals:{lbm:0.85,bf:0.45,vo2:0.20,str:0.88}, note:'Primary front delt + lateral head' },
+  front_delt_raise:       { name:'Front Raise (Cable)',               muscle:'front_delt', type:'isolation', exp:'novice',       maxSets:2, goals:{lbm:0.70,bf:0.40,vo2:0.14,str:0.38}, note:'Anterior delt isolation' },
+
+  // ── ABS ──────────────────────────────────────────────────────────────────
+  abs_hanging_leg_raise:  { name:'Hanging Leg Raise',                 muscle:'abs',        type:'isolation', exp:'intermediate', maxSets:3, goals:{lbm:0.60,bf:0.60,vo2:0.40,str:0.55}, note:'Highest EMG rectus' },
+  abs_weighted_crunch:    { name:'Weighted Cable Crunch',             muscle:'abs',        type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.65,bf:0.55,vo2:0.20,str:0.65}, note:'Heavy loaded spinal flexion' },
+  abs_ab_wheel:           { name:'Ab Wheel Rollout',                  muscle:'abs',        type:'isolation', exp:'beginner',     maxSets:3, goals:{lbm:0.62,bf:0.58,vo2:0.35,str:0.60}, note:'Full anterior chain anti-extension' },
+
+  // ── LEGS (group movements — no per-muscle labeling) ──────────────────────
+  legs_squat:             { name:'Barbell Back Squat',                muscle:'legs',       type:'compound',  exp:'beginner',     maxSets:5, goals:{lbm:0.95,bf:0.65,vo2:0.35,str:1.00}, note:'Quad dominant, total leg stimulus' },
+  legs_front_squat:       { name:'Front Squat',                       muscle:'legs',       type:'compound',  exp:'intermediate', maxSets:4, goals:{lbm:0.92,bf:0.60,vo2:0.32,str:0.92}, note:'Quad emphasis, upright torso' },
+  legs_goblet_squat:      { name:'Goblet Squat (DB)',                 muscle:'legs',       type:'compound',  exp:'novice',       maxSets:4, goals:{lbm:0.88,bf:0.62,vo2:0.30,str:0.72}, note:'Beginner-friendly squat pattern' },
+  legs_leg_press:         { name:'Leg Press (Machine)',               muscle:'legs',       type:'compound',  exp:'novice',       maxSets:4, goals:{lbm:0.92,bf:0.60,vo2:0.30,str:0.85}, note:'High load, foot position adjustable' },
+  legs_rdl:               { name:'Romanian Deadlift (RDL)',           muscle:'legs',       type:'compound',  exp:'beginner',     maxSets:4, goals:{lbm:0.88,bf:0.55,vo2:0.25,str:0.90}, note:'Posterior chain — ham + glute stretch' },
+  legs_bulgarian:         { name:'Bulgarian Split Squat',             muscle:'legs',       type:'compound',  exp:'intermediate', maxSets:4, goals:{lbm:0.90,bf:0.60,vo2:0.32,str:0.85}, note:'Unilateral quad + glute overload' },
+  legs_hip_thrust:        { name:'Hip Thrust (Machine or Barbell)',   muscle:'legs',       type:'compound',  exp:'novice',       maxSets:4, goals:{lbm:0.85,bf:0.58,vo2:0.22,str:0.80}, note:'Peak glute contraction' },
+  legs_leg_curl:          { name:'Leg Curl (Seated or Lying)',        muscle:'legs',       type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.80,bf:0.52,vo2:0.22,str:0.58}, note:'Hamstring isolation' },
+  legs_leg_extension:     { name:'Leg Extension (Machine)',           muscle:'legs',       type:'isolation', exp:'novice',       maxSets:3, goals:{lbm:0.80,bf:0.52,vo2:0.25,str:0.55}, note:'Quad isolation, terminal extension' },
+};
+
+// MEV / MAV / MRV per muscle per training level
+const LANDMARKS = {
+  novice:       { lats:[4,10,14], mid_back:[4,10,14], upper_back:[4,8,12],  rear_delt:[4,8,12],  chest:[4,10,14],  front_delt:[2,6,10],  side_delt:[6,12,16],  biceps:[4,10,14],  triceps_long:[4,8,12], triceps_lateral:[4,8,12], triceps_medial:[3,6,10], abs:[4,8,16],   quads:[6,12,16],  hamstrings:[4,10,14],  glutes:[4,10,16]  },
+  beginner:     { lats:[6,12,16], mid_back:[6,12,16], upper_back:[4,10,14], rear_delt:[4,10,14], chest:[6,12,16],  front_delt:[2,6,10],  side_delt:[8,14,20],  biceps:[6,12,16],  triceps_long:[5,10,14], triceps_lateral:[5,10,14], triceps_medial:[4,8,12], abs:[6,10,18],  quads:[8,14,18],  hamstrings:[6,12,16],  glutes:[6,12,18]  },
+  intermediate: { lats:[8,14,20], mid_back:[8,14,20], upper_back:[6,12,18], rear_delt:[6,12,18], chest:[8,14,20],  front_delt:[2,6,10],  side_delt:[10,16,22], biceps:[8,14,20],  triceps_long:[6,12,16], triceps_lateral:[6,12,16], triceps_medial:[5,10,14], abs:[8,14,20],  quads:[10,16,22], hamstrings:[8,14,20],  glutes:[8,14,20]  },
+  advanced:     { lats:[10,16,22],mid_back:[10,16,22],upper_back:[8,14,20], rear_delt:[8,14,20], chest:[10,16,22], front_delt:[0,4,8],   side_delt:[12,18,26], biceps:[10,16,22], triceps_long:[8,14,20], triceps_lateral:[8,14,20], triceps_medial:[6,12,16], abs:[10,16,24], quads:[12,18,24], hamstrings:[10,16,22], glutes:[10,16,22] },
+  elite:        { lats:[12,20,26],mid_back:[12,20,26],upper_back:[10,16,22],rear_delt:[10,16,22],chest:[12,18,24], front_delt:[0,4,8],   side_delt:[14,20,28], biceps:[12,18,24], triceps_long:[10,16,22], triceps_lateral:[10,16,22], triceps_medial:[8,14,18], abs:[12,20,28], quads:[14,20,28], hamstrings:[12,18,26], glutes:[12,18,26] },
+};
+
+const PROG_RATE = { novice:0.05, beginner:0.035, intermediate:0.02, advanced:0.01, elite:0.005 };
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function yearsToLevel(y) {
+  if (y < 0.75) return { level:'novice',       label:'NOVICE',       color:'#64748b', pct:8  };
+  if (y < 2)    return { level:'beginner',     label:'BEGINNER',     color:'#f97316', pct:25 };
+  if (y < 5)    return { level:'intermediate', label:'INTERMEDIATE', color:'#f59e0b', pct:50 };
+  if (y < 10)   return { level:'advanced',     label:'ADVANCED',     color:'#3b82f6', pct:75 };
+  return               { level:'elite',        label:'ELITE',        color:'#a855f7', pct:95 };
+}
+
+function updateLevel() {
+  const y = +document.getElementById('yearsTraining').value;
+  const { label, color, pct, level } = yearsToLevel(y);
+  document.getElementById('levelLabel').textContent = label;
+  document.getElementById('levelLabel').style.color = color;
+  document.getElementById('levelBar').style.width = pct + '%';
+  document.getElementById('levelBar').style.background = color;
+  document.getElementById('levelNote').textContent = `${y}yr → ${label.toLowerCase()} · MEV/MAV/MRV calibrated`;
+}
+
+function updateSliders() {
+  const vals = { lbm:+document.getElementById('pri_lbm').value, bf:+document.getElementById('pri_bf').value, vo2:+document.getElementById('pri_vo2').value, str:+document.getElementById('pri_str').value };
+  const total = vals.lbm+vals.bf+vals.vo2+vals.str || 1;
+  const colors = { lbm:'var(--blue)', bf:'var(--orange)', vo2:'var(--green)', str:'var(--purple)' };
+  Object.keys(vals).forEach(k => {
+    document.getElementById('lbl_'+k).textContent = vals[k];
+    const pct = (vals[k]/10)*100;
+    document.getElementById('pri_'+k).style.background = `linear-gradient(to right,${colors[k]} ${pct}%,var(--border2) ${pct}%)`;
+  });
+  const segs = document.querySelectorAll('#weightPie .pie-seg');
+  ['lbm','bf','vo2','str'].forEach((k,i) => { segs[i].style.width = ((vals[k]/total)*100)+'%'; });
+  document.getElementById('weightLabels').innerHTML = ['lbm','bf','vo2','str'].map((k,i) =>
+    `<span style="color:${['var(--blue)','var(--orange)','var(--green)','var(--purple)'][i]}">${k.toUpperCase()} ${Math.round(vals[k]/total*100)}%</span>`
+  ).join('');
+}
+
+function computeSleepScore(hrs, quality) {
+  const d = hrs<5?0.3:hrs<6?0.5:hrs<7?0.7:hrs<=9?0.9+(hrs-7)*0.05:0.9;
+  return (d*0.55) + (quality/10*0.45);
+}
+
+// Injury flag applies a fixed conservative modifier (0.65) instead of
+// the former subjective DOMS slider which had no quantitative basis.
+// Weights redistributed: daysSince 0.60, sleep 0.40 — both objective signals.
+function computeRecovery(sleepScore, daysSince, injured) {
+  const sleepCoeff = Math.min(sleepScore, 1.0);
+  const daysCoeff  = daysSince===0?0.50:daysSince===1?0.72:daysSince===2?0.88:Math.min(1.0,0.95+(daysSince-3)*0.01);
+  const base = daysCoeff*0.60 + sleepCoeff*0.40;
+  // Injury flag caps recovery at 0.65 regardless of days/sleep signals
+  return injured ? Math.min(base, 0.65) : Math.min(1.0, Math.max(0.05, base));
+}
+
+function recColor(s) { return s>=0.85?'#10b981':s>=0.65?'#f59e0b':s>=0.40?'#f97316':'#ef4444'; }
+
+function allocateVolume(recoveryData, trainingLevel) {
+  const lm = LANDMARKS[trainingLevel];
+  const results = [];
+  let totalFreedSets = 0;
+  Object.keys(ALL_MUSCLES).forEach(key => {
+    const m = ALL_MUSCLES[key];
+    const rec = recoveryData[key] || { score:0.8, doms:1, daysSince:2 };
+    const [mev,mav,mrv] = lm[key] || [4,10,16];
+    let targetSets;
+    if      (rec.score < 0.25) { targetSets=0; totalFreedSets+=mav; }
+    else if (rec.score < 0.45) { targetSets=Math.round(mev*0.75); }
+    else if (rec.score < 0.65) { targetSets=mev; }
+    else if (rec.score < 0.80) { targetSets=Math.round(mev+(mav-mev)*((rec.score-0.65)/0.15)); }
+    else if (rec.score < 0.92) { targetSets=mav; }
+    else                       { targetSets=Math.round(mav+(mrv-mav)*((rec.score-0.92)/0.08)); }
+    targetSets=Math.min(targetSets,mrv);
+    const status = targetSets===0?'skip':targetSets<=mev?'mev':targetSets<=mav?'mav':'mrv';
+    results.push({ key, ...m, rec:rec.score, doms:rec.doms, daysSince:rec.daysSince, mev,mav,mrv, targetSets, status });
+  });
+  // Reallocation
+  if (totalFreedSets > 0) {
+    const eligible = results.filter(r=>r.rec>=0.85&&r.targetSets<r.mrv).sort((a,b)=>b.rec-a.rec);
+    let rem = Math.min(totalFreedSets, eligible.length*4);
+    for (const e of eligible) {
+      if (rem<=0) break;
+      const add = Math.min(Math.ceil(rem/eligible.length), e.mrv-e.targetSets, 4);
+      e.targetSets+=add; e.reallocated=add; rem-=add;
+    }
+  }
+  return results;
+}
+
+function hypLevel(sets,mev,mav,mrv) {
+  if (sets===0)    return { label:'SKIP',          color:'#ef4444' };
+  if (sets<mev)    return { label:'SUB-MEV',        color:'#64748b' };
+  if (sets===mev)  return { label:'MAINTENANCE',    color:'#f97316' };
+  if (sets<mav)    return { label:'ACCUMULATION',   color:'#f59e0b' };
+  if (sets===mav)  return { label:'PEAK ADAPTIVE',  color:'#10b981' };
+  if (sets<mrv)    return { label:'HIGH VOLUME',    color:'#3b82f6' };
+  return                  { label:'MRV — PEAK',     color:'#a855f7' };
+}
+
+function getRepRange(w) {
+  const lo=Math.round(8*w.lbm+12*w.bf+15*w.vo2+4*w.str);
+  const hi=Math.round(15*w.lbm+20*w.bf+25*w.vo2+8*w.str);
+  return `${Math.max(4,lo)}–${Math.min(25,hi)}`;
+}
+
+function statusColor(s) { return {skip:'#ef444488',mev:'#f97316',mav:'#10b981',mrv:'#a855f7'}[s]||'#64748b'; }
+function statusLabel(s) { return {skip:'SKIP',mev:'MEV',mav:'MAV',mrv:'MRV'}[s]||''; }
+
+function epley1RM(w,r) { return (!w||!r)?null:Math.round(w*(1+r/30)); }
+function forecastMilestones(e1rm,rate,label,color) {
+  if (!e1rm) return null;
+  const wTo = t => Math.ceil(Math.log(t/e1rm)/Math.log(1+rate));
+  return { label,color,e1rm, ms110:Math.round(e1rm*1.10), ms125:Math.round(e1rm*1.25), ms150:Math.round(e1rm*1.50), w110:wTo(e1rm*1.10), w125:wTo(e1rm*1.25), w150:wTo(e1rm*1.50), rate };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GROUP SESSION ENGINE
+// Sessions = dedicated group days. Small muscles appended by volume bias.
+// Legs or Abs added as second block on applicable days (never both).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Session group definitions
+const SESSION_GROUPS = {
+  back:  { label:'Back',  color:'#3b82f6', muscles:['lats','mid_back','upper_back','rear_delt'], append:['biceps'] },
+  chest: { label:'Chest', color:'#f97316', muscles:['chest'], append:['triceps_long','triceps_lateral','triceps_medial','front_delt'] },
+  arms:  { label:'Arms',  color:'#10b981', muscles:['biceps','triceps_long','triceps_lateral','triceps_medial','side_delt'], append:[] },
+};
+
+// Which second block goes with which primary session
+// back → legs, chest → abs, arms → none
+const SECOND_BLOCK = { back:'legs', chest:'abs', arms:'none' };
+
+function allocateSessions(numSessions, w, volResults) {
+  // Score each group by total weighted volume of its muscles
+  const groupScore = (muscles) => muscles.reduce((sum, mk) => {
+    const vol = volResults.find(r => r.key === mk);
+    const goalScore = Object.entries(UPPER_MUSCLES[mk]?.goals || {})
+      .reduce((s,[k,v]) => s + v*(w[k]||0), 0);
+    return sum + (vol ? vol.targetSets : 0) * goalScore;
+  }, 0);
+
+  // Always include back and chest. Arms only at 5+ days.
+  const baseGroups = ['back','chest'];
+  const sessions = [];
+
+  if (numSessions <= 2) {
+    // 2 days: back + chest, one each
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'legs' });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'abs'  });
+  } else if (numSessions === 3) {
+    // 3 days: back / chest / back (back gets more frequency — pulling volume typically higher)
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'legs' });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'abs'  });
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'abs'  });
+  } else if (numSessions === 4) {
+    // 4 days: back / chest / back / chest
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'legs' });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'abs'  });
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'abs'  });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'legs' });
+  } else if (numSessions === 5) {
+    // 5 days: back / chest / arms / back / chest
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'legs' });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'abs'  });
+    sessions.push({ group:'arms',  ...SESSION_GROUPS.arms,  secondBlock:'none' });
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'abs'  });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'legs' });
+  } else {
+    // 6 days: back / chest / arms / back / chest / arms
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'legs' });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'abs'  });
+    sessions.push({ group:'arms',  ...SESSION_GROUPS.arms,  secondBlock:'none' });
+    sessions.push({ group:'back',  ...SESSION_GROUPS.back,  secondBlock:'abs'  });
+    sessions.push({ group:'chest', ...SESSION_GROUPS.chest, secondBlock:'legs' });
+    sessions.push({ group:'arms',  ...SESSION_GROUPS.arms,  secondBlock:'none' });
+  }
+
+  return sessions;
+}
+
+// Select exercises for a muscle key from the expanded pool
+function selectGroupExercises(muscleKey, w, expLevel, targetSets) {
+  const expIdx = ['novice','beginner','intermediate','advanced','elite'].indexOf(expLevel);
+  const pool = Object.values(EXERCISES)
+    .filter(e => e.muscle === muscleKey &&
+      ['novice','beginner','intermediate','advanced','elite'].indexOf(e.exp) <= expIdx)
+    .map(e => ({ ...e, score: Object.entries(e.goals)
+      .reduce((s,[k,v]) => s + v*(w[k]||0), 0) + (e.type==='compound'?0.2:0) }))
+    .sort((a,b) => b.score - a.score);
+
+  const result = []; let rem = targetSets;
+  for (const ex of pool) {
+    if (rem <= 0 || result.length >= 4) break;
+    const assigned = Math.min(ex.maxSets||3, rem);
+    result.push({ ...ex, prescribedSets: assigned });
+    rem -= assigned;
+  }
+  return result;
+}
+
+// Build all exercises for a group session, volume-weighted by muscle
+function buildGroupExercises(session, w, expLevel, volResults, scheme) {
+  const allExercises = [];
+  const allMuscles = [...session.muscles, ...session.append];
+
+  // Get volume for each muscle, use as set allocation weight
+  const muscleSets = {};
+  allMuscles.forEach(mk => {
+    const vol = volResults.find(r => r.key === mk);
+    muscleSets[mk] = vol ? Math.max(vol.targetSets, 4) : scheme.sets * 2;
+  });
+
+  // Primary muscles get full volume, appended get half (recovery headroom)
+  session.muscles.forEach(mk => {
+    const ex = selectGroupExercises(mk, w, expLevel, muscleSets[mk]);
+    allExercises.push(...ex);
+  });
+  session.append.forEach(mk => {
+    const sets = Math.ceil((muscleSets[mk]||scheme.sets*2) * 0.55);
+    const ex = selectGroupExercises(mk, w, expLevel, Math.max(sets, 3));
+    allExercises.push(...ex);
+  });
+
+  // Sort: compounds first, then by score
+  return allExercises.sort((a,b) => {
+    if (a.type==='compound' && b.type!=='compound') return -1;
+    if (b.type==='compound' && a.type!=='compound') return 1;
+    // Group by muscle so same-muscle exercises stay together
+    if (a.muscle !== b.muscle) return 0;
+    return b.score - a.score;
+  });
+}
+
+// Build legs group exercises (all movements treated as one unit)
+function buildLegsExercises(w, expLevel, scheme, volResults) {
+  const expIdx = ['novice','beginner','intermediate','advanced','elite'].indexOf(expLevel);
+  const pool = Object.values(EXERCISES)
+    .filter(e => e.muscle === 'legs' &&
+      ['novice','beginner','intermediate','advanced','elite'].indexOf(e.exp) <= expIdx)
+    .map(e => ({ ...e, score: Object.entries(e.goals)
+      .reduce((s,[k,v]) => s + v*(w[k]||0), 0) + (e.type==='compound'?0.25:0) }))
+    .sort((a,b) => b.score - a.score);
+
+  // Total leg sets from volume engine (quads + hams + glutes combined)
+  const legVol = ['quads','hamstrings','glutes']
+    .map(k => volResults.find(r=>r.key===k)?.targetSets||0)
+    .reduce((a,b)=>a+b,0);
+  const targetSets = Math.max(legVol, scheme.sets * 3);
+
+  const result = []; let rem = targetSets;
+  for (const ex of pool) {
+    if (rem <= 0 || result.length >= 6) break;
+    const assigned = Math.min(ex.maxSets||4, rem);
+    result.push({ ...ex, prescribedSets: assigned });
+    rem -= assigned;
+  }
+  return result;
+}
+
+// Build abs exercises
+function buildAbsExercises(w, expLevel, scheme) {
+  const expIdx = ['novice','beginner','intermediate','advanced','elite'].indexOf(expLevel);
+  return Object.values(EXERCISES)
+    .filter(e => e.muscle === 'abs' &&
+      ['novice','beginner','intermediate','advanced','elite'].indexOf(e.exp) <= expIdx)
+    .map(e => ({ ...e, score: Object.entries(e.goals).reduce((s,[k,v])=>s+v*(w[k]||0),0),
+      prescribedSets: Math.min(e.maxSets||3, 3) }))
+    .sort((a,b) => b.score - a.score)
+    .slice(0, 3);
+}
+
+const EXP_ORDER=['novice','beginner','intermediate','advanced','elite'];
+
+function getScheme(w,expLevel) {
+  const cfg={ novice:{rlo:12,rhi:20,slo:3,shi:3,rir:3}, beginner:{rlo:10,rhi:15,slo:3,shi:4,rir:2}, intermediate:{rlo:8,rhi:15,slo:3,shi:4,rir:2}, advanced:{rlo:6,rhi:15,slo:4,shi:5,rir:1}, elite:{rlo:5,rhi:12,slo:4,shi:6,rir:1} }[expLevel];
+  const repLo=Math.round(cfg.rlo*w.lbm+12*w.bf+15*w.vo2+cfg.rlo*w.str);
+  const repHi=Math.round(cfg.rhi*w.lbm+20*w.bf+20*w.vo2+8*w.str);
+  const sets =Math.max(cfg.slo,Math.min(Math.round(5*w.lbm+3*w.bf+3*w.vo2+5*w.str),cfg.shi+1));
+  const rest =Math.max(30,Math.min(Math.round(240*w.str+90*w.lbm+45*w.bf+60*w.vo2),300));
+  const rir  =Math.max(0,Math.min(Math.round(cfg.rir-w.str*1.5+w.bf*0.5),3));
+  const restL=rest>=60?Math.round(rest/60)+'min':rest+'s';
+  return {repLo,repHi,sets,restSec:rest,restLabel:restL,rir};
+}
+
+function selectExercises(muscleKey, w, expLevel, setsNeeded) {
+  const expIdx=EXP_ORDER.indexOf(expLevel);
+  const pool=Object.values(EXERCISES).filter(e=>e.muscle===muscleKey&&EXP_ORDER.indexOf(e.exp)<=expIdx)
+    .map(e=>({...e,score:Object.entries(e.goals).reduce((s,[k,v])=>s+v*(w[k]||0),0)+(e.type==='compound'?0.15*(w.lbm+w.str):0)}))
+    .sort((a,b)=>b.score-a.score);
+  const result=[]; let rem=setsNeeded;
+  for (const ex of pool) {
+    if(rem<=0||result.length>=3) break;
+    const assigned=Math.min(ex.maxSets||3,rem);
+    result.push({...ex,prescribedSets:assigned}); rem-=assigned;
+  }
+  return result;
+}
+
+function orderSession(muscleA, muscleB, exA, exB, w) {
+  const intAonB=getInterference(muscleA,muscleB);
+  const intBonA=getInterference(muscleB,muscleA);
+  const [first,second,fM,sM]=intAonB>=intBonA?[exA,exB,muscleA,muscleB]:[exB,exA,muscleB,muscleA];
+  const sort=g=>g.sort((a,b)=>{
+    if(a.type==='compound'&&b.type!=='compound') return -1;
+    if(b.type==='compound'&&a.type!=='compound') return 1;
+    return b.score-a.score;
+  });
+  return {ordered:[...sort(first),...sort(second)],firstMuscle:fM,secondMuscle:sM};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BUILD UI INPUTS
+// ═══════════════════════════════════════════════════════════════════════════════
+function buildInputs() {
+  const domsEl=document.getElementById('domsGrid');
+  const daysEl=document.getElementById('daysGrid');
+  const strEl =document.getElementById('strengthGrid');
+
+  Object.entries(ALL_MUSCLES).forEach(([key,m])=>{
+    // Injury flag toggle
+    const dc=document.createElement('div'); dc.className='injury-card';
+    dc.innerHTML=`<div class="injury-muscle" style="color:${m.color}">${m.label}</div>
+      <div class="injury-toggle">
+        <button class="itog active-ok" id="doms_${key}_ok" onclick="setInjury('${key}',false)">OK</button>
+        <button class="itog" id="doms_${key}_flag" onclick="setInjury('${key}',true)">⚑ Flag</button>
+      </div>`;
+    domsEl.appendChild(dc);
+    // Days
+    const dy=document.createElement('div'); dy.className='doms-card';
+    dy.innerHTML=`<div class="doms-muscle" style="color:${m.color}">${m.label}</div>
+      <input type="number" class="str-input" id="days_${key}" value="2" min="0" max="14" style="text-align:center;margin-top:4px">`;
+    daysEl.appendChild(dy);
+    // Strength
+    const sc=document.createElement('div'); sc.className='str-card';
+    sc.innerHTML=`<div class="str-muscle" style="color:${m.color}">${m.label}</div>
+      <div class="str-fields">
+        <div><input type="number" class="str-input" id="str_w_${key}" placeholder="lbs" min="0"><div class="str-sublabel">Weight</div></div>
+        <div><input type="number" class="str-input" id="str_r_${key}" placeholder="reps" min="1"><div class="str-sublabel">Reps</div></div>
+      </div>`;
+    strEl.appendChild(sc);
+  });
+}
+
+// Injury flag state — keyed by muscle key, true = flagged
+const INJURY_FLAGS = {};
+function setInjury(key, flagged) {
+  INJURY_FLAGS[key] = flagged;
+  const okBtn   = document.getElementById('doms_'+key+'_ok');
+  const flagBtn = document.getElementById('doms_'+key+'_flag');
+  if(okBtn)   { okBtn.className   = 'itog' + (flagged?'':' active-ok'); }
+  if(flagBtn) { flagBtn.className = 'itog' + (flagged?' active-flag':''); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VOLUME METER RENDERERS
+// ═══════════════════════════════════════════════════════════════════════════════
+function renderMasterMeter(volResults, trainingLevel) {
+  const total=volResults.reduce((s,r)=>s+r.targetSets,0);
+  const totalMAV=volResults.reduce((s,r)=>s+r.mav,0);
+  const totalMRV=volResults.reduce((s,r)=>s+r.mrv,0);
+  const totalMEV=volResults.reduce((s,r)=>s+r.mev,0);
+  const fillPct=Math.min(100,(total/totalMRV)*100);
+  const mavPct=(totalMAV/totalMRV)*100;
+  const mevPct=(totalMEV/totalMRV)*100;
+  const effPct=totalMAV>0?Math.round((total/totalMAV)*100):0;
+  const eff=effPct>=95?{t:'ALLOCATIVELY EFFICIENT',c:'#10b981'}:effPct>=75?{t:'APPROACHING EFFICIENCY',c:'#f59e0b'}:effPct>=50?{t:'BELOW MAV TARGET',c:'#f97316'}:{t:'RECOVERY-LIMITED',c:'#ef4444'};
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:800;color:var(--white);line-height:1">${total}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);margin-left:6px">pts / week</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted);margin-left:8px">of ${totalMRV} MRV</span>
+      </div>
+      <span class="efficiency-badge" style="background:${eff.c}20;color:${eff.c};border:1px solid ${eff.c}30">${eff.t} — ${effPct}% of MAV</span>
+    </div>
+    <div class="master-meter-wrap">
+      <div class="master-meter-fill" style="width:${fillPct}%">
+        <div class="master-meter-gradient"></div>
+        <div class="master-meter-text">${total} pts</div>
+      </div>
+      <div style="position:absolute;inset:0;pointer-events:none">
+        <div class="master-landmark-line" style="left:${mevPct}%"></div>
+        <div class="master-landmark-tag" style="left:${mevPct}%">MEV ${totalMEV}</div>
+        <div class="master-landmark-line" style="left:${mavPct}%"></div>
+        <div class="master-landmark-tag" style="left:${mavPct}%">MAV ${totalMAV}</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted)">
+      <span>0</span><span style="color:#f97316">MEV ${totalMEV}</span><span style="color:#10b981">MAV ${totalMAV} ← target</span><span style="color:#a855f7">MRV ${totalMRV}</span>
+    </div>`;
+}
+
+function renderMuscleMeters(volResults, repRange) {
+  return volResults.map(r=>{
+    const fillPct=r.mrv>0?Math.min(100,(r.targetSets/r.mrv)*100):0;
+    const barPct=fillPct;
+    const mavPct=r.mrv>0?(r.mav/r.mrv*100).toFixed(1):50;
+    const mevPct=r.mrv>0?(r.mev/r.mrv*100).toFixed(1):25;
+    const hl=hypLevel(r.targetSets,r.mev,r.mav,r.mrv);
+    const rc=recColor(r.rec);
+    return `
+      <div class="muscle-meter-card" id="mmcard_${r.key}">
+        <div class="mm-bg-fill" id="mmbg_${r.key}" style="height:${fillPct}%;background:${r.color}"></div>
+        <div class="mm-content">
+          <div class="mm-name" style="color:${r.color}">${r.label}</div>
+          <div class="mm-pts" id="mmpts_${r.key}" style="color:${r.targetSets===0?'var(--dim)':r.color}">${r.targetSets}</div>
+          <div class="mm-reps">${repRange} reps/set</div>
+          <div style="position:relative;margin-bottom:2px">
+            <div class="mm-bar-wrap"><div class="mm-bar" id="mmbar_${r.key}" style="width:${barPct}%;background:${r.color}"></div></div>
+            <div style="position:absolute;top:-2px;bottom:-2px;left:${mevPct}%;width:1px;background:rgba(249,115,22,0.5)"></div>
+            <div style="position:absolute;top:-2px;bottom:-2px;left:${mavPct}%;width:1px;background:rgba(16,185,129,0.6)"></div>
+          </div>
+          <div class="mm-ticks"><span>0</span><span style="color:#f97316">${r.mev}</span><span style="color:#10b981">${r.mav}</span><span style="color:#a855f7">${r.mrv}</span></div>
+          <span class="mm-hyp" id="mmhyp_${r.key}" style="background:${hl.color}18;color:${hl.color};border:1px solid ${hl.color}30">${hl.label}</span>
+          <div class="mm-stepper">
+            <button onclick="stepVol('${r.key}',-1)">−</button>
+            <div class="mm-stepper-info">MEV ${r.mev} · MAV ${r.mav}<br>${Math.round(r.rec*100)}% rec${r.injured?' · ⚑ flagged':''}</div>
+            <button onclick="stepVol('${r.key}',+1)">+</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function stepVol(key,delta) {
+  const r=window._volState.find(r=>r.key===key);
+  if(!r) return;
+  const nv=Math.max(0,Math.min(r.mrv,r.targetSets+delta));
+  if(nv===r.targetSets) return;
+  r.targetSets=nv;
+  r.status=nv===0?'skip':nv<=r.mev?'mev':nv<=r.mav?'mav':'mrv';
+  const fillPct=r.mrv>0?Math.min(100,(nv/r.mrv)*100):0;
+  const hl=hypLevel(nv,r.mev,r.mav,r.mrv);
+  const bg=document.getElementById('mmbg_'+key); if(bg) bg.style.height=fillPct+'%';
+  const pts=document.getElementById('mmpts_'+key); if(pts){pts.textContent=nv;pts.style.color=nv===0?'var(--dim)':r.color;}
+  const bar=document.getElementById('mmbar_'+key); if(bar) bar.style.width=fillPct+'%';
+  const hyp=document.getElementById('mmhyp_'+key); if(hyp){hyp.textContent=hl.label;hyp.style.color=hl.color;hyp.style.background=hl.color+'18';hyp.style.borderColor=hl.color+'30';}
+  // Update master meter
+  const total=window._volState.reduce((s,r)=>s+r.targetSets,0);
+  const totalMRV=window._volState.reduce((s,r)=>s+r.mrv,0);
+  const totalMAV=window._volState.reduce((s,r)=>s+r.mav,0);
+  const totalMEV=window._volState.reduce((s,r)=>s+r.mev,0);
+  const fillPctM=Math.min(100,(total/totalMRV)*100);
+  const mavPct=(totalMAV/totalMRV)*100;
+  const mevPct=(totalMEV/totalMRV)*100;
+  const effPct=totalMAV>0?Math.round((total/totalMAV)*100):0;
+  const eff=effPct>=95?{t:'ALLOCATIVELY EFFICIENT',c:'#10b981'}:effPct>=75?{t:'APPROACHING EFFICIENCY',c:'#f59e0b'}:effPct>=50?{t:'BELOW MAV TARGET',c:'#f97316'}:{t:'RECOVERY-LIMITED',c:'#ef4444'};
+  const mm=document.getElementById('masterMeterWrap'); if(!mm) return;
+  mm.querySelector('.master-meter-fill').style.width=fillPctM+'%';
+  mm.querySelector('.master-meter-text').textContent=total+' pts';
+  const totalDisp=mm.querySelector('.total-disp'); if(totalDisp) totalDisp.textContent=total;
+  const effBadge=mm.querySelector('.efficiency-badge'); if(effBadge){effBadge.textContent=eff.t+' — '+effPct+'% of MAV';effBadge.style.color=eff.c;effBadge.style.background=eff.c+'20';effBadge.style.borderColor=eff.c+'30';}
+  const lmLines=mm.querySelectorAll('.master-landmark-line');
+  const lmTags=mm.querySelectorAll('.master-landmark-tag');
+  if(lmLines[0]) lmLines[0].style.left=mevPct+'%';
+  if(lmLines[1]) lmLines[1].style.left=mavPct+'%';
+  if(lmTags[0]) { lmTags[0].style.left=mevPct+'%'; lmTags[0].textContent='MEV '+totalMEV; }
+  if(lmTags[1]) { lmTags[1].style.left=mavPct+'%'; lmTags[1].textContent='MAV '+totalMAV; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN GENERATE
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+// GOAL GAP ANALYSIS — derives directional emphasis from current vs target
+// Used to bias rep range, volume, and prescription toward specific adaptation
+// ─────────────────────────────────────────────────────────────────────────────
+function getGoalGaps() {
+  const cur_bf   = +document.getElementById('cur_bf').value;
+  const goal_bf  = +document.getElementById('goal_bf').value;
+  const cur_lbm  = +document.getElementById('cur_lbm').value;
+  const goal_lbm = +document.getElementById('goal_lbm').value;
+  const cur_vo2  = +document.getElementById('cur_vo2').value;
+  const goal_vo2 = +document.getElementById('goal_vo2').value;
+  const cur_str  = +document.getElementById('cur_str').value;
+  const goal_str = +document.getElementById('goal_str_target').value;
+
+  const bf_gap   = goal_bf  - cur_bf;   // negative = need to lose fat
+  const lbm_gap  = goal_lbm - cur_lbm;  // positive = need to gain muscle
+  const vo2_gap  = goal_vo2 - cur_vo2;  // positive = need more cardio
+  const str_gap  = goal_str - cur_str;  // positive = need more strength work
+
+  // Normalise gaps to 0–1 urgency scores
+  const bf_urgency  = Math.min(1, Math.abs(bf_gap)  / 10);
+  const lbm_urgency = Math.min(1, Math.abs(lbm_gap) / 20);
+  const vo2_urgency = Math.min(1, Math.abs(vo2_gap) / 20);
+  const str_urgency = Math.min(1, Math.abs(str_gap) / 1.5);
+
+  return { bf_gap, lbm_gap, vo2_gap, str_gap, bf_urgency, lbm_urgency, vo2_urgency, str_urgency,
+           cur_bf, goal_bf, cur_lbm, goal_lbm, cur_vo2, goal_vo2, cur_str, goal_str };
+}
+
+function updateGapSummary() {
+  const g = getGoalGaps();
+  const rows = [
+    { label:'BF%',  cur:g.cur_bf+'%',  goal:g.goal_bf+'%',  delta:(g.bf_gap>0?'+':'')+g.bf_gap.toFixed(1)+'pp', color: g.bf_gap<0?'#10b981':'#ef4444', dir: g.bf_gap<0?'↓ lose fat':'↑ gain fat' },
+    { label:'LBM',  cur:g.cur_lbm+'lb',goal:g.goal_lbm+'lb',delta:(g.lbm_gap>0?'+':'')+g.lbm_gap+'lb',          color: g.lbm_gap>0?'#3b82f6':'#f97316', dir: g.lbm_gap>0?'↑ build muscle':'↓ cut' },
+    { label:'VO₂',  cur:g.cur_vo2,     goal:g.goal_vo2,      delta:(g.vo2_gap>0?'+':'')+g.vo2_gap,               color: g.vo2_gap>0?'#10b981':'#f59e0b', dir: g.vo2_gap>0?'↑ cardio emphasis':'' },
+    { label:'STR×', cur:g.cur_str+'×', goal:g.goal_str+'×',  delta:(g.str_gap>0?'+':'')+g.str_gap.toFixed(2)+'×',color: g.str_gap>0?'#a855f7':'#f97316', dir: g.str_gap>0?'↑ strength emphasis':'' },
+  ];
+  document.getElementById('gapRows').innerHTML = rows.map(r=>`
+    <div style="background:var(--s3);border:1px solid var(--border);border-radius:2px;padding:5px 7px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">${r.label}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:700;color:${r.color}">${r.delta}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:var(--muted)">${r.cur} → ${r.goal}</div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GOAL-GAP ADJUSTED REP RANGE
+// Gaps shift the rep range toward the modality that closes them fastest
+// Fat loss gap → higher reps (metabolic), Muscle gap → hypertrophy range,
+// VO2 gap → endurance range, Strength gap → strength range
+// ─────────────────────────────────────────────────────────────────────────────
+function getAdjustedRepRange(w, gaps) {
+  // Base from goal weights
+  let lo = Math.round(8*w.lbm + 12*w.bf + 15*w.vo2 + 4*w.str);
+  let hi = Math.round(15*w.lbm + 20*w.bf + 25*w.vo2 + 8*w.str);
+
+  // Shift by urgency: each gap pulls rep range toward its modality
+  const bfPull  = gaps.bf_gap  < 0 ? gaps.bf_urgency  : 0; // fat to lose → higher reps
+  const lbmPull = gaps.lbm_gap > 0 ? gaps.lbm_urgency : 0; // muscle to gain → 8-15
+  const vo2Pull = gaps.vo2_gap > 0 ? gaps.vo2_urgency : 0; // vo2 to gain → higher reps
+  const strPull = gaps.str_gap > 0 ? gaps.str_urgency : 0; // strength to gain → lower reps
+
+  lo = Math.round(lo + bfPull*2 + vo2Pull*3 - strPull*2);
+  hi = Math.round(hi + bfPull*3 + vo2Pull*4 - strPull*3);
+
+  return `${Math.max(4,lo)}–${Math.min(30,hi)}`;
+}
+
+const DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+// ── WEEK SCHEDULER ──────────────────────────────────────────────────────────
+// Places sessions across a 7-day week enforcing rest between overlapping
+// muscle groups. Returns a full 7-slot week array with session or rest entries.
+function buildWeekSchedule(numSessions, sessions, hasLegDay, legBlock) {
+  // Canonical rest-enforcing templates per training frequency
+  const TEMPLATES = {
+    2: [0, 2],           // Mon Wed
+    3: [0, 2, 4],        // Mon Wed Fri
+    4: [0, 1, 3, 4],     // Mon Tue Thu Fri
+    5: [0, 1, 2, 4, 5],  // Mon Tue Wed Fri Sat
+    6: [0, 1, 2, 3, 4, 5], // Mon–Sat
+  };
+
+  const trainingSlots = TEMPLATES[Math.min(6, Math.max(2, numSessions))] || TEMPLATES[3];
+
+  // Build the leg day slot — place on a day not adjacent to a training day
+  // that hits legs (quads/hamstrings overlap with lower back from deadlifts etc)
+  let legSlot = -1;
+  if (hasLegDay && legBlock === 'standalone') {
+    const usedSlots = new Set(trainingSlots);
+    // Prefer a slot with at least 1 rest day buffer from last training day
+    const candidates = [0,1,2,3,4,5,6].filter(d => !usedSlots.has(d));
+    // Pick candidate with max gap from nearest training day
+    let bestGap = -1;
+    for (const c of candidates) {
+      const minGap = Math.min(...trainingSlots.map(t => Math.abs(t - c)));
+      if (minGap > bestGap) { bestGap = minGap; legSlot = c; }
+    }
+  }
+
+  // Build full 7-day week
+  const week = Array(7).fill(null).map((_, d) => {
+    const sessionIdx = trainingSlots.indexOf(d);
+    if (sessionIdx !== -1 && sessionIdx < sessions.length) {
+      return { type: 'session', sessionIdx, day: d };
+    }
+    if (d === legSlot) {
+      return { type: 'leg', day: d };
+    }
+    return { type: 'rest', day: d };
+  });
+
+  return week;
+}
+
+function generate() {
+  const years       = +document.getElementById('yearsTraining').value;
+  const bodyweight  = +document.getElementById('bodyweight').value;
+  const numSessions = +document.getElementById('sessionDays').value;
+  const sessionTime = +document.getElementById('sessionTime').value;
+  const sleepHrs    = +document.getElementById('sleepHrs').value;
+  const sleepQuality= +document.getElementById('sleepQuality').value;
+  const legBlock    = document.getElementById('legBlock').value;
+  const legFocus    = document.getElementById('legFocus').value;
+
+  const { level: expLevel } = yearsToLevel(years);
+  const raw = { lbm:+document.getElementById('pri_lbm').value, bf:+document.getElementById('pri_bf').value, vo2:+document.getElementById('pri_vo2').value, str:+document.getElementById('pri_str').value };
+  const total=raw.lbm+raw.bf+raw.vo2+raw.str||1;
+  const w={ lbm:raw.lbm/total, bf:raw.bf/total, vo2:raw.vo2/total, str:raw.str/total };
+
+  const sleepScore=computeSleepScore(sleepHrs,sleepQuality);
+  const recoveryData={};
+  Object.keys(ALL_MUSCLES).forEach(key=>{
+    const days=+document.getElementById('days_'+key).value;
+    const injured=!!(INJURY_FLAGS[key]);
+    recoveryData[key]={ score:computeRecovery(sleepScore,days,injured), injured, daysSince:days };
+  });
+
+  const volResults=allocateVolume(recoveryData, expLevel);
+  window._volState=volResults;
+
+  const scheme=getScheme(w,expLevel);
+  const gaps = getGoalGaps();
+  const repRange = getAdjustedRepRange(w, gaps);
+  // sessions built in week schedule block below
+
+  // Strength forecasts
+  const rate=PROG_RATE[expLevel];
+  const forecasts=[];
+  Object.entries(ALL_MUSCLES).forEach(([key,m])=>{
+    const wt=+document.getElementById('str_w_'+key).value;
+    const rp=+document.getElementById('str_r_'+key).value;
+    const e1rm=epley1RM(wt,rp);
+    if(e1rm){ const f=forecastMilestones(e1rm,rate,m.label,m.color); if(f) forecasts.push(f); }
+  });
+
+  // ── BUILD WEEK SCHEDULE + SESSION CARDS ────────────────────────────────────
+  const sessions = allocateSessions(numSessions, w, volResults);
+  const weekSchedule = buildWeekSchedule(numSessions, sessions, true, 'standalone');
+  const scheduledDayNames = weekSchedule
+    .filter(d => d.type === 'session')
+    .sort((a,b) => a.sessionIdx - b.sessionIdx)
+    .map(d => DAY_NAMES[d.day]);
+
+  const renderEx = (ex, i, scheme) => {
+    const isLegs = ex.muscle === 'legs';
+    const isAbs  = ex.muscle === 'abs';
+    const isPlyo = ex.name.includes('Plyometric') || ex.name.includes('Jump');
+    const mKey   = ex.muscle;
+    // Color: use group color for legs, muscle color for others
+    const mColor = isLegs ? '#a855f7'
+      : ALL_MUSCLES[mKey]?.color
+      || (mKey==='triceps_long'||mKey==='triceps_lateral'||mKey==='triceps_medial' ? '#34d399' : '#64748b');
+    const mLabel = isLegs ? 'Legs'
+      : ALL_MUSCLES[mKey]?.label
+      || (mKey==='triceps_long'?'Tricep — Long Head':mKey==='triceps_lateral'?'Tricep — Lateral Head':mKey==='triceps_medial'?'Tricep — Medial Head':mKey);
+    const reps = isAbs?'15–25':isPlyo?'5–8':`${scheme.repLo}–${scheme.repHi}`;
+    const sets = ex.prescribedSets || scheme.sets;
+    const rest = isAbs?'45s':isPlyo?'2min':scheme.restLabel;
+    const rir  = isAbs||isPlyo?'—':scheme.rir;
+    return `<tr>
+      <td><div class="ex-order-dot" style="background:${mColor}22;color:${mColor};border:1px solid ${mColor}44">${i+1}</div></td>
+      <td><div class="ex-name-cell">${ex.name}</div>
+          <div class="ex-muscle-sub">${mLabel} · ${ex.type} · ${ex.note}</div></td>
+      <td><div class="presc-val">${sets}</div><div class="presc-sub">sets</div></td>
+      <td><div class="presc-val">${reps}</div><div class="presc-sub">reps</div></td>
+      <td><div class="presc-val">${rest}</div><div class="presc-sub">rest</div></td>
+      <td><div class="presc-val">${rir}</div><div class="presc-sub">RIR</div></td>
+      <td><div class="presc-val" style="font-size:0.72rem;color:${mColor}">${(ex.score||0).toFixed(2)}</div><div class="presc-sub">score</div></td>
+    </tr>`;
+  };
+
+  const buildSessionCard = (session, idx, secondBlockExs, scheme) => {
+    const primaryExs  = buildGroupExercises(session, w, expLevel, volResults, scheme);
+    const totalSets   = primaryExs.reduce((s,e)=>s+(e.prescribedSets||scheme.sets),0)
+                      + secondBlockExs.reduce((s,e)=>s+(e.prescribedSets||scheme.sets),0);
+    const totalEx     = primaryExs.length + secondBlockExs.length;
+    const dayName     = scheduledDayNames[idx] || DAY_NAMES[idx] || 'Day '+(idx+1);
+    const secondLabel = session.secondBlock==='legs'?'+ Legs':'+ Abs';
+    const secondColor = session.secondBlock==='legs'?'#a855f7':'#f59e0b';
+    const allMuscleKeys = [...session.muscles,...session.append];
+    const musclePills = allMuscleKeys.map(mk => {
+      const col = ALL_MUSCLES[mk]?.color
+        ||(mk.startsWith('triceps')?'#34d399':'#64748b');
+      const lbl = ALL_MUSCLES[mk]?.label
+        ||(mk==='triceps_long'?'Tri Long':mk==='triceps_lateral'?'Tri Lateral':mk==='triceps_medial'?'Tri Medial':mk);
+      return `<span class="muscle-pill" style="background:${col}22;color:${col};border:1px solid ${col}44">${lbl}</span>`;
+    }).join('');
+
+    return `
+      <div class="session-card" style="animation-delay:${idx*50}ms">
+        <div class="session-header" onclick="toggleS(${idx})">
+          <div class="session-day">${dayName}</div>
+          <div class="session-muscles">
+            <span class="muscle-pill" style="background:${session.color}22;color:${session.color};border:1px solid ${session.color}44;font-weight:600">${session.label}</span>
+            ${musclePills}
+            ${session.secondBlock!=='none'?`<span class="muscle-pill" style="background:${secondColor}22;color:${secondColor};border:1px solid ${secondColor}44">${secondLabel}</span>`:''}
+          </div>
+          <div class="session-meta-right">${totalEx} ex · ${totalSets} sets<br><span style="font-size:0.5rem">▼ expand</span></div>
+        </div>
+        <div class="ex-table-wrap" id="sb_${idx}" style="display:none">
+
+          <!-- Primary block -->
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:2px;color:${session.color};padding:8px 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px">
+            ${session.label} — Primary Block · Volume-weighted · Compounds first
+          </div>
+          <table class="ex-table">
+            <thead><tr><th>#</th><th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th><th>RIR</th><th>Score</th></tr></thead>
+            <tbody>${primaryExs.map((e,i)=>renderEx(e,i,scheme)).join('')}</tbody>
+          </table>
+
+          ${secondBlockExs.length>0?`
+          <!-- Second block -->
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:2px;color:${secondColor};padding:8px 0 6px;border-bottom:1px solid var(--border);margin:14px 0 6px">
+            ${session.secondBlock==='legs'?'Legs':'Abs'} — Second Block · Independent fatigue window
+          </div>
+          <table class="ex-table">
+            <thead><tr><th>#</th><th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th><th>RIR</th><th>Score</th></tr></thead>
+            <tbody>${secondBlockExs.map((e,i)=>renderEx(e,i,scheme)).join('')}</tbody>
+          </table>`:''}
+
+        </div>
+      </div>`;
+  };
+
+  const sessionCards = sessions.map((session, idx) => {
+    let secondExs = [];
+    if (session.secondBlock === 'legs') secondExs = buildLegsExercises(w, expLevel, scheme, volResults);
+    if (session.secondBlock === 'abs')  secondExs = buildAbsExercises(w, expLevel, scheme);
+    return buildSessionCard(session, idx, secondExs, scheme);
+  }).join('');
+
+  // ── REALLOC NOTE ─────────────────────────────────────────────────────────
+  const skipped=volResults.filter(r=>r.status==='skip').map(r=>r.label).join(', ');
+  const realloced=volResults.filter(r=>r.reallocated).map(r=>`${r.label}+${r.reallocated}`).join(', ');
+
+  // ── PO FORECASTS ─────────────────────────────────────────────────────────
+  const poHTML=forecasts.length>0?forecasts.map(f=>`
+    <div class="po-card">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${f.color};margin-bottom:6px">${f.label}</div>
+      <div class="po-row">
+        <div><div class="po-label">Est. 1RM</div><div class="po-val" style="color:${f.color}">${f.e1rm} lbs</div></div>
+        <div><div class="po-label">110% — ${f.w110}wk</div><div class="po-val" style="color:#f59e0b">${f.ms110} lbs</div></div>
+        <div><div class="po-label">125% — ${f.w125}wk</div><div class="po-val" style="color:#f97316">${f.ms125} lbs</div></div>
+        <div><div class="po-label">150% — ${f.w150}wk</div><div class="po-val" style="color:#a855f7">${f.ms150} lbs</div></div>
+      </div>
+      <div class="po-progress-wrap"><div class="po-progress" style="width:${Math.min(100,Math.round((1/f.w110)*100))}%;background:${f.color}"></div></div>
+    </div>`).join('')
+    :`<div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);padding:10px">Enter weight × reps per muscle to see overload forecasts.</div>`;
+
+
+  // ── Persist profile to localStorage for milestone tracker ──────────────────
+  try {
+    const existing = JSON.parse(localStorage.getItem('sba_profile') || '{}');
+    localStorage.setItem('sba_profile', JSON.stringify({
+      ...existing,
+      cur_bf:    +document.getElementById('cur_bf').value,
+      goal_bf:   +document.getElementById('goal_bf').value,
+      cur_lbm:   +document.getElementById('cur_lbm').value,
+      goal_lbm:  +document.getElementById('goal_lbm').value,
+      cur_vo2:   +document.getElementById('cur_vo2').value,
+      goal_vo2:  +document.getElementById('goal_vo2').value,
+      cur_str:   +document.getElementById('cur_str').value,
+      goal_str:  +document.getElementById('goal_str_target').value,
+      bodyweight:+document.getElementById('bodyweight').value,
+      years:     +document.getElementById('yearsTraining').value,
+      wf_saved:  Date.now(),
+    }));
+  } catch(e) { console.warn('localStorage write failed', e); }
+  sbaSave();
+
+  // ── ASSEMBLE OUTPUT ───────────────────────────────────────────────────────
+  document.getElementById('output').innerHTML = `
+
+    <!-- Master budget meter -->
+    <div class="vol-section-title">Weekly Volume Budget</div>
+    <div class="card" style="padding:16px 18px;margin-bottom:16px" id="masterMeterWrap">
+      ${renderMasterMeter(volResults, expLevel)}
+    </div>
+
+    <!-- Muscle meters -->
+    <div class="muscle-meters-grid">
+      ${renderMuscleMeters(volResults, repRange)}
+    </div>
+
+    <!-- Session map -->
+    <div class="vol-section-title">Weekly Session Plan</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted);margin-bottom:10px;line-height:1.7">
+      Sets per session pulled from recovery-weighted volume budget · ${expLevel} prescription · ${repRange} reps · ${scheme.restLabel} rest · RIR ${scheme.rir}
+    </div>
+    <div class="week-map">${weekSchedule.map(slot => {
+      if (slot.type === 'session') {
+        const cards = [];
+        let rem = sessionCards;
+        const marker = '<div class="session-card"';
+        let pos = rem.indexOf(marker), prev = 0, count = 0;
+        while (pos !== -1) {
+          const next = rem.indexOf(marker, pos + marker.length);
+          cards.push(next === -1 ? rem.slice(pos) : rem.slice(pos, next));
+          prev = pos; pos = next; count++;
+        }
+        return cards[slot.sessionIdx] || '';
+      }
+      if (slot.type === 'leg') return ''; // legs now inside session cards
+      const isWeekend = slot.day >= 5;
+      return `<div style="display:flex;align-items:center;gap:12px;padding:9px 14px;background:var(--s1);border:1px solid var(--border);border-radius:5px;opacity:0.45">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);min-width:32px">${DAY_NAMES[slot.day]}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted)">${isWeekend ? '— off day' : '— rest · recovery'}</div>
+        <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--dim)">no training · muscle repair window</div>
+      </div>`;
+    }).join('')}</div>
+
+    <!-- Goal gap context -->
+    <div style="background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:0 4px 4px 0;padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--dim);line-height:1.75;margin-bottom:10px">
+      <strong style="color:var(--text)">Goal gap prescription adjustments:</strong>
+      ${gaps.bf_gap < 0 ? `BF% deficit of <span style="color:#10b981">${Math.abs(gaps.bf_gap).toFixed(1)}pp</span> → rep range shifted higher (metabolic density emphasis). ` : ''}
+      ${gaps.lbm_gap > 0 ? `LBM deficit of <span style="color:#3b82f6">+${gaps.lbm_gap}lbs</span> → hypertrophy volume prioritized. ` : ''}
+      ${gaps.vo2_gap > 0 ? `VO₂ deficit of <span style="color:#10b981">+${gaps.vo2_gap}</span> → endurance rep range contribution increased. ` : ''}
+      ${gaps.str_gap > 0 ? `Strength deficit of <span style="color:#a855f7">+${gaps.str_gap.toFixed(2)}×</span> → rep range pulled lower, strength landmark volume increased. ` : ''}
+      Rep range: <strong style="color:var(--white)">${repRange}</strong>
+    </div>
+
+    <!-- Realloc note -->
+    <div class="realloc-note">
+      <strong>Volume engine:</strong>
+      ${skipped?`${skipped} skipped (recovery &lt;25%). `:' All muscles cleared. '}
+      ${realloced?`Reallocated to ${realloced}. `:''}
+      Sleep ${sleepHrs}hrs · ${(computeSleepScore(sleepHrs,sleepQuality)*100).toFixed(0)}% coefficient · ${years}yr training → ${expLevel} landmarks.
+    </div>
+
+    <!-- Progressive overload -->
+    <div class="vol-section-title">Progressive Overload Forecast</div>
+    ${poHTML}
+  `;
+}
+
+function toggleS(idx) {
+  const el=document.getElementById('sb_'+idx);
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+
+// Init
+buildInputs();
+updateSliders();
+updateLevel();
+updateGapSummary();
+
+// Wire goal target inputs to live gap summary
+['cur_bf','goal_bf','cur_lbm','goal_lbm','cur_vo2','goal_vo2','cur_str','goal_str_target'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', updateGapSummary);
+});
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BF PICKER — global reusable module
+// Usage: bfPickerOpen('inputElementId', currentValue, sex)
+// On confirm: writes selected value back to input, dispatches 'input' event
+// ─────────────────────────────────────────────────────────────────────────────
+
+const BFP_TIERS = {
+  male: [
+    { max:6,  label:'Essential Fat',   color:'#10b981', desc:'Minimum fat required for organ function. Competition-lean. Not sustainable long-term — hormonal and immune suppression risk.' },
+    { max:9,  label:'Stage Ready',     color:'#14b8a6', desc:'Competition bodybuilding range. Visible striations on all muscle groups. Requires careful monitoring.' },
+    { max:12, label:'Athletic — Peak', color:'#3b82f6', desc:'Peak health composition. Maximum testosterone:estrogen ratio. Vascularity high. Optimal across all health markers.' },
+    { max:15, label:'Athletic',        color:'#60a5fa', desc:'Athletic body composition. All major muscle groups clearly visible. Excellent hormonal and cardiovascular profile.' },
+    { max:18, label:'Fitness',         color:'#f59e0b', desc:'Fit, healthy composition. Muscle definition visible. Good metabolic health. Minor visceral fat beginning.' },
+    { max:22, label:'Average — Active',color:'#f97316', desc:'Average active adult. Some abdominal fat. Hormonal and metabolic health still solid. Visible softness over muscle groups.' },
+    { max:26, label:'Average',         color:'#fb923c', desc:'Population average. Moderate visceral fat. Insulin sensitivity declining. Testosterone:estrogen ratio shifting.' },
+    { max:30, label:'Overweight',      color:'#ef4444', desc:'Elevated visceral fat. Insulin resistance likely. Aromatase increasing — testosterone converting to estrogen.' },
+    { max:40, label:'Obese',           color:'#dc2626', desc:'High visceral fat burden. Systemic chronic inflammation. Significant metabolic and cardiovascular disease risk.' },
+  ],
+  female: [
+    { max:14, label:'Essential Fat',   color:'#10b981', desc:'At or below essential fat for females. Hormonal disruption likely — estrogen suppression affects bone density.' },
+    { max:18, label:'Athletic — Peak', color:'#14b8a6', desc:'Athletic competition range. Excellent definition. Monitor — sustained periods below 16% may affect hormonal cycling.' },
+    { max:22, label:'Athletic',        color:'#3b82f6', desc:'Healthy athletic composition. Excellent cardiovascular and metabolic profile. Optimal health range for active females.' },
+    { max:26, label:'Fitness',         color:'#60a5fa', desc:'Fit composition. Good metabolic health. Muscle definition visible. Healthy hormonal profile maintained.' },
+    { max:30, label:'Average — Active',color:'#f59e0b', desc:'Healthy active female range. Minor fat accumulation but metabolically sound.' },
+    { max:34, label:'Average',         color:'#f97316', desc:'Population average. Moderate fat accumulation. Insulin sensitivity declining. Cardiovascular markers manageable.' },
+    { max:42, label:'Above Average',   color:'#ef4444', desc:'Elevated adiposity. Increasing visceral fat. Metabolic and cardiovascular risk rising.' },
+  ]
+};
+
+let _bfpTargetId = null;
+let _bfpSex = 'male';
+let _bfpVal = 14;
+
+
+window._bfOpen = function(inputId) {
+  var el = document.getElementById(inputId);
+  if (!el) return;
+  var sex = 'male';
+  try { var s = document.getElementById('sex'); if (s) sex = s.value; } catch(e) {}
+  bfPickerOpen(inputId, parseFloat(el.value) || 14, sex);
+};
+
+function bfPickerOpen(targetInputId, currentVal, sex) {
+  _bfpTargetId = targetInputId;
+  _bfpSex      = sex || 'male';
+  _bfpVal      = currentVal || 14;
+
+  // Set sex buttons
+  document.getElementById('bfpBtnMale').classList.toggle('active',   _bfpSex==='male');
+  document.getElementById('bfpBtnFemale').classList.toggle('active', _bfpSex==='female');
+
+  // Set slider range
+  const sl = document.getElementById('bfpSlider');
+  sl.min   = _bfpSex==='female' ? 10 : 4;
+  sl.max   = _bfpSex==='female' ? 42 : 40;
+  sl.value = _bfpVal;
+  _buildTicks();
+  bfpOnSlide(_bfpVal);
+
+  // Store starting BF% as baseline for marginal calculations
+  _bfpBaseBF = currentVal || 14;
+  document.getElementById('bfPickerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function bfPickerClose() {
+  document.getElementById('bfPickerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function bfPickerConfirm() {
+  if (_bfpTargetId) {
+    const el = document.getElementById(_bfpTargetId);
+    if (el) {
+      el.value = _bfpVal;
+      el.dispatchEvent(new Event('input', { bubbles:true }));
+      el.dispatchEvent(new Event('change',{ bubbles:true }));
+    }
+  }
+  bfPickerClose();
+}
+
+function bfpSetSex(sex) {
+  _bfpSex = sex;
+  document.getElementById('bfpBtnMale').classList.toggle('active',   sex==='male');
+  document.getElementById('bfpBtnFemale').classList.toggle('active', sex==='female');
+  const sl = document.getElementById('bfpSlider');
+  sl.min = sex==='female'?10:4;
+  sl.max = sex==='female'?42:40;
+  if (+sl.value < +sl.min) sl.value = +sl.min;
+  _buildTicks();
+  bfpOnSlide(sl.value);
+}
+
+function _buildTicks() {
+  const sl    = document.getElementById('bfpSlider');
+  const min   = +sl.min, max = +sl.max;
+  const steps = [min, Math.round(min+(max-min)*0.25), Math.round(min+(max-min)*0.5), Math.round(min+(max-min)*0.75), max];
+  document.getElementById('bfpTicks').innerHTML = steps.map(v=>`<span>${v}%</span>`).join('');
+}
+
+function bfpOnSlide(val) {
+  _bfpVal = +val;
+  const tiers = BFP_TIERS[_bfpSex];
+  const tier  = tiers.find(t => _bfpVal <= t.max) || tiers[tiers.length-1];
+
+  // Update slider track fill
+  const sl = document.getElementById('bfpSlider');
+  if (sl) {
+    const pct = ((+val - +sl.min) / (+sl.max - +sl.min)) * 100;
+    sl.style.background = `linear-gradient(to right,${tier.color} ${pct}%,#1e1e38 ${pct}%)`;
+  }
+
+  // Update big pct display
+  const bigEl = document.getElementById('bfpPctBig');
+  bigEl.textContent = (+val).toFixed(1);
+  bigEl.style.color = tier.color;
+
+  // Tier label
+  const tlEl = document.getElementById('bfpTierLabel');
+  tlEl.textContent   = tier.label;
+  tlEl.style.background = tier.color + '20';
+  tlEl.style.color   = tier.color;
+  tlEl.style.border  = `1px solid ${tier.color}40`;
+
+  // Tier description
+  document.getElementById('bfpTierDesc').textContent = tier.desc;
+  document.getElementById('bfpTierDesc').style.color = tier.color + 'cc';
+
+  // Confirm button
+  document.getElementById('bfpConfirmVal').textContent = (+val).toFixed(1);
+
+  // Health scores — bars show absolute level, label shows marginal delta vs start
+  const sc = _bfpScores(+val, _bfpSex);
+  // Bar width = absolute health score (where on the curve is this BF%)
+  // Label = marginal delta from starting point (positive = improvement)
+  _setBarMarginal('bfpBarH',    'bfpValH',    sc.hormonalAbs,  sc.hormonal,  100);
+  _setBarMarginal('bfpBarC',    'bfpValC',    sc.cardioAbs,    sc.cardio,    100);
+  _setBarMarginal('bfpBarM',    'bfpValM',    sc.metabolicAbs, sc.metabolic, 100);
+  _setBarMarginalMort('bfpBarMort','bfpValMort', sc.mortalityAbs, sc.mortality, 30);
+
+  // Redraw silhouette
+  _bfpDrawBody(+val, _bfpSex, tier.color);
+}
+
+function _setBar(barId, valId, val, max, prefix, suffix) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) b.style.width = Math.round(val/max*100)+'%';
+  if(v) v.textContent = (prefix||'')+val+(suffix||'');
+}
+
+// Bar width = absolute score position on curve
+// Label = marginal delta from starting BF% (+ good, - bad)
+function _setBarMarginal(barId, valId, absVal, delta, max) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) {
+    b.style.width = Math.round(absVal/max*100)+'%';
+    // Color shift: green if improving, orange if same, red if worse
+    b.style.background = delta > 2 ? '#10b981' : delta < -2 ? '#ef4444' : '#f59e0b';
+  }
+  if(v) {
+    const sign = delta > 0 ? '+' : '';
+    v.textContent = sign + delta;
+    v.style.color  = delta > 2 ? '#10b981' : delta < -2 ? '#ef4444' : '#f59e0b';
+  }
+}
+function _setBarMarginalMort(barId, valId, absVal, delta, max) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) {
+    b.style.width = Math.round(absVal/max*100)+'%';
+    b.style.background = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#f59e0b';
+  }
+  if(v) {
+    const sign = delta > 0 ? '-' : delta < 0 ? '+' : '';
+    v.textContent = sign + Math.abs(delta) + '%';
+    v.style.color  = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#f59e0b';
+  }
+}
+
+let _bfpBaseBF = 14; // set when picker opens
+
+// _bfpScores returns MARGINAL benefit scores relative to starting BF%
+// Bars show: how much does moving from _bfpBaseBF to 'bf' improve each category
+// Positive delta = improvement, negative = regression
+// Each category peaks at its optimal BF% — not at the leanest point
+function _bfpAbsScores(bf, sex) {
+  const male = sex === 'male';
+  // Hormonal — peaks at ~11% male, ~21% female (aromatase minimum)
+  // Drops on both sides: too lean suppresses hormones, too heavy converts T→E
+  const hormonalPeak = male ? 11 : 21;
+  const hormonal  = Math.max(5,  Math.min(100, 100 - Math.pow(Math.abs(bf - hormonalPeak)*3.5, 1.1)));
+  // Cardiovascular — monotonically better as BF falls (to a floor around essential fat)
+  // At 4% it's not the best — risk curve reverses at extremes
+  const cardioFloor = male ? 6 : 13;
+  const cardio = bf < cardioFloor
+    ? Math.max(40, 90 - (cardioFloor - bf) * 8)   // reversal below essential fat
+    : Math.max(10, Math.min(90, 100 - (bf - cardioFloor) * 2.6));
+  // Metabolic / insulin — best between 8-12% male, 16-20% female
+  const metPeak = male ? 10 : 18;
+  const metabolic = Math.max(8, Math.min(95,
+    bf < metPeak
+      ? 95 - Math.pow((metPeak - bf) * 2.5, 1.2)   // too lean impairs metabolic flexibility
+      : 95 - Math.max(0, bf - metPeak) * 3.0));
+  // Mortality — peaks around 10-12% male, nonlinear curve
+  // Very low BF reverses the mortality benefit
+  const mortPeak = male ? 11 : 20;
+  const mortality = Math.max(0, Math.min(30,
+    bf < mortPeak
+      ? 30 - Math.pow((mortPeak - bf) * 2, 1.3) * 0.5   // slight reversal at extremes
+      : Math.max(0, 30 - (bf - mortPeak) * 1.0)));
+  return {
+    hormonal:  Math.round(Math.max(0, Math.min(100, hormonal))),
+    cardio:    Math.round(Math.max(0, Math.min(100, cardio))),
+    metabolic: Math.round(Math.max(0, Math.min(100, metabolic))),
+    mortality: Math.round(Math.max(0, Math.min(30,  mortality))),
+  };
+}
+
+function _bfpScores(bf, sex) {
+  // Returns marginal delta vs the starting BF% when picker was opened
+  const base = _bfpAbsScores(_bfpBaseBF || bf, sex);
+  const curr = _bfpAbsScores(bf, sex);
+  return {
+    hormonal:  curr.hormonal  - base.hormonal,
+    cardio:    curr.cardio    - base.cardio,
+    metabolic: curr.metabolic - base.metabolic,
+    mortality: curr.mortality - base.mortality,
+    // Also expose absolute for bar width calculation
+    hormonalAbs:  curr.hormonal,
+    cardioAbs:    curr.cardio,
+    metabolicAbs: curr.metabolic,
+    mortalityAbs: curr.mortality,
+  };
+}
+
+// Procedural SVG body — same morphing logic as body-composition-visual.html
+function _bfpDrawBody(bf, sex, col) {
+  const svg = document.getElementById('bfpBodySvg');
+  if (!svg) return;
+  const isMale = sex === 'male';
+  const MIN = isMale ? 4 : 10, MAX = isMale ? 40 : 42;
+  const t = Math.max(0, Math.min(1, (bf - MIN) / (MAX - MIN)));
+  // t=0 → lean/shredded, t=1 → high BF
+  const L = (a, b) => a + (b - a) * t;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // ── Canvas: 220 wide × 480 tall ──────────────────────────────────────────
+  const cx = 110;
+
+  // ── Detail opacity curves ─────────────────────────────────────────────────
+  // All curves: at t=0 (5% BF) → full opacity. Fade as fat covers muscle.
+  const vascOp   = clamp((0.13 - bf) / 0.09, 0, 1.0);   // sub-13% only
+  const sepOp    = clamp(1 - t * 1.6, 0, 1.0);           // separation lines
+  const absOp    = clamp(1 - t * 1.9, 0, 1.0);           // ab grid
+  const pecOp    = clamp(1 - t * 1.4, 0, 1.0);           // pec shelf
+  const oblOp    = clamp(1 - t * 1.7, 0, 1.0);           // obliques
+  const striatOp = clamp(1 - t * 3.5, 0, 0.7);           // striations: sub-10% only
+  const vCutOp   = clamp((0.16 - bf) / 0.12, 0, 1.0);   // V-cut: sub-16%
+
+  // ── Key measurements ──────────────────────────────────────────────────────
+  const headR    = 20;
+  const headCY   = 36;
+  const headW    = 19; // slightly oval
+
+  // Neck
+  const neckW    = L(isMale ? 11 : 9,  isMale ? 13 : 12);
+  const neckTop  = headCY + headR - 3;
+  const neckBot  = neckTop + 16;
+
+  // Trapezius sweep — wider at lean
+  const trapW    = L(isMale ? 10 : 7, isMale ? 6 : 4); // trap peak above shoulder
+  const shoulderY = neckBot + 5;
+  // Shoulder width — deltoid caps visible at lean
+  const shoulderW = L(isMale ? 57 : 50, isMale ? 65 : 62);
+  // Deltoid cap protrusion at lean
+  const deltCap   = L(isMale ? 6 : 4, isMale ? 2 : 1);
+
+  // Chest
+  const chestY   = shoulderY + 18;
+  const chestW   = L(isMale ? 44 : 38, isMale ? 56 : 54);
+  // Pec lower border Y
+  const pecBotY  = chestY + L(isMale ? 28 : 22, isMale ? 32 : 26);
+
+  // Waist
+  const waistW   = L(isMale ? 29 : 25, isMale ? 52 : 50);
+  const waistY   = pecBotY + L(isMale ? 20 : 18, isMale ? 26 : 22);
+
+  // Belly bulge — nonlinear, only appears above ~18%
+  const bellyT   = Math.max(0, (t - 0.3) / 0.7);
+  const belly    = bellyT * bellyT * (isMale ? 32 : 24);
+
+  // Hips / iliac crest
+  const hipsW    = L(isMale ? 40 : 48, isMale ? 58 : 68);
+  const hipsY    = waistY + L(18, 24);
+  // Iliac crest visible protrusion at lean
+  const iliacPop = L(isMale ? 4 : 3, 0);
+
+  // Crotch / legs
+  const crotchY  = hipsY + 20;
+  const thighTopW = L(isMale ? 24 : 28, isMale ? 34 : 42);
+  const thighMidW = L(isMale ? 20 : 23, isMale ? 29 : 36);
+  const kneeW     = L(isMale ? 14 : 13, isMale ? 20 : 19);
+  const calfPeakW = L(isMale ? 16 : 15, isMale ? 22 : 21);
+  const ankleW    = L(isMale ? 8 : 7,   isMale ? 12 : 11);
+  const kneeY     = crotchY + 80;
+  const calfPeakY = kneeY + 50;
+  const ankleY    = kneeY + 110;
+
+  // Arms
+  const shoulderCapY = shoulderY + 8;
+  const bicepPeakW   = L(isMale ? 14 : 10, isMale ? 18 : 14);
+  const forearmW     = L(isMale ? 10 : 8,  isMale ? 13 : 11);
+  const wristW       = L(isMale ? 6 : 5,   isMale ? 8 : 7);
+  const elbowY       = shoulderCapY + 75;
+  const wristY       = elbowY + 80;
+  const armOutX      = cx + shoulderW + deltCap;
+  const armInX       = cx + shoulderW - 8;
+
+  // ── SINGLE CONTINUOUS BODY PATH ──────────────────────────────────────────
+  // One closed path: down the right silhouette, across the base, up the left.
+  // Each transition shares tangent directions — no corners between regions.
+  // Shorthand: R(x,y) = cx+x,y  L(x,y) = cx-x,y
+
+  // Derived arm geometry (corrected — no double-subtraction)
+  const armROutX  = cx + shoulderW + deltCap + 4;  // right arm outer edge
+  const armLOutX  = cx - shoulderW - deltCap - 4;  // left arm outer edge
+  const armRInX   = cx + shoulderW - 6;             // right arm inner edge
+  const armLInX   = cx - shoulderW + 6;             // left arm inner edge
+
+  // ── RIGHT ARM — single smooth closed shape ────────────────────────────────
+  // Flows from deltoid cap, outer bicep sweep, forearm taper, wrist, back up inner
+  const rArm = `M ${cx + shoulderW - 2} ${shoulderCapY + 6}
+    C ${armROutX - 2} ${shoulderCapY + 18},
+      ${armROutX + bicepPeakW - 4} ${elbowY - 45},
+      ${armROutX + forearmW - 6}   ${elbowY + 2}
+    C ${armROutX + forearmW - 8} ${elbowY + 38},
+      ${armROutX + wristW - 2}    ${wristY - 14},
+      ${armROutX + wristW - 4}    ${wristY}
+    C ${armROutX - wristW + 2}    ${wristY + 3},
+      ${armROutX - wristW}        ${wristY}
+      ${armROutX - wristW}        ${wristY}
+    C ${armROutX - forearmW + 4}  ${wristY - 12},
+      ${armRInX  + forearmW - 8}  ${elbowY + 35},
+      ${armRInX  + forearmW - 6}  ${elbowY + 4}
+    C ${armRInX  - 2} ${elbowY - 18},
+      ${armRInX  + 2} ${shoulderCapY + 26},
+      ${cx + shoulderW} ${shoulderCapY + 14}
+    Z`;
+
+  // ── LEFT ARM — true mirror of right ──────────────────────────────────────
+  const lArm = `M ${cx - shoulderW + 2} ${shoulderCapY + 6}
+    C ${armLOutX + 2} ${shoulderCapY + 18},
+      ${armLOutX - bicepPeakW + 4} ${elbowY - 45},
+      ${armLOutX - forearmW + 6}   ${elbowY + 2}
+    C ${armLOutX - forearmW + 8} ${elbowY + 38},
+      ${armLOutX - wristW + 2}    ${wristY - 14},
+      ${armLOutX - wristW + 4}    ${wristY}
+    C ${armLOutX + wristW - 2}    ${wristY + 3},
+      ${armLOutX + wristW}        ${wristY}
+      ${armLOutX + wristW}        ${wristY}
+    C ${armLOutX + forearmW - 4}  ${wristY - 12},
+      ${armLInX  - forearmW + 8}  ${elbowY + 35},
+      ${armLInX  - forearmW + 6}  ${elbowY + 4}
+    C ${armLInX  + 2} ${elbowY - 18},
+      ${armLInX  - 2} ${shoulderCapY + 26},
+      ${cx - shoulderW} ${shoulderCapY + 14}
+    Z`;
+
+  // ── FULL BODY — one continuous closed path ────────────────────────────────
+  // Right side: top of neck → right shoulder → chest → waist → hip → thigh → knee → calf → ankle
+  // Base: right ankle across to left ankle
+  // Left side: left ankle → calf → knee → thigh → hip → waist → chest → shoulder → top of neck
+  // Each C command: cp1x cp1y, cp2x cp2y, endx endy
+  // Tangent continuity rule: cp2 of segment N reflected through endpoint = cp1 of segment N+1
+
+  const fullBody = `
+    M ${cx + neckW} ${neckTop}
+
+    C ${cx + neckW + 1}       ${neckTop + 6},
+      ${cx + neckW + trapW*0.4} ${neckBot - 4},
+      ${cx + neckW + trapW*0.7} ${neckBot + 2}
+
+    C ${cx + shoulderW*0.55}  ${neckBot + 8},
+      ${cx + shoulderW - deltCap} ${shoulderY - 6},
+      ${cx + shoulderW + deltCap*0.3} ${shoulderY + 2}
+
+    C ${cx + shoulderW + deltCap} ${shoulderY + 8},
+      ${cx + shoulderW + deltCap*0.8} ${shoulderCapY + 4},
+      ${cx + shoulderW - 2}   ${shoulderCapY + 10}
+
+    C ${cx + chestW + 3}      ${shoulderCapY + 22},
+      ${cx + chestW + 1}      ${chestY + 8},
+      ${cx + chestW - 1}      ${pecBotY - 6}
+
+    C ${cx + chestW - 2}      ${pecBotY + 4},
+      ${cx + waistW + belly + 6} ${waistY - 14},
+      ${cx + waistW + belly}  ${waistY}
+
+    C ${cx + waistW + belly - 1} ${waistY + 10},
+      ${cx + hipsW - iliacPop - 2} ${hipsY - 10},
+      ${cx + hipsW + 1}       ${hipsY + 2}
+
+    C ${cx + hipsW + 3}       ${hipsY + 12},
+      ${cx + thighTopW + 6}   ${crotchY - 8},
+      ${cx + thighTopW + 2}   ${crotchY + 4}
+
+    C ${cx + thighMidW + 5}   ${crotchY + 22},
+      ${cx + thighMidW + 4}   ${kneeY - 28},
+      ${cx + kneeW + 3}       ${kneeY - 4}
+
+    C ${cx + kneeW + 2}       ${kneeY + 8},
+      ${cx + calfPeakW + 5}   ${calfPeakY - 6},
+      ${cx + calfPeakW + 2}   ${calfPeakY + 10}
+
+    C ${cx + calfPeakW - 2}   ${calfPeakY + 28},
+      ${cx + ankleW + 3}      ${ankleY - 14},
+      ${cx + ankleW}          ${ankleY}
+
+    L ${cx - ankleW}          ${ankleY}
+
+    C ${cx - ankleW - 3}      ${ankleY - 14},
+      ${cx - calfPeakW + 2}   ${calfPeakY + 28},
+      ${cx - calfPeakW - 2}   ${calfPeakY + 10}
+
+    C ${cx - calfPeakW - 5}   ${calfPeakY - 6},
+      ${cx - kneeW - 2}       ${kneeY + 8},
+      ${cx - kneeW - 3}       ${kneeY - 4}
+
+    C ${cx - thighMidW - 4}   ${kneeY - 28},
+      ${cx - thighMidW - 5}   ${crotchY + 22},
+      ${cx - thighTopW - 2}   ${crotchY + 4}
+
+    C ${cx - thighTopW - 6}   ${crotchY - 8},
+      ${cx - hipsW - 3}       ${hipsY + 12},
+      ${cx - hipsW - 1}       ${hipsY + 2}
+
+    C ${cx - hipsW + iliacPop + 2} ${hipsY - 10},
+      ${cx - waistW - belly + 1} ${waistY + 10},
+      ${cx - waistW - belly}  ${waistY}
+
+    C ${cx - waistW - belly - 6} ${waistY - 14},
+      ${cx - chestW + 2}      ${pecBotY + 4},
+      ${cx - chestW + 1}      ${pecBotY - 6}
+
+    C ${cx - chestW - 1}      ${chestY + 8},
+      ${cx - chestW - 3}      ${shoulderCapY + 22},
+      ${cx - shoulderW + 2}   ${shoulderCapY + 10}
+
+    C ${cx - shoulderW - deltCap*0.8} ${shoulderCapY + 4},
+      ${cx - shoulderW - deltCap}     ${shoulderY + 8},
+      ${cx - shoulderW - deltCap*0.3} ${shoulderY + 2}
+
+    C ${cx - shoulderW + deltCap}   ${shoulderY - 6},
+      ${cx - shoulderW*0.55}        ${neckBot + 8},
+      ${cx - neckW - trapW*0.7}     ${neckBot + 2}
+
+    C ${cx - neckW - trapW*0.4} ${neckBot - 4},
+      ${cx - neckW - 1}        ${neckTop + 6},
+      ${cx - neckW}            ${neckTop}
+
+    Z`;
+
+  // ── MUSCLE DETAIL LINES ─────────────────────────────────────────────────────
+  // Full anatomical set — every surface muscle identifiable at 5% BF
+
+  // ── CHEST ────────────────────────────────────────────────────────────────
+  // Pec lower border (infra-sternal fold)
+  const pecLine = `M ${cx-chestW+5} ${pecBotY-2}
+    C ${cx-14} ${pecBotY+6} ${cx-6} ${pecBotY+3} ${cx} ${pecBotY+2}
+    C ${cx+6} ${pecBotY+3} ${cx+14} ${pecBotY+6} ${cx+chestW-5} ${pecBotY-2}`;
+  // Sternal groove
+  const sternalLine = `M ${cx} ${chestY+2} L ${cx} ${pecBotY+2}`;
+  // Pec upper border — clavicular head sweeps to anterior delt
+  const pecUpperR = `M ${cx+3} ${chestY+2} C ${cx+18} ${chestY-4} ${cx+shoulderW-18} ${shoulderCapY+10} ${cx+shoulderW-12} ${shoulderCapY+16}`;
+  const pecUpperL = `M ${cx-3} ${chestY+2} C ${cx-18} ${chestY-4} ${cx-shoulderW+18} ${shoulderCapY+10} ${cx-shoulderW+12} ${shoulderCapY+16}`;
+  // Inner pec — medial border curvature
+  const pecInnerR = `M ${cx+4} ${chestY+6} Q ${cx+8} ${pecBotY-8} ${cx+6} ${pecBotY}`;
+  const pecInnerL = `M ${cx-4} ${chestY+6} Q ${cx-8} ${pecBotY-8} ${cx-6} ${pecBotY}`;
+
+  // ── DELTOIDS — 3 heads visible at lean ──────────────────────────────────
+  // Anterior delt / pec-delt groove
+  const deltFrontR = `M ${cx+shoulderW-2} ${shoulderY+2} C ${cx+shoulderW+deltCap*0.8} ${shoulderY+10} ${cx+shoulderW+deltCap*0.5} ${shoulderCapY+8} ${cx+chestW+3} ${chestY+4}`;
+  const deltFrontL = `M ${cx-shoulderW+2} ${shoulderY+2} C ${cx-shoulderW-deltCap*0.8} ${shoulderY+10} ${cx-shoulderW-deltCap*0.5} ${shoulderCapY+8} ${cx-chestW-3} ${chestY+4}`;
+  // Lateral delt cap — curved dome
+  const deltCapR = `M ${cx+shoulderW-4} ${shoulderY} C ${cx+shoulderW+deltCap+2} ${shoulderY+8} ${cx+shoulderW+deltCap+1} ${shoulderCapY+8} ${cx+shoulderW-2} ${shoulderCapY+14}`;
+  const deltCapL = `M ${cx-shoulderW+4} ${shoulderY} C ${cx-shoulderW-deltCap-2} ${shoulderY+8} ${cx-shoulderW-deltCap-1} ${shoulderCapY+8} ${cx-shoulderW+2} ${shoulderCapY+14}`;
+  // Deltoid insertion line (delt → bicep transition)
+  const deltInsR = `M ${cx+shoulderW+deltCap*0.3} ${shoulderCapY+16} Q ${cx+shoulderW-2} ${shoulderCapY+30} ${armROutX+forearmW} ${shoulderCapY+50}`;
+  const deltInsL = `M ${cx-shoulderW-deltCap*0.3} ${shoulderCapY+16} Q ${cx-shoulderW+2} ${shoulderCapY+30} ${armLOutX-forearmW} ${shoulderCapY+50}`;
+
+  // ── TRAPEZIUS — upper and mid ─────────────────────────────────────────────
+  const trapLineR = `M ${cx+neckW+2} ${neckBot-2} C ${cx+neckW+trapW*0.9} ${neckBot+8} ${cx+shoulderW-deltCap*2} ${shoulderY-4} ${cx+shoulderW-8} ${shoulderY+4}`;
+  const trapLineL = `M ${cx-neckW-2} ${neckBot-2} C ${cx-neckW-trapW*0.9} ${neckBot+8} ${cx-shoulderW+deltCap*2} ${shoulderY-4} ${cx-shoulderW+8} ${shoulderY+4}`;
+  // Mid trap — vertical spine border
+  const midTrapR = `M ${cx+6} ${neckBot+10} Q ${cx+10} ${chestY+4} ${cx+8} ${pecBotY-6}`;
+  const midTrapL = `M ${cx-6} ${neckBot+10} Q ${cx-10} ${chestY+4} ${cx-8} ${pecBotY-6}`;
+
+  // ── BICEP — short + long head ────────────────────────────────────────────
+  const bicepLongR = `M ${armROutX+bicepPeakW*0.1} ${shoulderCapY+22} C ${armROutX+bicepPeakW*0.6} ${elbowY-55} ${armROutX+forearmW*0.8} ${elbowY-20} ${armROutX+forearmW-3} ${elbowY-2}`;
+  const bicepShortR= `M ${armROutX-bicepPeakW*0.3} ${shoulderCapY+28} Q ${armROutX+bicepPeakW*0.1} ${elbowY-45} ${armROutX+forearmW*0.3} ${elbowY-4}`;
+  const bicepLongL = `M ${armLOutX-bicepPeakW*0.1} ${shoulderCapY+22} C ${armLOutX-bicepPeakW*0.6} ${elbowY-55} ${armLOutX-forearmW*0.8} ${elbowY-20} ${armLOutX-forearmW+3} ${elbowY-2}`;
+  const bicepShortL= `M ${armLOutX+bicepPeakW*0.3} ${shoulderCapY+28} Q ${armLOutX-bicepPeakW*0.1} ${elbowY-45} ${armLOutX-forearmW*0.3} ${elbowY-4}`;
+
+  // ── TRICEP — lateral + long head ────────────────────────────────────────
+  const tricepLatR = `M ${armROutX+bicepPeakW*0.2} ${shoulderCapY+18} C ${armROutX+bicepPeakW+2} ${elbowY-50} ${armROutX+forearmW+4} ${elbowY-25} ${armROutX+forearmW+1} ${elbowY}`;
+  const tricepLatL = `M ${armLOutX-bicepPeakW*0.2} ${shoulderCapY+18} C ${armLOutX-bicepPeakW-2} ${elbowY-50} ${armLOutX-forearmW-4} ${elbowY-25} ${armLOutX-forearmW-1} ${elbowY}`;
+  const tricepLongR= `M ${armRInX-2} ${shoulderCapY+16} Q ${armRInX+4} ${elbowY-30} ${armROutX+forearmW-4} ${elbowY+2}`;
+  const tricepLongL= `M ${armLInX+2} ${shoulderCapY+16} Q ${armLInX-4} ${elbowY-30} ${armLOutX-forearmW+4} ${elbowY+2}`;
+
+  // ── FOREARM — extensor + flexor groups ──────────────────────────────────
+  const forearmExtR = `M ${armROutX+forearmW-4} ${elbowY+8} Q ${armROutX+forearmW-2} ${elbowY+45} ${armROutX+wristW+2} ${wristY-12}`;
+  const forearmExtL = `M ${armLOutX-forearmW+4} ${elbowY+8} Q ${armLOutX-forearmW+2} ${elbowY+45} ${armLOutX-wristW-2} ${wristY-12}`;
+  const forearmFlxR = `M ${armRInX+forearmW-8} ${elbowY+10} Q ${armRInX+forearmW-4} ${elbowY+42} ${armROutX-wristW+4} ${wristY-10}`;
+
+  // ── SERRATUS ANTERIOR ─────────────────────────────────────────────────────
+  const serratusR = [0,1,2,3].map(i =>
+    `M ${cx+chestW-8} ${pecBotY+3+i*10} C ${cx+chestW+2} ${pecBotY+7+i*10} ${cx+chestW+1} ${pecBotY+12+i*10} ${cx+chestW-10} ${pecBotY+16+i*10}`
+  ).join(' ');
+  const serratusL = [0,1,2,3].map(i =>
+    `M ${cx-chestW+8} ${pecBotY+3+i*10} C ${cx-chestW-2} ${pecBotY+7+i*10} ${cx-chestW-1} ${pecBotY+12+i*10} ${cx-chestW+10} ${pecBotY+16+i*10}`
+  ).join(' ');
+
+  // ── RECTUS ABDOMINIS — 6 pack + linea ────────────────────────────────────
+  const lineaAlba = `M ${cx} ${pecBotY+3} L ${cx} ${waistY-3}`;
+  const absLines  = [0,1,2].map(i => {
+    const y = pecBotY + 12 + i * 15;
+    return `M ${cx-11} ${y} C ${cx-5} ${y-3} ${cx+5} ${y-3} ${cx+11} ${y}`;
+  }).join(' ');
+  // Rectus border lines — defines the ab column width
+  const absColR = `M ${cx+10} ${pecBotY+4} L ${cx+10} ${waistY-4}`;
+  const absColL = `M ${cx-10} ${pecBotY+4} L ${cx-10} ${waistY-4}`;
+
+  // ── OBLIQUES — external + internal sweep ─────────────────────────────────
+  const obliqueR = `M ${cx+chestW-6} ${pecBotY+10} C ${cx+chestW+2} ${waistY-20} ${cx+waistW+belly+8} ${waistY-8} ${cx+hipsW-8} ${hipsY-2}`;
+  const obliqueL = `M ${cx-chestW+6} ${pecBotY+10} C ${cx-chestW-2} ${waistY-20} ${cx-waistW-belly-8} ${waistY-8} ${cx-hipsW+8} ${hipsY-2}`;
+  const oblIntR  = `M ${cx+chestW-12} ${pecBotY+18} Q ${cx+waistW+4} ${waistY-4} ${cx+hipsW-16} ${hipsY+4}`;
+  const oblIntL  = `M ${cx-chestW+12} ${pecBotY+18} Q ${cx-waistW-4} ${waistY-4} ${cx-hipsW+16} ${hipsY+4}`;
+
+  // ── ILIAC / V-CUT ─────────────────────────────────────────────────────────
+  const iliacR = `M ${cx+waistW+belly-2} ${waistY+4} C ${cx+hipsW-4} ${hipsY-14} ${cx+thighTopW+6} ${crotchY-10} ${cx+thighTopW+2} ${crotchY-2}`;
+  const iliacL = `M ${cx-waistW-belly+2} ${waistY+4} C ${cx-hipsW+4} ${hipsY-14} ${cx-thighTopW-6} ${crotchY-10} ${cx-thighTopW-2} ${crotchY-2}`;
+  // Hip flexor line (tensor fascia latae)
+  const tfaR = `M ${cx+hipsW-4} ${hipsY+6} Q ${cx+thighTopW+8} ${crotchY+16} ${cx+thighMidW+4} ${crotchY+40}`;
+  const tfaL = `M ${cx-hipsW+4} ${hipsY+6} Q ${cx-thighTopW-8} ${crotchY+16} ${cx-thighMidW-4} ${crotchY+40}`;
+
+  // ── QUADS — rectus, vastus lateralis, VMO ────────────────────────────────
+  // Rectus femoris (center stripe)
+  const rectFemR = `M ${cx+thighTopW-6} ${crotchY+14} C ${cx+thighMidW} ${kneeY-55} ${cx+kneeW+4} ${kneeY-20} ${cx+kneeW+2} ${kneeY-4}`;
+  const rectFemL = `M ${cx-thighTopW+6} ${crotchY+14} C ${cx-thighMidW} ${kneeY-55} ${cx-kneeW-4} ${kneeY-20} ${cx-kneeW-2} ${kneeY-4}`;
+  // Vastus lateralis (outer sweep)
+  const quadR = `M ${cx+thighTopW+2} ${crotchY+10} C ${cx+thighMidW+8} ${kneeY-50} ${cx+thighMidW+4} ${kneeY-24} ${cx+kneeW+6} ${kneeY-8}`;
+  const quadL = `M ${cx-thighTopW-2} ${crotchY+10} C ${cx-thighMidW-8} ${kneeY-50} ${cx-thighMidW-4} ${kneeY-24} ${cx-kneeW-6} ${kneeY-8}`;
+  // Vastus medialis (inner — teardrop above knee)
+  const vmoR = `M ${cx+kneeW-2} ${kneeY-20} C ${cx+kneeW+12} ${kneeY-10} ${cx+kneeW+10} ${kneeY} ${cx+kneeW+2} ${kneeY+4}`;
+  const vmoL = `M ${cx-kneeW+2} ${kneeY-20} C ${cx-kneeW-12} ${kneeY-10} ${cx-kneeW-10} ${kneeY} ${cx-kneeW-2} ${kneeY+4}`;
+  // Inner thigh (adductor) line
+  const adductR = `M ${cx+thighTopW-10} ${crotchY+8} Q ${cx+kneeW+4} ${kneeY-30} ${cx+kneeW} ${kneeY-6}`;
+  const adductL = `M ${cx-thighTopW+10} ${crotchY+8} Q ${cx-kneeW-4} ${kneeY-30} ${cx-kneeW} ${kneeY-6}`;
+
+  // ── CALF — gastrocnemius medial + lateral heads ───────────────────────────
+  const calfMedR = `M ${cx+kneeW+2} ${kneeY+10} C ${cx+calfPeakW+2} ${calfPeakY-10} ${cx+calfPeakW-2} ${calfPeakY+14} ${cx+ankleW+4} ${ankleY-20}`;
+  const calfLatR = `M ${cx+kneeW+4} ${kneeY+12} C ${cx+calfPeakW+6} ${calfPeakY-8} ${cx+calfPeakW+4} ${calfPeakY+16} ${cx+ankleW+6} ${ankleY-18}`;
+  const calfMedL = `M ${cx-kneeW-2} ${kneeY+10} C ${cx-calfPeakW-2} ${calfPeakY-10} ${cx-calfPeakW+2} ${calfPeakY+14} ${cx-ankleW-4} ${ankleY-20}`;
+  const calfLatL = `M ${cx-kneeW-4} ${kneeY+12} C ${cx-calfPeakW-6} ${calfPeakY-8} ${cx-calfPeakW-4} ${calfPeakY+16} ${cx-ankleW-6} ${ankleY-18}`;
+  // Calf split line (medial/lateral groove)
+  const calfSplitR = `M ${cx+calfPeakW*0.6} ${kneeY+18} Q ${cx+calfPeakW*0.5} ${calfPeakY+4} ${cx+ankleW+2} ${ankleY-14}`;
+  const calfSplitL = `M ${cx-calfPeakW*0.6} ${kneeY+18} Q ${cx-calfPeakW*0.5} ${calfPeakY+4} ${cx-ankleW-2} ${ankleY-14}`;
+
+  // ── STRIATIONS — sub 10% only, parametric hash marks ─────────────────────
+  // Pec striations (diagonal across pec belly)
+  const pecStriatR = [0,1,2,3].map(i =>
+    `M ${cx+6+i*5} ${chestY+8} Q ${cx+10+i*5} ${pecBotY-12} ${cx+14+i*4} ${pecBotY-4}`
+  ).join(' ');
+  const pecStriatL = [0,1,2,3].map(i =>
+    `M ${cx-6-i*5} ${chestY+8} Q ${cx-10-i*5} ${pecBotY-12} ${cx-14-i*4} ${pecBotY-4}`
+  ).join(' ');
+  // Delt striations
+  const deltStriatR= [0,1,2].map(i =>
+    `M ${cx+shoulderW-4+i*3} ${shoulderY+4+i*4} Q ${cx+shoulderW+deltCap-2+i*2} ${shoulderY+16+i*4} ${cx+chestW+2+i*2} ${chestY+8+i*3}`
+  ).join(' ');
+  const deltStriatL= [0,1,2].map(i =>
+    `M ${cx-shoulderW+4-i*3} ${shoulderY+4+i*4} Q ${cx-shoulderW-deltCap+2-i*2} ${shoulderY+16+i*4} ${cx-chestW-2-i*2} ${chestY+8+i*3}`
+  ).join(' ');
+  // Quad striations
+  const quadStriatR= [0,1].map(i =>
+    `M ${cx+thighTopW-4+i*4} ${crotchY+18+i*6} Q ${cx+thighMidW+2+i*3} ${kneeY-40+i*4} ${cx+kneeW+4+i*2} ${kneeY-12+i*3}`
+  ).join(' ');
+
+  // ── VASCULAR LINES (only at very lean — below ~10%) ──────────────────────
+  // Bicep vein
+  const bvR = `M ${armROutX + bicepPeakW - 4} ${shoulderCapY + 25} Q ${armROutX + bicepPeakW - 3} ${elbowY - 30} ${armROutX + forearmW} ${elbowY + 10}`;
+  const bvL = `M ${armLOutX - bicepPeakW + 4} ${shoulderCapY + 25} Q ${armLOutX - bicepPeakW + 3} ${elbowY - 30} ${armLOutX - forearmW} ${elbowY + 10}`;
+  // Forearm veins
+  const fvR  = `M ${armROutX + forearmW - 2} ${elbowY + 8} Q ${armROutX + forearmW - 3} ${elbowY + 50} ${armROutX + wristW} ${wristY - 8}`;
+  // Abdominal vein (linea semilunaris)
+  const abVR = `M ${cx + 12} ${pecBotY + 6} Q ${cx + 14} ${waistY - 10} ${cx + 10} ${waistY + 2}`;
+  const abVL = `M ${cx - 12} ${pecBotY + 6} Q ${cx - 14} ${waistY - 10} ${cx - 10} ${waistY + 2}`;
+
+  // ── SKIN TONE ────────────────────────────────────────────────────────────
+  // Realistic flesh tones — light source top-left
+  // Lean: higher contrast, warm highlights, deeper shadows
+  // Heavy: flatter, cooler, less definition
+  const skinBase    = isMale ? '#c8865a' : '#d4957a';
+  const skinLight   = isMale ? '#e8b48a' : '#f0c4a0';
+  const skinShadow  = isMale ? '#a06040' : '#b07558';
+  const skinMid     = isMale ? '#cc8c62' : '#d89878';
+  // Muscle shadow color — subsurface darkening at lean
+  const muscleDark  = `rgba(80,40,20,${L(0.22, 0.06)})`;
+  const muscleLight = `rgba(255,200,160,${L(0.18, 0.04)})`;
+  // Soft blur at high BF (fat smooths everything)
+  const blurAmt     = L(0, 1.2);
+  // Specular highlight intensity drops at high BF
+  const specOp      = L(0.22, 0.06);
+  // Female-specific glute shelf depth
+  const gluteShelf  = !isMale ? L(8, 4) : 0;
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
+  svg.innerHTML = `
+    <defs>
+      <!-- Main body radial gradient — light from top-left -->
+      <radialGradient id="bfpSkinGrad" cx="35%" cy="22%" r="70%" gradientUnits="objectBoundingBox">
+        <stop offset="0%"   stop-color="${skinLight}"/>
+        <stop offset="38%"  stop-color="${skinBase}"/>
+        <stop offset="75%"  stop-color="${skinMid}"/>
+        <stop offset="100%" stop-color="${skinShadow}"/>
+      </radialGradient>
+      <!-- Arm gradient — side lighting -->
+      <linearGradient id="bfpArmGradR" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="${skinShadow}"/>
+        <stop offset="40%"  stop-color="${skinBase}"/>
+        <stop offset="70%"  stop-color="${skinLight}"/>
+        <stop offset="100%" stop-color="${skinShadow}"/>
+      </linearGradient>
+      <linearGradient id="bfpArmGradL" x1="1" y1="0" x2="0" y2="0">
+        <stop offset="0%"   stop-color="${skinShadow}"/>
+        <stop offset="40%"  stop-color="${skinBase}"/>
+        <stop offset="70%"  stop-color="${skinLight}"/>
+        <stop offset="100%" stop-color="${skinShadow}"/>
+      </linearGradient>
+      <!-- Muscle shadow fills — subsurface depth -->
+      <radialGradient id="bfpMuscleShad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="rgba(60,30,10,0.0)"/>
+        <stop offset="100%" stop-color="rgba(60,30,10,${L(0.28,0.05)})"/>
+      </radialGradient>
+      <!-- Specular highlight — top-left glint -->
+      <radialGradient id="bfpSpec" cx="30%" cy="18%" r="55%">
+        <stop offset="0%"   stop-color="rgba(255,235,210,${specOp})"/>
+        <stop offset="100%" stop-color="rgba(255,235,210,0)"/>
+      </radialGradient>
+      <!-- Soft blur for high BF smoothing -->
+      <filter id="bfpBlur">
+        <feGaussianBlur stdDeviation="${blurAmt}"/>
+      </filter>
+      <!-- Muscle line sharpening at lean -->
+      <filter id="bfpCrisp">
+        <feGaussianBlur stdDeviation="${L(0, 0.4)}"/>
+      </filter>
+    </defs>
+
+    <!-- Ground shadow -->
+    <ellipse cx="${cx}" cy="${ankleY + 12}" rx="${L(30,48)}" ry="${L(5,8)}"
+      fill="rgba(0,0,0,0.18)" filter="url(#bfpBlur)"/>
+
+    <!-- ── BODY BASE FILL ── -->
+    <path d="${fullBody}" fill="url(#bfpSkinGrad)" filter="url(#bfpBlur)"/>
+
+    <!-- ── SUBSURFACE MUSCLE SHADOWS (depth under lean muscle bellies) ── -->
+    <!-- Pec shadow fills -->
+    <path d="M ${cx-chestW+8} ${chestY+4} Q ${cx-14} ${pecBotY-4} ${cx} ${pecBotY}
+             Q ${cx+14} ${pecBotY-4} ${cx+chestW-8} ${chestY+4} Z"
+      fill="${muscleDark}" opacity="${pecOp*0.7}" filter="url(#bfpCrisp)"/>
+    <!-- Delt shadow -->
+    <ellipse cx="${cx+shoulderW+deltCap*0.4}" cy="${shoulderCapY+12}"
+      rx="${deltCap*1.8+3}" ry="8"
+      fill="${muscleDark}" opacity="${sepOp*0.6}"/>
+    <ellipse cx="${cx-shoulderW-deltCap*0.4}" cy="${shoulderCapY+12}"
+      rx="${deltCap*1.8+3}" ry="8"
+      fill="${muscleDark}" opacity="${sepOp*0.6}"/>
+    <!-- Ab block shadow -->
+    <rect x="${cx-11}" y="${pecBotY+2}" width="22" height="${waistY-pecBotY-6}"
+      rx="4" fill="${muscleDark}" opacity="${absOp*0.5}" filter="url(#bfpCrisp)"/>
+    <!-- Lateral oblique light catch -->
+    <path d="M ${cx+chestW-6} ${pecBotY+6} Q ${cx+waistW+6} ${waistY-4} ${cx+hipsW-8} ${hipsY-2}"
+      fill="none" stroke="${muscleLight}" stroke-width="4" opacity="${oblOp*0.5}"
+      stroke-linecap="round" filter="url(#bfpCrisp)"/>
+    <path d="M ${cx-chestW+6} ${pecBotY+6} Q ${cx-waistW-6} ${waistY-4} ${cx-hipsW+8} ${hipsY-2}"
+      fill="none" stroke="${muscleLight}" stroke-width="4" opacity="${oblOp*0.5}"
+      stroke-linecap="round" filter="url(#bfpCrisp)"/>
+    <!-- Bicep belly highlight -->
+    <path d="M ${armROutX+bicepPeakW*0.3} ${shoulderCapY+28}
+             Q ${armROutX+bicepPeakW*0.5} ${elbowY-48} ${armROutX+forearmW*0.4} ${elbowY-10}"
+      fill="none" stroke="${muscleLight}" stroke-width="3.5" opacity="${sepOp*0.45}"
+      stroke-linecap="round"/>
+    <path d="M ${armLOutX-bicepPeakW*0.3} ${shoulderCapY+28}
+             Q ${armLOutX-bicepPeakW*0.5} ${elbowY-48} ${armLOutX-forearmW*0.4} ${elbowY-10}"
+      fill="none" stroke="${muscleLight}" stroke-width="3.5" opacity="${sepOp*0.45}"
+      stroke-linecap="round"/>
+    <!-- Quad highlight sweep -->
+    <path d="M ${cx+thighTopW-8} ${crotchY+16} Q ${cx+thighMidW+2} ${kneeY-50} ${cx+kneeW+2} ${kneeY-12}"
+      fill="none" stroke="${muscleLight}" stroke-width="5" opacity="${sepOp*0.35}"
+      stroke-linecap="round" filter="url(#bfpCrisp)"/>
+    <path d="M ${cx-thighTopW+8} ${crotchY+16} Q ${cx-thighMidW-2} ${kneeY-50} ${cx-kneeW-2} ${kneeY-12}"
+      fill="none" stroke="${muscleLight}" stroke-width="5" opacity="${sepOp*0.35}"
+      stroke-linecap="round" filter="url(#bfpCrisp)"/>
+
+    <!-- Female glute shelf shadow -->
+    ${!isMale ? `<path d="M ${cx-hipsW+4} ${hipsY+2} Q ${cx} ${hipsY+gluteShelf+4} ${cx+hipsW-4} ${hipsY+2}"
+      fill="none" stroke="${muscleDark}" stroke-width="6" opacity="${L(0.5,0.2)}"
+      stroke-linecap="round" filter="url(#bfpBlur)"/>` : ''}
+
+    <!-- ── ARMS ── -->
+    <path d="${rArm}" fill="url(#bfpArmGradR)" filter="url(#bfpBlur)"/>
+    <path d="${lArm}" fill="url(#bfpArmGradL)" filter="url(#bfpBlur)"/>
+
+    <!-- ── BODY + ARM OUTLINES ── -->
+    <path d="${fullBody}" fill="none" stroke="${skinShadow}" stroke-width="1.0" opacity="0.6"/>
+    <path d="${rArm}"     fill="none" stroke="${skinShadow}" stroke-width="0.7" opacity="0.5"/>
+    <path d="${lArm}"     fill="none" stroke="${skinShadow}" stroke-width="0.7" opacity="0.5"/>
+
+    <!-- ── NECK / TRAP ── -->
+    <path d="${trapLineR}" fill="none" stroke="${skinShadow}" stroke-width="1.4" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${trapLineL}" fill="none" stroke="${skinShadow}" stroke-width="1.4" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${midTrapR}"  fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${sepOp*0.6}" stroke-linecap="round"/>
+    <path d="${midTrapL}"  fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${sepOp*0.6}" stroke-linecap="round"/>
+    <path d="M ${cx-neckW} ${neckBot} Q ${cx} ${neckBot-4} ${cx+neckW} ${neckBot}"
+      fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${sepOp*0.7}"/>
+
+    <!-- ── PECS ── -->
+    <path d="${pecLine}"    fill="none" stroke="${skinShadow}" stroke-width="2.0" opacity="${pecOp}" stroke-linecap="round"/>
+    <path d="${sternalLine}" fill="none" stroke="${skinShadow}" stroke-width="1.1" opacity="${pecOp*0.9}" stroke-linecap="round"/>
+    <path d="${pecUpperR}"  fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${pecOp*0.85}" stroke-linecap="round"/>
+    <path d="${pecUpperL}"  fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${pecOp*0.85}" stroke-linecap="round"/>
+    <path d="${pecInnerR}"  fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${pecOp*0.6}" stroke-linecap="round"/>
+    <path d="${pecInnerL}"  fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${pecOp*0.6}" stroke-linecap="round"/>
+
+    <!-- ── DELTOIDS ── -->
+    <path d="${deltCapR}"   fill="none" stroke="${skinShadow}" stroke-width="1.6" opacity="${sepOp*0.95}" stroke-linecap="round"/>
+    <path d="${deltCapL}"   fill="none" stroke="${skinShadow}" stroke-width="1.6" opacity="${sepOp*0.95}" stroke-linecap="round"/>
+    <path d="${deltFrontR}" fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${deltFrontL}" fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${deltInsR}"   fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${sepOp*0.65}" stroke-linecap="round"/>
+    <path d="${deltInsL}"   fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${sepOp*0.65}" stroke-linecap="round"/>
+
+    <!-- ── BICEPS ── -->
+    <path d="${bicepLongR}"  fill="none" stroke="${skinShadow}" stroke-width="1.4" opacity="${sepOp*0.95}" stroke-linecap="round"/>
+    <path d="${bicepShortR}" fill="none" stroke="${skinShadow}" stroke-width="1.0" opacity="${sepOp*0.75}" stroke-linecap="round"/>
+    <path d="${bicepLongL}"  fill="none" stroke="${skinShadow}" stroke-width="1.4" opacity="${sepOp*0.95}" stroke-linecap="round"/>
+    <path d="${bicepShortL}" fill="none" stroke="${skinShadow}" stroke-width="1.0" opacity="${sepOp*0.75}" stroke-linecap="round"/>
+
+    <!-- ── TRICEPS ── -->
+    <path d="${tricepLatR}"  fill="none" stroke="${skinShadow}" stroke-width="1.2" opacity="${sepOp*0.85}" stroke-linecap="round"/>
+    <path d="${tricepLatL}"  fill="none" stroke="${skinShadow}" stroke-width="1.2" opacity="${sepOp*0.85}" stroke-linecap="round"/>
+    <path d="${tricepLongR}" fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${sepOp*0.65}" stroke-linecap="round"/>
+    <path d="${tricepLongL}" fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${sepOp*0.65}" stroke-linecap="round"/>
+
+    <!-- ── FOREARMS ── -->
+    <path d="${forearmExtR}" fill="none" stroke="${skinShadow}" stroke-width="1.0" opacity="${sepOp*0.8}" stroke-linecap="round"/>
+    <path d="${forearmExtL}" fill="none" stroke="${skinShadow}" stroke-width="1.0" opacity="${sepOp*0.8}" stroke-linecap="round"/>
+    <path d="${forearmFlxR}" fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${sepOp*0.6}" stroke-linecap="round"/>
+
+    <!-- ── SERRATUS ── -->
+    <path d="${serratusR}" fill="none" stroke="${skinShadow}" stroke-width="1.1" opacity="${clamp(oblOp*0.95,0,0.95)}" stroke-linecap="round"/>
+    <path d="${serratusL}" fill="none" stroke="${skinShadow}" stroke-width="1.1" opacity="${clamp(oblOp*0.95,0,0.95)}" stroke-linecap="round"/>
+
+    <!-- ── ABS ── -->
+    <path d="${lineaAlba}" fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${absOp}" stroke-linecap="round"/>
+    <path d="${absLines}"  fill="none" stroke="${skinShadow}" stroke-width="1.4" opacity="${absOp}" stroke-linecap="round"/>
+    <path d="${absColR}"   fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${absOp*0.7}" stroke-linecap="round"/>
+    <path d="${absColL}"   fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${absOp*0.7}" stroke-linecap="round"/>
+    <!-- Ab highlight between bands -->
+    ${[0,1,2].map(i=>`<path d="M ${cx-9} ${pecBotY+8+i*15} Q ${cx} ${pecBotY+6+i*15} ${cx+9} ${pecBotY+8+i*15}" fill="none" stroke="${muscleLight}" stroke-width="1.8" opacity="${absOp*0.55}" stroke-linecap="round"/>`).join('')}
+
+    <!-- ── OBLIQUES ── -->
+    <path d="${obliqueR}"  fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${oblOp*0.95}" stroke-linecap="round"/>
+    <path d="${obliqueL}"  fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${oblOp*0.95}" stroke-linecap="round"/>
+    <path d="${oblIntR}"   fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${oblOp*0.6}" stroke-linecap="round"/>
+    <path d="${oblIntL}"   fill="none" stroke="${skinShadow}" stroke-width="0.8" opacity="${oblOp*0.6}" stroke-linecap="round"/>
+
+    <!-- ── V-CUT / ILIAC / TFL ── -->
+    <path d="${iliacR}" fill="none" stroke="${skinShadow}" stroke-width="1.2" opacity="${vCutOp}" stroke-linecap="round"/>
+    <path d="${iliacL}" fill="none" stroke="${skinShadow}" stroke-width="1.2" opacity="${vCutOp}" stroke-linecap="round"/>
+    <path d="${tfaR}"   fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${vCutOp*0.8}" stroke-linecap="round"/>
+    <path d="${tfaL}"   fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${vCutOp*0.8}" stroke-linecap="round"/>
+    <!-- V-cut highlight -->
+    <path d="M ${cx+waistW+belly-5} ${waistY+6} C ${cx+hipsW-8} ${hipsY-10} ${cx+thighTopW+2} ${crotchY-6} ${cx+thighTopW} ${crotchY-2}"
+      fill="none" stroke="${muscleLight}" stroke-width="1.8" opacity="${vCutOp*0.65}" stroke-linecap="round"/>
+    <path d="M ${cx-waistW-belly+5} ${waistY+6} C ${cx-hipsW+8} ${hipsY-10} ${cx-thighTopW-2} ${crotchY-6} ${cx-thighTopW} ${crotchY-2}"
+      fill="none" stroke="${muscleLight}" stroke-width="1.8" opacity="${vCutOp*0.65}" stroke-linecap="round"/>
+
+    <!-- ── QUADS ── -->
+    <path d="${rectFemR}"  fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${rectFemL}"  fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${quadR}"     fill="none" stroke="${skinShadow}" stroke-width="1.2" opacity="${sepOp*0.85}" stroke-linecap="round"/>
+    <path d="${quadL}"     fill="none" stroke="${skinShadow}" stroke-width="1.2" opacity="${sepOp*0.85}" stroke-linecap="round"/>
+    <path d="${vmoR}"      fill="none" stroke="${skinShadow}" stroke-width="1.4" opacity="${absOp*0.95}" stroke-linecap="round"/>
+    <path d="${vmoL}"      fill="none" stroke="${skinShadow}" stroke-width="1.4" opacity="${absOp*0.95}" stroke-linecap="round"/>
+    <path d="${adductR}"   fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${sepOp*0.65}" stroke-linecap="round"/>
+    <path d="${adductL}"   fill="none" stroke="${skinShadow}" stroke-width="0.9" opacity="${sepOp*0.65}" stroke-linecap="round"/>
+
+    <!-- ── CALVES ── -->
+    <path d="${calfMedR}"   fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${calfLatR}"   fill="none" stroke="${skinShadow}" stroke-width="1.1" opacity="${sepOp*0.8}" stroke-linecap="round"/>
+    <path d="${calfMedL}"   fill="none" stroke="${skinShadow}" stroke-width="1.3" opacity="${sepOp*0.9}" stroke-linecap="round"/>
+    <path d="${calfLatL}"   fill="none" stroke="${skinShadow}" stroke-width="1.1" opacity="${sepOp*0.8}" stroke-linecap="round"/>
+    <path d="${calfSplitR}" fill="none" stroke="${skinShadow}" stroke-width="1.0" opacity="${sepOp*0.75}" stroke-linecap="round"/>
+    <path d="${calfSplitL}" fill="none" stroke="${skinShadow}" stroke-width="1.0" opacity="${sepOp*0.75}" stroke-linecap="round"/>
+
+    <!-- ── STRIATIONS (sub 10%) ── -->
+    <path d="${pecStriatR}"   fill="none" stroke="${skinShadow}" stroke-width="0.5" opacity="${striatOp*0.8}" stroke-linecap="round"/>
+    <path d="${pecStriatL}"   fill="none" stroke="${skinShadow}" stroke-width="0.5" opacity="${striatOp*0.8}" stroke-linecap="round"/>
+    <path d="${deltStriatR}"  fill="none" stroke="${skinShadow}" stroke-width="0.5" opacity="${striatOp*0.75}" stroke-linecap="round"/>
+    <path d="${deltStriatL}"  fill="none" stroke="${skinShadow}" stroke-width="0.5" opacity="${striatOp*0.75}" stroke-linecap="round"/>
+    <path d="${quadStriatR}"  fill="none" stroke="${skinShadow}" stroke-width="0.5" opacity="${striatOp*0.65}" stroke-linecap="round"/>
+
+    <!-- ── VASCULARITY (sub ~12%) ── -->
+    <path d="${bvR}" fill="none" stroke="${col}" stroke-width="1.4" opacity="${vascOp*0.85}" stroke-linecap="round"/>
+    <path d="${bvL}" fill="none" stroke="${col}" stroke-width="1.4" opacity="${vascOp*0.85}" stroke-linecap="round"/>
+    <path d="${fvR}" fill="none" stroke="${col}" stroke-width="1.0" opacity="${vascOp*0.65}" stroke-linecap="round"/>
+    <path d="${abVR}" fill="none" stroke="${col}" stroke-width="0.9" opacity="${vascOp*0.55}" stroke-linecap="round"/>
+    <path d="${abVL}" fill="none" stroke="${col}" stroke-width="0.9" opacity="${vascOp*0.55}" stroke-linecap="round"/>
+
+    <!-- ── SPECULAR HIGHLIGHT (light catch top-left of body) ── -->
+    <path d="${fullBody}" fill="url(#bfpSpec)"/>
+
+    <!-- ── HEAD ── -->
+    <ellipse cx="${cx}" cy="${headCY}" rx="${headW}" ry="${headR}"
+      fill="url(#bfpSkinGrad)" stroke="${skinShadow}" stroke-width="0.8" opacity="0.95"/>
+    <!-- Ear suggestion -->
+    <ellipse cx="${cx+headW-2}" cy="${headCY+4}" rx="3" ry="5"
+      fill="${skinBase}" stroke="${skinShadow}" stroke-width="0.5" opacity="0.7"/>
+    <ellipse cx="${cx-headW+2}" cy="${headCY+4}" rx="3" ry="5"
+      fill="${skinBase}" stroke="${skinShadow}" stroke-width="0.5" opacity="0.7"/>
+
+    <!-- ── BF% LABEL ── -->
+    <text x="${cx}" y="${waistY-6}" text-anchor="middle"
+      font-family="'Barlow Condensed',sans-serif" font-size="15" font-weight="800"
+      fill="rgba(255,255,255,${L(0.88,0.45)})">${bf.toFixed(1)}%</text>
+  `;
+}
+
+// Close on backdrop click
+document.getElementById('bfPickerOverlay').addEventListener('click', function(e) {
+  if (e.target === this) bfPickerClose();
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') bfPickerClose();
+});
+
+// Init ticks
+_buildTicks();
+
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BIDIRECTIONAL LBM ↔ BF% AUTO-CALCULATION
+// Anchor: bodyweight. Change BF% → LBM updates. Change LBM → BF% updates.
+// ─────────────────────────────────────────────────────────────────────────────
+function _lbmFromBf(bw, bf)  { return Math.round((bw * (1 - bf/100)) * 10) / 10; }
+function _bfFromLbm(bw, lbm) { return Math.round(((1 - lbm/bw) * 100) * 10) / 10; }
+
+function _syncBfToLbm(bwId, bfId, lbmId) {
+  const bw  = +document.getElementById(bwId)?.value;
+  const bf  = +document.getElementById(bfId)?.value;
+  const lbmEl = document.getElementById(lbmId);
+  if (!bw || !bf || !lbmEl) return;
+  const lbm = _lbmFromBf(bw, bf);
+  if (lbm > 0 && lbm < bw) {
+    lbmEl.value = lbm;
+    lbmEl.dispatchEvent(new Event('change', { bubbles:true }));
+    _flashInput(lbmEl);
+  }
+}
+
+function _syncLbmToBf(bwId, bfId, lbmId) {
+  const bw   = +document.getElementById(bwId)?.value;
+  const lbm  = +document.getElementById(lbmId)?.value;
+  const bfEl = document.getElementById(bfId);
+  if (!bw || !lbm || !bfEl) return;
+  const bf = _bfFromLbm(bw, lbm);
+  if (bf > 2 && bf < 65) {
+    bfEl.value = bf;
+    bfEl.dispatchEvent(new Event('change', { bubbles:true }));
+    _flashInput(bfEl);
+  }
+}
+
+function _flashInput(el) {
+  if (!el) return;
+  el.style.transition = 'border-color 0.15s, box-shadow 0.15s';
+  el.style.borderColor = '#10b981';
+  el.style.boxShadow   = '0 0 0 2px rgba(16,185,129,0.18)';
+  setTimeout(() => {
+    el.style.borderColor = '';
+    el.style.boxShadow   = '';
+  }, 900);
+}
+
+// Wire all bidirectional pairs on the page
+// Format: [weightId, curBfId, curLbmId, goalBfId, goalLbmId]
+function _wireBidir(weightId, curBfId, curLbmId, goalBfId, goalLbmId, extraBfIds) {
+  const bwEl = document.getElementById(weightId);
+  if (bwEl) bwEl.addEventListener('input', () => {
+    if (document.activeElement === bwEl) {
+      // Recalc LBM from current BF% when weight changes
+      _syncBfToLbm(weightId, curBfId,  curLbmId);
+      if (goalBfId && goalLbmId) _syncBfToLbm(weightId, goalBfId, goalLbmId);
+    }
+  });
+
+  // cur_bf change → cur_lbm
+  const cbf = document.getElementById(curBfId);
+  if (cbf) cbf.addEventListener('change', () => _syncBfToLbm(weightId, curBfId, curLbmId));
+
+  // cur_lbm change → cur_bf
+  const clbm = document.getElementById(curLbmId);
+  if (clbm) {
+    // Make LBM editable (remove readonly if set)
+    clbm.removeAttribute('readonly');
+    clbm.style.cursor = '';
+    clbm.addEventListener('input', () => {
+      if (document.activeElement === clbm) _syncLbmToBf(weightId, curBfId, curLbmId);
+    });
+  }
+
+  // goal_bf change → goal_lbm
+  if (goalBfId && goalLbmId) {
+    const gbf = document.getElementById(goalBfId);
+    if (gbf) gbf.addEventListener('change', () => _syncBfToLbm(weightId, goalBfId, goalLbmId));
+
+    // goal_lbm change → goal_bf
+    const glbm = document.getElementById(goalLbmId);
+    if (glbm) {
+      glbm.removeAttribute('readonly');
+      glbm.style.cursor = '';
+      glbm.addEventListener('input', () => {
+        if (document.activeElement === glbm) _syncLbmToBf(weightId, goalBfId, goalLbmId);
+      });
+    }
+  }
+
+  // Extra BF% inputs (e.g. bf_pct in nutrition) that should also trigger LBM sync
+  if (extraBfIds) extraBfIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => _syncBfToLbm(weightId, id, curLbmId));
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  _wireBidir("bodyweight","cur_bf","cur_lbm","goal_bf","goal_lbm");
+  // Initial sync on load
+  _syncBfToLbm("bodyweight","cur_bf","cur_lbm");
+  _syncBfToLbm("bodyweight","goal_bf","goal_lbm");
+});
+
+
+
+// ── Wire BF match buttons via addEventListener ────────────────────────────
+(function() {
+  function wireMatchBtns() {
+    document.querySelectorAll('[data-bf-input]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var inputId = btn.getAttribute('data-bf-input');
+        var el = document.getElementById(inputId);
+        var sex = 'male';
+        try { var s = document.getElementById('sex'); if (s) sex = s.value || 'male'; } catch(e2) {}
+        if (typeof bfPickerOpen === 'function') {
+          bfPickerOpen(inputId, parseFloat(el ? el.value : 14) || 14, sex);
+        } else if (typeof window._bfOpen === 'function') {
+          window._bfOpen(inputId);
+        }
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireMatchBtns);
+  } else {
+    wireMatchBtns();
+  }
+})();
+
+
+// ── Wire static picker + TDEE modal buttons ───────────────────────────────
+(function() {
+  function wireStaticBtns() {
+    // BF picker buttons
+    document.querySelectorAll('[data-picker-action="close"]').forEach(function(el) {
+      el.addEventListener('click', function() { if(typeof bfPickerClose==='function') bfPickerClose(); });
+    });
+    document.querySelectorAll('[data-picker-action="confirm"]').forEach(function(el) {
+      el.addEventListener('click', function() { if(typeof bfPickerConfirm==='function') bfPickerConfirm(); });
+    });
+    document.querySelectorAll('[data-picker-sex]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var sex = el.getAttribute('data-picker-sex');
+        if(typeof bfpSetSex==='function') bfpSetSex(sex);
+      });
+    });
+    // TDEE modal buttons
+    document.querySelectorAll('[data-tdee-action]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var action = el.getAttribute('data-tdee-action');
+        if(action==='close'   && typeof _tdeeClose==='function')   _tdeeClose();
+        if(action==='calc'    && typeof _tdeeCalc==='function')    _tdeeCalc();
+        if(action==='confirm' && typeof _tdeeConfirm==='function') _tdeeConfirm();
+      });
+    });
+    // Backdrop close
+    var overlay = document.getElementById('bfPickerOverlay');
+    if(overlay) overlay.addEventListener('click', function(e) {
+      if(e.target===this && typeof bfPickerClose==='function') bfPickerClose();
+    });
+    var tdeeModal = document.getElementById('tdeeModal');
+    if(tdeeModal) tdeeModal.addEventListener('click', function(e) {
+      if(e.target===this && typeof _tdeeClose==='function') _tdeeClose();
+    });
+  }
+  if(document.readyState==='loading') {
+    document.addEventListener('DOMContentLoaded', wireStaticBtns);
+  } else {
+    wireStaticBtns();
+  }
+})();
+
+
+
+window._tdeeOpen = function() {
+  document.getElementById('tmResult').style.display      = 'none';
+  document.getElementById('tmConfirmBtn').style.display  = 'none';
+  document.getElementById('tdeeModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+function _tdeeClose() {
+  document.getElementById('tdeeModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function _tdeeConfirm() {
+  if (_tmResult > 0) {
+    const el = document.getElementById('tdee');
+    if (el) { el.value = _tmResult; el.dispatchEvent(new Event('input',{bubbles:true})); }
+  }
+  _tdeeClose();
+}
+
+function _tdeeCalc() {
+  // Pull biometrics from localStorage profile or page inputs
+  let wlbs = 180, bf = 0.14, age = 22, sex = 'male';
+  try {
+    const p = JSON.parse(localStorage.getItem('sba_profile') || '{}');
+    wlbs = p.bodyweight || +document.getElementById('weight')?.value || 180;
+    bf   = (p.cur_bf   || +document.getElementById('cur_bf')?.value  || 14) / 100;
+    age  = p.age       || +document.getElementById('age')?.value     || 22;
+    sex  = p.sex       || document.getElementById('sex')?.value      || 'male';
+  } catch(e) {}
+
+  const tDays = +document.getElementById('tm_trainDays').value;
+  const sDur  = +document.getElementById('tm_sessionDur').value;
+  const cDays = +document.getElementById('tm_cardioDays').value;
+  const cDur  = +document.getElementById('tm_cardioDur').value;
+  const zone  =  document.getElementById('tm_zone').value;
+  const mod   =  document.getElementById('tm_modality').value;
+  const steps = +document.getElementById('tm_steps').value;
+  const occ   =  document.getElementById('tm_occupation').value;
+
+  const wkg   = wlbs * 0.453592;
+  const lbmkg = wkg  * (1 - bf);
+
+  // BMR — Katch-McArdle + Cunningham blend (LBM-based, best for athletes)
+  const bmrK = 370 + 21.6 * lbmkg;
+  const bmrC = 500 + 22   * lbmkg;
+  const bw   = bf < 0.12 ? 0.4 : bf < 0.18 ? 0.25 : 0.1;
+  const bmr  = bmrK*(1-bw) + bmrC*bw;
+
+  // Resistance EAT — MET 4.5 average for moderate-high intensity training
+  // (sets/rest removed — too variable and marginally correlated at population level)
+  // Duration × bodyweight × MET is the research-supported primary driver
+  const eatR = 4.5 * wkg * sDur * 0.95;
+
+  // Endurance EAT
+  const zMET  = {z1:2.8,z2:5.5,z3:7.5,z4:9.5,z5:12.0,intermittent:7.2};
+  const mMod  = {running:1.05,cycling:0.92,rowing:1.00,elliptical:0.88,
+                 stairmaster:1.02,sport:0.97,swimming:0.95,hiit:1.03};
+  const eatE  = zMET[zone] * (mMod[mod]||1) * wkg * cDur * 0.93;
+
+  // Multipliers
+  const cOffDays   = Math.min(cDays, 7-tDays);
+  const cTrainDays = cDays - cOffDays;
+  const trainMult  = 1.2 + eatR/bmr + (cTrainDays>0 ? eatE/bmr : 0);
+  const offMult    = 1.2 + (cOffDays>0 ? eatE/bmr : 0);
+
+  // TEF (athlete defaults)
+  const tef = Math.round(wlbs*4*0.25 + wlbs*2*4*0.07 + wlbs*0.4*9*0.02);
+
+  // NEAT
+  const stepN  = Math.round(steps*0.038*(wkg*0.9));
+  const occN   = {seated:0,mixed:120,standing:280,active:500}[occ];
+  const spa    = tDays >= 4 ? 80 : 120;
+  const neatT  = Math.round(stepN*0.85 + occN + spa);
+  const neatO  = Math.round(stepN      + occN + spa);
+
+  // Day TDEEs
+  const trainDay = Math.round(bmr*trainMult) + tef + neatT;
+  const offDay   = Math.round(bmr*offMult)   + tef + neatO;
+  const offDays  = 7 - tDays;
+  const weekly   = Math.round((trainDay*tDays + offDay*offDays) / 7);
+
+  _tmResult = weekly;
+
+  document.getElementById('tmResult').style.display     = 'block';
+  document.getElementById('tmResultNum').textContent    = weekly.toLocaleString();
+  document.getElementById('tmResultBd').innerHTML       =
+    `BMR ${Math.round(bmr)} · R-EAT ${Math.round(eatR)} · E-EAT ${Math.round(eatE)} · TEF ${tef} · NEAT ~${neatT}<br>` +
+    `Training day ${trainDay.toLocaleString()} kcal · Off day ${offDay.toLocaleString()} kcal · ${tDays}×/${offDays}× split`;
+  document.getElementById('tmConfirmVal').textContent   = weekly.toLocaleString();
+  document.getElementById('tmConfirmBtn').style.display = 'block';
+}
+
+document.getElementById('tdeeModal').addEventListener('click', function(e) {
+  if (e.target === this) _tdeeClose();
+});
+
+window.generate = generate;
+window.bfPickerOpen = bfPickerOpen;
+window.bfPickerClose = bfPickerClose;
+window.bfpOnSlide = bfpOnSlide;
+window.toggleS = toggleS;
+window.setInjury = setInjury;
+window.stepVol = typeof stepVol === 'function' ? stepVol : undefined;
+
+
+// ── Firebase save hook ────────────────────────────────────────────────────────
+function sbaSave() {
+  try {
+    const data = {
+      yearsTraining: +document.getElementById('yearsTraining')?.value,
+      bodyweight:    +document.getElementById('bodyweight')?.value,
+      sessionDays:   +document.getElementById('sessionDays')?.value,
+      sessionTime:   +document.getElementById('sessionTime')?.value,
+      sleepHrs:      +document.getElementById('sleepHrs')?.value,
+      sleepQuality:  +document.getElementById('sleepQuality')?.value,
+      cur_bf:        +document.getElementById('cur_bf')?.value,
+      goal_bf:       +document.getElementById('goal_bf')?.value,
+      cur_lbm:       +document.getElementById('cur_lbm')?.value,
+      goal_lbm:      +document.getElementById('goal_lbm')?.value,
+      cur_vo2:       +document.getElementById('cur_vo2')?.value,
+      goal_vo2:      +document.getElementById('goal_vo2')?.value,
+      cur_str:       +document.getElementById('cur_str')?.value,
+      goal_str:      +document.getElementById('goal_str_target')?.value,
+      goalWeights: {
+        lbm: +document.getElementById('pri_lbm')?.value,
+        bf:  +document.getElementById('pri_bf')?.value,
+        vo2: +document.getElementById('pri_vo2')?.value,
+        str: +document.getElementById('pri_str')?.value,
+      },
+      savedAt: new Date().toISOString(),
+    };
+    window.parent.postMessage({ type:'sba-save', module:'workout', data }, '*');
+    // Also log metric entry
+    window.parent.postMessage({ type:'sba-log-metric', data:{
+      date:   new Date().toISOString().split('T')[0],
+      vo2:    data.cur_vo2,
+      lbm:    data.cur_lbm,
+      bf:     data.cur_bf,
+      str:    data.cur_str,
+      bodyweight: data.bodyweight,
+      source: 'workout',
+    }}, '*');
+  } catch(e) { console.warn('sbaSave error', e); }
+}
+
+// Load saved data when parent sends it
+window.addEventListener('message', e => {
+  const d = e.data;
+  if (!d || d.type !== 'sba-load' || !d.workout) return;
+  const w = d.workout;
+  const set = (id, val) => { const el=document.getElementById(id); if(el&&val!=null&&val!==0) el.value=val; };
+  set('yearsTraining', w.yearsTraining);
+  set('bodyweight',    w.bodyweight);
+  set('sessionDays',   w.sessionDays);
+  set('sessionTime',   w.sessionTime);
+  set('sleepHrs',      w.sleepHrs);
+  set('cur_bf',        w.cur_bf);
+  set('goal_bf',       w.goal_bf);
+  set('cur_lbm',       w.cur_lbm);
+  set('goal_lbm',      w.goal_lbm);
+  set('cur_vo2',       w.cur_vo2);
+  set('goal_vo2',      w.goal_vo2);
+  set('cur_str',       w.cur_str);
+  set('goal_str_target', w.goal_str);
+  if (w.goalWeights) {
+    set('pri_lbm', w.goalWeights.lbm);
+    set('pri_bf',  w.goalWeights.bf);
+    set('pri_vo2', w.goalWeights.vo2);
+    set('pri_str', w.goalWeights.str);
+  }
+  if (typeof updateSliders === 'function') updateSliders();
+  if (typeof updateLevel   === 'function') updateLevel();
+  if (typeof updateGapSummary === 'function') updateGapSummary();
+});
+</script>
+</body>
+</html>

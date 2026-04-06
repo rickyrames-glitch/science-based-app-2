@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutrition Formulation — Science Based App</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+
+
+:root {
+  --bg:#050508;--s1:#07070f;--s2:#0d0d1a;--s3:#111122;
+  --border:#181830;--border2:#20203a;
+  --text:#d8ddf0;--muted:#52527a;--dim:#34345a;--white:#eef0ff;
+  --green:#10b981;--protein:#3b82f6;--carbs:#10b981;--fat:#f59e0b;--timing:#a855f7;--yellow:#f59e0b;--orange:#f97316;--red:#ef4444;
+  --blue:#3b82f6;--purple:#a855f7;--pink:#ec4899;--teal:#14b8a6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh;}
+
+/* ── Header ── */
+header{padding:36px 32px 24px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+header::before{content:'WFM';position:absolute;right:-8px;top:-12px;font-family:'Barlow Condensed',sans-serif;font-size:180px;font-weight:800;color:rgba(255,255,255,0.018);line-height:1;pointer-events:none;letter-spacing:-8px;}
+.nav-back{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);text-decoration:none;margin-bottom:18px;transition:color 0.2s;}
+.nav-back:hover{color:var(--blue);}
+.header-tag{font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:8px;opacity:0.8;}
+header h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);font-weight:800;letter-spacing:-1px;line-height:0.92;color:var(--white);text-transform:uppercase;}
+header h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.18);}
+header .sub{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:12px;}
+
+/* ── Layout ── */
+.main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 180px);}
+@media(max-width:900px){.main{grid-template-columns:1fr;}}
+
+/* ── Sidebar ── */
+.sidebar{border-right:1px solid var(--border);padding:22px 18px;overflow-y:auto;}
+.section-tag{font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.input-group{margin-bottom:12px;}
+label{display:block;font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px;}
+input[type="number"],select{width:100%;background:var(--s1);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:7px 9px;outline:none;transition:border-color 0.15s;appearance:none;}
+input:focus,select:focus{border-color:var(--blue);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* Goal sliders */
+.goal-bar-row{margin-bottom:10px;}
+.goal-bar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.goal-bar-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;font-weight:500;}
+.goal-bar-val{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:500;}
+.goal-slider{width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;}
+.goal-slider::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border-radius:50%;cursor:pointer;}
+.slider-lbm::-webkit-slider-thumb{background:var(--blue);}
+.slider-bf::-webkit-slider-thumb{background:var(--orange);}
+.slider-vo2::-webkit-slider-thumb{background:var(--green);}
+.slider-str::-webkit-slider-thumb{background:var(--purple);}
+.weight-pie{display:flex;height:5px;border-radius:3px;overflow:hidden;margin:8px 0 3px;}
+.pie-seg{height:100%;transition:width 0.3s ease;}
+
+/* Injury toggle grid */
+.injury-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.injury-card{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 9px;display:flex;align-items:center;justify-content:space-between;}
+.injury-muscle{font-family:'JetBrains Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:1px;}
+.injury-toggle{display:flex;gap:5px;}
+.itog{font-family:'JetBrains Mono',monospace;font-size:0.52rem;padding:3px 8px;border-radius:2px;border:1px solid var(--border);background:var(--s3);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.itog.active-ok{background:rgba(16,185,129,0.15);border-color:#10b981;color:#10b981;}
+.itog.active-flag{background:rgba(239,68,68,0.15);border-color:#ef4444;color:#ef4444;}
+
+/* Level display */
+.level-box{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:9px 11px;margin-bottom:10px;}
+
+/* Strength log */
+.str-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.str-card{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 9px;}
+.str-muscle{font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;}
+.str-fields{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.str-input{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.75rem;padding:5px 6px;outline:none;}
+.str-sublabel{font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:var(--dim);margin-top:1px;}
+
+/* Generate button */
+.generate-btn{width:100%;background:var(--white);color:var(--bg);border:none;border-radius:3px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-top:14px;}
+.generate-btn:hover{background:var(--blue);color:white;}
+
+/* ── Output panel ── */
+.output{padding:24px 24px 60px;overflow-y:auto;}
+.empty-state{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:60px 20px;}
+.empty-state .icon{font-size:2.6rem;margin-bottom:14px;opacity:0.22;}
+.empty-state p{font-family:'JetBrains Mono',monospace;font-size:0.66rem;letter-spacing:1px;text-transform:uppercase;line-height:1.9;}
+
+/* ── Master budget meter ── */
+.master-meter-wrap{height:50px;background:var(--s2);border:1px solid var(--border);border-radius:5px;overflow:hidden;position:relative;margin-bottom:8px;}
+.master-meter-fill{position:absolute;top:0;left:0;bottom:0;border-radius:5px;transition:width 0.7s cubic-bezier(0.16,1,0.3,1);display:flex;align-items:center;padding:0 14px;overflow:hidden;}
+.master-meter-gradient{position:absolute;inset:0;background:linear-gradient(90deg,#3b82f6 0%,#10b981 40%,#f59e0b 75%,#ef4444 100%);opacity:0.88;}
+.master-meter-text{position:relative;z-index:1;font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:2px;color:#000;white-space:nowrap;}
+.master-landmark-line{position:absolute;top:0;bottom:0;width:1px;background:rgba(0,0,0,0.22);}
+.master-landmark-tag{position:absolute;bottom:3px;font-family:'JetBrains Mono',monospace;font-size:0.44rem;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,0.45);transform:translateX(-50%);}
+.efficiency-badge{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:2px;}
+
+/* ── Muscle meters grid ── */
+.muscle-meters-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;}
+@media(max-width:900px){.muscle-meters-grid{grid-template-columns:1fr 1fr 1fr;}}
+@media(max-width:600px){.muscle-meters-grid{grid-template-columns:1fr 1fr;}}
+
+.muscle-meter-card{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:11px 12px;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.mm-bg-fill{position:absolute;bottom:0;left:0;right:0;border-radius:0 0 4px 4px;transition:height 0.6s cubic-bezier(0.16,1,0.3,1);z-index:0;opacity:0.1;}
+.mm-content{position:relative;z-index:1;}
+.mm-name{font-family:'Barlow Condensed',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.mm-pts{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;line-height:1;margin-bottom:2px;}
+.mm-reps{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);margin-bottom:6px;}
+.mm-bar-wrap{background:var(--border);border-radius:2px;height:4px;overflow:hidden;position:relative;margin-bottom:3px;}
+.mm-bar{height:100%;border-radius:2px;transition:width 0.6s cubic-bezier(0.16,1,0.3,1);}
+.mm-ticks{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:var(--muted);margin-bottom:5px;}
+.mm-hyp{font-family:'JetBrains Mono',monospace;font-size:0.44rem;text-transform:uppercase;letter-spacing:1px;padding:2px 6px;border-radius:8px;display:inline-block;margin-bottom:5px;}
+.mm-stepper{display:flex;align-items:center;gap:4px;}
+.mm-stepper button{width:20px;height:20px;border-radius:50%;border:1px solid var(--border);background:var(--s3);color:var(--text);font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:'Barlow Condensed',sans-serif;font-weight:700;flex-shrink:0;}
+.mm-stepper button:hover{border-color:var(--blue);color:var(--blue);}
+.mm-stepper-info{font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:var(--muted);flex:1;text-align:center;line-height:1.5;}
+
+/* ── Session cards ── */
+.week-map{display:grid;gap:10px;margin-bottom:20px;}
+.session-card{background:var(--s1);border:1px solid var(--border);border-radius:5px;overflow:hidden;animation:slideUp 0.3s ease both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.session-header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 14px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+.session-header:hover{background:var(--s2);}
+.session-day{font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);min-width:32px;}
+.session-muscles{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.muscle-pill{font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:8px;font-weight:500;}
+.interference-score{display:inline-flex;align-items:center;gap:3px;font-family:'JetBrains Mono',monospace;font-size:0.54rem;padding:2px 7px;border-radius:2px;}
+.session-meta-right{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:var(--muted);text-align:right;line-height:1.7;}
+
+/* Exercise table */
+.ex-table-wrap{padding:0 14px 12px;}
+.ex-table{width:100%;border-collapse:collapse;}
+.ex-table th{text-align:left;padding:7px 9px;font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s2);}
+.ex-table td{padding:9px 9px;border-bottom:1px solid var(--s2);vertical-align:middle;}
+.ex-table tr:last-child td{border-bottom:none;}
+.ex-table tr:hover td{background:rgba(255,255,255,0.012);}
+.ex-order-dot{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:0.68rem;font-weight:700;flex-shrink:0;}
+.ex-name-cell{font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:600;letter-spacing:0.5px;color:var(--white);}
+.ex-muscle-sub{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);margin-top:1px;}
+.presc-val{font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;color:var(--white);letter-spacing:0.5px;}
+.presc-sub{font-family:'JetBrains Mono',monospace;font-size:0.46rem;color:var(--muted);}
+
+/* Leg block */
+.leg-session-card{background:var(--s1);border:1px solid #a855f733;border-radius:5px;overflow:hidden;margin-top:10px;}
+
+/* Volume section divider */
+.vol-section-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin:22px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+/* Recovery compact row */
+.rec-compact{display:grid;grid-template-columns:100px 1fr 52px 52px 52px 60px;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);}
+.rec-compact:last-child{border-bottom:none;}
+.rec-compact:hover{background:var(--s2);}
+.rec-bar-wrap{background:var(--border);border-radius:2px;height:4px;overflow:hidden;}
+.rec-bar{height:100%;border-radius:2px;}
+
+/* PO cards */
+.po-card{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:8px;}
+.po-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.po-label{font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.po-val{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;}
+.po-progress-wrap{background:var(--border);border-radius:2px;height:4px;overflow:hidden;margin-top:5px;}
+.po-progress{height:100%;border-radius:2px;transition:width 0.6s ease;}
+
+/* Realloc note */
+.realloc-note{background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:0 4px 4px 0;padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--dim);line-height:1.75;margin-bottom:14px;}
+.realloc-note strong{color:var(--text);font-weight:500;}
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:18px 20px;margin-bottom:16px;}
+
+/* ── BF Picker overlay (injected) ──*/
+
+
+
+
+/* ── Nutrition Formulation specifics ── */
+.main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 180px);}
+@media(max-width:900px){.main{grid-template-columns:1fr;}}
+.gen-btn{width:100%;background:var(--white);color:var(--bg);border:none;border-radius:3px;
+  padding:13px;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-top:14px;}
+.gen-btn:hover{background:var(--green);color:white;}
+
+
+/* ── BF Picker Overlay ── */
+#bfPickerOverlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(3,3,6,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;}
+#bfPickerOverlay.open{display:flex !important;}
+#bfPickerModal{background:#07070f;border:1px solid #1e1e38;border-radius:8px;width:100%;max-width:760px;max-height:94vh;overflow-y:auto;display:flex;flex-direction:column;animation:bfpSlide 0.2s ease;}
+@keyframes bfpSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.bfp-header{padding:16px 20px 12px;border-bottom:1px solid #161628;display:flex;align-items:center;justify-content:space-between;}
+.bfp-title{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#eaecff;}
+.bfp-subtitle{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:#4a4a72;margin-top:3px;}
+.bfp-close{width:28px;height:28px;border-radius:50%;border:1px solid #1e1e38;background:#0b0b18;color:#4a4a72;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.bfp-close:hover{border-color:#ef4444;color:#ef4444;}
+.bfp-body{display:grid;grid-template-columns:220px 1fr;gap:0;flex:1;}
+@media(max-width:560px){.bfp-body{grid-template-columns:1fr;}}
+.bfp-silhouette{background:#050508;border-right:1px solid #161628;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 10px;position:relative;min-height:320px;}
+#bfpBodySvg{width:160px;height:auto;}
+.bfp-pct-on-body{position:absolute;bottom:16px;font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;color:#eaecff;line-height:1;}
+.bfp-tier-label{position:absolute;top:12px;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;}
+.bfp-controls{padding:16px 18px;display:flex;flex-direction:column;gap:12px;}
+.bfp-sex-row{display:flex;gap:6px;}
+.bfp-sex-btn{flex:1;padding:6px;border-radius:2px;border:1px solid #1e1e38;background:#0b0b18;color:#4a4a72;font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
+.bfp-sex-btn.active{border-color:#f97316;color:#f97316;background:rgba(249,115,22,0.1);}
+.bfp-slider-section{display:flex;flex-direction:column;gap:6px;}
+.bfp-track-wrap{position:relative;padding-bottom:18px;}
+.bfp-slider{width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,#f97316 0%,#1e1e38 0%);}
+.bfp-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#f97316;border:2px solid #fff;cursor:pointer;}
+.bfp-ticks{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:#2a2a50;}
+.bfp-tier-desc{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:#4a4a72;line-height:1.6;min-height:40px;}
+.bfp-bars{display:flex;flex-direction:column;gap:6px;}
+.bfp-bar-row{display:flex;align-items:center;gap:8px;}
+.bfp-bar-label{font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:#2a2a50;min-width:88px;}
+.bfp-bar-wrap{flex:1;background:#1e1e38;border-radius:2px;height:4px;overflow:hidden;}
+.bfp-bar-fill{height:100%;border-radius:2px;transition:width 0.3s ease;}
+.bfp-bar-val{font-family:'JetBrains Mono',monospace;font-size:0.5rem;min-width:36px;text-align:right;}
+.bfp-footer{padding:12px 18px;border-top:1px solid #161628;display:flex;gap:8px;justify-content:flex-end;}
+.bfp-cancel{font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:1.5px;padding:7px 14px;border-radius:2px;border:1px solid #1e1e38;background:transparent;color:#4a4a72;cursor:pointer;}
+.bfp-confirm{font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:7px 18px;border-radius:2px;border:none;background:#f97316;color:#fff;cursor:pointer;}
+.bfp-confirm:hover{background:#ea580c;}
+
+
+/* ── TDEE Modal ── */
+#tdeeModal{display:none;position:fixed;inset:0;z-index:9100;background:rgba(3,3,6,0.9);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:12px;}
+#tdeeModal.open{display:flex !important;}
+
+
+/* ── Goal priority slider tracks ── */
+input[type="range"].goal-slider { -webkit-appearance:none; appearance:none; height:4px; border-radius:2px; outline:none; cursor:pointer; width:100%; }
+input[type="range"].goal-slider::-webkit-slider-runnable-track { height:4px; border-radius:2px; }
+input[type="range"].goal-slider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; margin-top:-5px; cursor:pointer; border:2px solid var(--bg); }
+input[type="range"].goal-slider.lbm::-webkit-slider-thumb { background: var(--blue); }
+input[type="range"].goal-slider.bf::-webkit-slider-thumb  { background: var(--orange); }
+input[type="range"].goal-slider.vo2::-webkit-slider-thumb { background: var(--green); }
+input[type="range"].goal-slider.str::-webkit-slider-thumb { background: var(--purple); }
+
+
+/* ── Nutrition Output ─────────────────────────────────────────────────── */
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.logic-note{background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:0 4px 4px 0;padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:var(--dim);line-height:1.75;margin-bottom:16px;}
+.logic-note strong{color:var(--text);}
+
+/* Macro master bar */
+.macro-master{background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:16px 18px;margin-bottom:14px;}
+.macro-total-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.macro-total-kcal{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;color:var(--white);line-height:1;}
+.macro-total-kcal span{font-size:0.9rem;color:var(--muted);font-family:'JetBrains Mono',monospace;font-weight:300;}
+.macro-stacked-bar{display:flex;height:28px;border-radius:3px;overflow:hidden;margin-bottom:5px;}
+.macro-seg{display:flex;align-items:center;justify-content:center;overflow:hidden;transition:width 0.5s ease;min-width:0;}
+.macro-seg-label{font-family:'JetBrains Mono',monospace;font-size:0.44rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;}
+
+/* Macro detail cards */
+.macro-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:600px){.macro-cards{grid-template-columns:1fr;}}
+.macro-card{background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:14px 14px 10px;position:relative;overflow:hidden;min-height:100px;}
+.macro-card-fill{position:absolute;bottom:0;left:0;right:0;opacity:0.08;transition:height 0.5s ease;}
+.macro-card-content{position:relative;z-index:1;}
+.macro-card-name{font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.macro-card-grams{font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:800;color:var(--white);line-height:1;}
+.macro-card-g{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted);}
+.macro-card-kcal{font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--muted);margin-top:3px;}
+.macro-card-per-lb{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--dim);margin-top:5px;line-height:1.5;border-top:1px solid var(--border);padding-top:5px;}
+
+/* Day type grid */
+.day-type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px;}
+@media(max-width:500px){.day-type-grid{grid-template-columns:1fr;}}
+.day-type-card{background:var(--s1);border:1px solid var(--border);border-radius:4px;padding:12px 14px;}
+.day-type-label{font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;}
+.day-macro-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.day-macro-name{font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.day-macro-val{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--white);}
+
+/* Meal timeline */
+.meal-timeline{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.meal-block{background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:13px 15px;}
+.meal-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;color:var(--white);}
+.meal-time{font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+.meal-kcal-badge{font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:700;padding:2px 8px;border-radius:2px;background:var(--s2);}
+.meal-macros{display:flex;gap:14px;margin-bottom:6px;}
+.meal-window-tag{font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:2px;background:var(--s2);color:var(--muted);display:inline-block;margin-bottom:5px;}
+.meal-foods{font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--dim);line-height:1.8;}
+
+/* Micronutrient grid */
+.micro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+@media(max-width:600px){.micro-grid{grid-template-columns:1fr 1fr;}}
+.micro-card{background:var(--s1);border:1px solid var(--border);border-radius:4px;padding:10px 12px;}
+.micro-name{font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px;}
+.micro-status{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;}
+.micro-bar-wrap{background:var(--border);border-radius:2px;height:3px;margin:4px 0;}
+.micro-bar{height:100%;border-radius:2px;transition:width 0.4s ease;}
+.micro-foods{font-family:'JetBrains Mono',monospace;font-size:0.46rem;color:var(--dim);line-height:1.6;}
+.micro-note{font-family:'JetBrains Mono',monospace;font-size:0.46rem;color:var(--muted);margin-top:3px;font-style:italic;}
+
+/* Alerts */
+.anabolic-alert{background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.25);border-radius:4px;padding:10px 13px;font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:var(--muted);line-height:1.7;margin-bottom:14px;}
+
+
+/* ── Module nav ── */
+.module-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.module-nav a{font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;padding:5px 12px;border-radius:2px;border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:all 0.15s;}
+.module-nav a:hover{border-color:var(--blue);color:var(--blue);}
+.module-nav a.active{color:var(--white);border-color:var(--white);background:rgba(255,255,255,0.05);}
+
+</style>
+</head>
+<body>
+
+<!-- BF Picker Overlay -->
+<div id="bfPickerOverlay" style="display:none">
+  <div id="bfPickerModal">
+    <div class="bfp-header">
+      <div>
+        <div class="bfp-title">Match Your Body</div>
+        <div class="bfp-subtitle">Slide until the silhouette matches your physique → confirm to set BF%</div>
+      </div>
+      <button class="bfp-close" data-picker-action="close">✕</button>
+    </div>
+    <div class="bfp-body">
+      <div class="bfp-silhouette">
+        <svg id="bfpBodySvg" viewBox="0 0 220 480" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="bfp-pct-on-body" id="bfpPctBig"></div>
+        <div class="bfp-tier-label" id="bfpTierLabel"></div>
+      </div>
+      <div class="bfp-controls">
+        <div class="bfp-sex-row">
+          <button class="bfp-sex-btn active" id="bfpBtnMale" data-picker-sex="male">Male</button>
+          <button class="bfp-sex-btn" id="bfpBtnFemale" data-picker-sex="female">Female</button>
+        </div>
+        <div class="bfp-slider-section">
+          <div class="bfp-track-wrap">
+            <input type="range" id="bfpSlider" class="bfp-slider" oninput="bfpOnSlide(this.value)" min="4" max="45" value="14" step="0.5">
+            <div class="bfp-ticks" id="bfpTicks"></div>
+          </div>
+        </div>
+        <div class="bfp-tier-desc" id="bfpTierDesc"></div>
+        <div class="bfp-bars">
+          <div class="bfp-bar-row"><span class="bfp-bar-label">Hormonal</span><div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarH" style="width:60%;background:#a855f7"></div></div><span class="bfp-bar-val" id="bfpValH" style="color:#a855f7"></span></div>
+          <div class="bfp-bar-row"><span class="bfp-bar-label">Cardiovascular</span><div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarC" style="width:60%;background:#ef4444"></div></div><span class="bfp-bar-val" id="bfpValC" style="color:#ef4444"></span></div>
+          <div class="bfp-bar-row"><span class="bfp-bar-label">Metabolic</span><div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarM" style="width:60%;background:#3b82f6"></div></div><span class="bfp-bar-val" id="bfpValM" style="color:#3b82f6"></span></div>
+          <div class="bfp-bar-row"><span class="bfp-bar-label">Mortality risk</span><div class="bfp-bar-wrap"><div class="bfp-bar-fill" id="bfpBarMort" style="width:60%;background:#10b981"></div></div><span class="bfp-bar-val" id="bfpValMort" style="color:#10b981"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="bfp-footer">
+      <button class="bfp-cancel" data-picker-action="close">Cancel</button>
+      <button class="bfp-confirm" data-picker-action="confirm">Set <span id="bfpConfirmVal">14</span>%</button>
+    </div>
+  </div>
+</div>
+
+<!-- TDEE Modal -->
+<div id="tdeeModal" style="display:none">
+  <div id="tdeeModalBox" style="background:#07070f;border:1px solid #1e1e38;border-radius:8px;width:100%;max-width:720px;max-height:94vh;overflow-y:auto;display:flex;flex-direction:column;">
+    <div style="padding:16px 20px 12px;border-bottom:1px solid #161628;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#eaecff;">TDEE Calculator</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:#4a4a72;margin-top:3px;">Katch-McArdle BMR · EAT · TEF · NEAT → weekly average</div>
+      </div>
+      <button data-tdee-action="close" style="width:30px;height:30px;border-radius:50%;border:1px solid #1e1e38;background:#0b0b18;color:#4a4a72;cursor:pointer;font-size:0.9rem;">✕</button>
+    </div>
+    <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="grid-column:1/-1;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;padding-top:4px;">Resistance Training</div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Training days / week</span>
+        <select class="tm-inp" id="tm_trainDays" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="2">2 days</option><option value="3" selected>3 days</option><option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Session duration</span>
+        <select class="tm-inp" id="tm_sessionDur" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="0.75">45 min</option><option value="1">1 hr</option><option value="1.5">1.5 hrs</option><option value="2" selected>2 hrs</option><option value="2.5">2.5 hrs</option><option value="3">3 hrs</option>
+        </select></div>
+      <div style="grid-column:1/-1;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;padding-top:8px;border-top:1px solid #161628;margin-top:4px;">Cardio / Endurance</div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Cardio days / week</span>
+        <select id="tm_cardioDays" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="0" selected>None</option><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Duration per session</span>
+        <select id="tm_cardioDur" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="0.5">30 min</option><option value="0.75">45 min</option><option value="1" selected>1 hr</option><option value="1.5">1.5 hrs</option><option value="2">2 hrs</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Zone / Intensity</span>
+        <select id="tm_zone" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="z1">Zone 1 — Recovery</option><option value="z2" selected>Zone 2 — Aerobic base</option><option value="z3">Zone 3 — Tempo</option><option value="z4">Zone 4 — Threshold</option><option value="z5">Zone 5 — VO₂ max</option><option value="intermittent">Sport / Intermittent</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Modality</span>
+        <select id="tm_modality" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="running">Running</option><option value="cycling">Cycling</option><option value="rowing">Rowing</option><option value="sport" selected>Sport (basketball etc.)</option><option value="swimming">Swimming</option><option value="hiit">HIIT</option><option value="elliptical">Elliptical</option><option value="stairmaster">Stairmaster</option>
+        </select></div>
+      <div style="grid-column:1/-1;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:2px;color:#4a4a72;padding-top:8px;border-top:1px solid #161628;margin-top:4px;">NEAT</div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Daily steps</span>
+        <select id="tm_steps" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="3000">~3,000 — sedentary</option><option value="6000">~6,000 — light</option><option value="8000" selected>~8,000 — moderate</option><option value="10000">~10,000 — active</option><option value="14000">~14,000 — very active</option>
+        </select></div>
+      <div><span style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:#2a2a50;margin-bottom:4px;display:block;">Occupation type</span>
+        <select id="tm_occupation" style="width:100%;background:#0b0b18;border:1px solid #161628;border-radius:3px;color:#d0d5f0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;padding:7px 9px;outline:none;">
+          <option value="seated" selected>Seated — desk / study</option><option value="mixed">Mixed — standing + moving</option><option value="standing">Mostly standing</option><option value="active">Active — physical labor</option>
+        </select></div>
+      <div id="tmResult" style="display:none;background:#0b0b18;border:1px solid #1e1e38;border-radius:4px;padding:14px 16px;grid-column:1/-1;margin-top:4px;">
+        <div id="tmResultNum" style="font-family:'Barlow Condensed',sans-serif;font-size:3.2rem;font-weight:800;color:#3b82f6;line-height:1;">—</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:#4a4a72;margin-top:4px;">kcal / day — weekly average</div>
+        <div id="tmResultBd" style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:#2a2a50;margin-top:8px;line-height:1.9;"></div>
+      </div>
+    </div>
+    <div style="padding:12px 20px 16px;border-top:1px solid #161628;display:flex;gap:8px;justify-content:flex-end;align-items:center;">
+      <button data-tdee-action="close" style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:1.5px;padding:8px 14px;border-radius:3px;border:1px solid #1e1e38;background:transparent;color:#4a4a72;cursor:pointer;">Cancel</button>
+      <button data-tdee-action="calc" style="font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:3px;border:none;background:#3b82f6;color:#fff;cursor:pointer;">Calculate</button>
+      <button id="tmConfirmBtn" data-tdee-action="confirm" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:3px;border:none;background:#eaecff;color:#030306;cursor:pointer;">Use <span id="tmConfirmVal">—</span> kcal</button>
+    </div>
+  </div>
+</div>
+
+<header>
+<div class="module-nav">
+  <a href="workout-formulation.html">Workout Formulation</a>
+  <a href="nutrition-formulation.html" class="active">Nutrition Formulation</a>
+  <a href="milestone-tracker.html">Milestone Tracker</a>
+</div>
+  <div class="header-tag">Science Based App · Module 03</div>
+  <h1>Nutrition<br><em>Formulation</em></h1>
+  <div class="sub">Katch-McArdle BMR · Day-type targets · Macro prescription · Goal-adaptive</div>
+</header>
+
+<div class="main">
+<div class="sidebar">
+
+  <div class="section-tag">01 — Biometrics</div>
+  <div class="grid-2">
+    <div class="input-group"><label>Bodyweight (lbs)</label><input type="number" id="weight" value="180" min="80" max="400"></div>
+    <div class="input-group"><label>Height (inches)</label><input type="number" id="height" value="74" min="48" max="96"></div>
+  </div>
+  <div class="grid-2">
+    <div class="input-group"><label>Age</label><input type="number" id="age" value="22" min="14" max="80"></div>
+    <div class="input-group"><label>Sex</label>
+      <select id="sex"><option value="male" selected>Male</option><option value="female">Female</option></select>
+    </div>
+  </div>
+  <div class="input-group"><label>Years Trained</label><input type="number" id="years" value="5" min="0" max="40" step="0.5"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">02 — Goal Priority</div>
+  <div style="margin-bottom:5px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">LBM</span>
+      <span id="lbl_lbm" style="font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:700;color:var(--blue)">4</span>
+    </div>
+    <input type="range" id="pri_lbm" class="goal-slider lbm" min="0" max="10" value="4" style="width:100%;accent-color:var(--blue)" oninput="updSliders()">
+  </div>
+  <div style="margin-bottom:5px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Fat Loss</span>
+      <span id="lbl_bf" style="font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:700;color:var(--orange)">4</span>
+    </div>
+    <input type="range" id="pri_bf"  class="goal-slider bf"  min="0" max="10" value="4" style="width:100%;accent-color:var(--orange)" oninput="updSliders()">
+  </div>
+  <div style="margin-bottom:5px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">VO₂</span>
+      <span id="lbl_vo2" style="font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:700;color:var(--green)">2</span>
+    </div>
+    <input type="range" id="pri_vo2" class="goal-slider vo2" min="0" max="10" value="2" style="width:100%;accent-color:var(--green)" oninput="updSliders()">
+  </div>
+  <div style="margin-bottom:5px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Strength</span>
+      <span id="lbl_str" style="font-family:'Barlow Condensed',sans-serif;font-size:0.88rem;font-weight:700;color:var(--purple)">2</span>
+    </div>
+    <input type="range" id="pri_str" class="goal-slider str" min="0" max="10" value="2" style="width:100%;accent-color:var(--purple)" oninput="updSliders()">
+  </div>
+  <div id="weightPie" style="display:flex;height:5px;border-radius:3px;overflow:hidden;margin:6px 0 3px">
+    <div class="pie-seg" style="background:var(--blue);height:100%"></div>
+    <div class="pie-seg" style="background:var(--orange);height:100%"></div>
+    <div class="pie-seg" style="background:var(--green);height:100%"></div>
+    <div class="pie-seg" style="background:var(--purple);height:100%"></div>
+  </div>
+  <div id="weightLabels" style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:var(--muted);line-height:1.7;display:flex;gap:8px;flex-wrap:wrap"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">03 — Day Type</div>
+  <div class="input-group">
+    <select id="dayType">
+      <option value="resistance">Resistance Training</option>
+      <option value="two_resistance_cardio">2 Sessions — Training + Cardio</option>
+      <option value="two_resistance_resistance">2 Sessions — Training + Training</option>
+      <option value="two_cardio_cardio">2 Sessions — Cardio + Cardio</option>
+      <option value="cardio">Cardio Only</option>
+      <option value="rest">Rest Day</option>
+    </select>
+  </div>
+  <div class="input-group"><label>Training Window</label>
+    <select id="trainingWindow">
+      <option value="morning">Morning (fasted / semi-fasted)</option>
+      <option value="midday" selected>Midday</option>
+      <option value="evening">Evening</option>
+    </select>
+  </div>
+  <div class="input-group"><label>Meal Frequency</label>
+    <select id="mealFreq">
+      <option value="2">2 meals</option>
+      <option value="3" selected>3 meals</option>
+      <option value="4">4 meals</option>
+      <option value="5">5 meals</option>
+      <option value="6">6 meals</option>
+    </select>
+  </div>
+  <div class="input-group"><label>Digestive Speed</label>
+    <select id="digestSpeed">
+      <option value="slow">Slow (prioritize whole foods / high fiber)</option>
+      <option value="moderate" selected>Moderate</option>
+      <option value="fast">Fast (prioritize fast-absorbing proteins / simple carbs peri-workout)</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">04 — Physiological Targets</div>
+  <div class="grid-2">
+    <div class="input-group"><label>Current BF%</label>
+      <div style="display:flex;gap:4px;align-items:center">
+        <input type="number" id="cur_bf" value="14" min="4" max="45" step="0.5" style="flex:1">
+        <button type="button" style="flex-shrink:0;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.4);border-radius:2px;color:rgba(249,115,22,0.9);font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:1px;text-transform:uppercase;padding:4px 6px;cursor:pointer" data-bf-input="cur_bf">⬡ match</button>
+      </div>
+    </div>
+    <div class="input-group"><label>Target BF%</label>
+      <div style="display:flex;gap:4px;align-items:center">
+        <input type="number" id="goal_bf" value="11" min="4" max="40" step="0.5" style="flex:1">
+        <button type="button" style="flex-shrink:0;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.4);border-radius:2px;color:rgba(249,115,22,0.9);font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:1px;text-transform:uppercase;padding:4px 6px;cursor:pointer" data-bf-input="goal_bf">⬡ match</button>
+      </div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="input-group"><label>Current LBM (lbs)</label><input type="number" id="cur_lbm" value="155" min="60" max="300"></div>
+    <div class="input-group"><label>Target LBM (lbs)</label><input type="number" id="goal_lbm" value="165" min="60" max="300"></div>
+  </div>
+  <div class="grid-2">
+    <div class="input-group"><label>Current VO₂</label><input type="number" id="cur_vo2" value="50" min="20" max="90"></div>
+    <div class="input-group"><label>Target VO₂</label><input type="number" id="goal_vo2" value="55" min="20" max="90"></div>
+  </div>
+  <div class="grid-2">
+    <div class="input-group"><label>Current Strength (×BW)</label><input type="number" id="cur_str" value="1.5" min="0.3" max="4" step="0.05"></div>
+    <div class="input-group"><label>Target Strength (×BW)</label><input type="number" id="goal_str" value="1.8" min="0.3" max="4" step="0.05"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">05 — NEAT Adjustment</div>
+  <div class="input-group">
+    <select id="neat">
+      <option value="-0.08">Very Low (desk all day, &lt;3k steps)</option>
+      <option value="-0.04">Low (light movement, 3–6k steps)</option>
+      <option value="0" selected>Moderate (6–10k steps)</option>
+      <option value="0.04">High (10–14k steps / active job)</option>
+      <option value="0.08">Very High (14k+ steps / manual labor)</option>
+    </select>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-tag">06 — TDEE Reference</div>
+  <div class="input-group">
+    <label>Weekly Avg TDEE</label>
+    <div style="display:flex;gap:6px;align-items:center">
+      <input type="number" id="tdee" value="3200" min="1200" max="6000" style="flex:1">
+      <button type="button" style="flex-shrink:0;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.5);border-radius:2px;color:rgba(59,130,246,0.9);font-family:'JetBrains Mono',monospace;font-size:0.48rem;letter-spacing:1px;text-transform:uppercase;padding:7px 9px;cursor:pointer;white-space:nowrap" data-tdee-open="true">⬡ calculate</button>
+    </div>
+  </div>
+
+  <button class="gen-btn" data-action="generate">Formulate Nutrition Plan</button>
+</div>
+
+<div class="output" id="output">
+  <div class="empty-state">
+    <div class="icon">⬡</div>
+    <p>Configure biometrics,<br>goals, and training context,<br>then formulate your plan.</p>
+  </div>
+</div>
+</div>
+
+<script>
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MICRONUTRIENT DATABASE — hypertrophy-critical nutrients
+// ═══════════════════════════════════════════════════════════════════════════
+const MICROS = [
+  {
+    name:'Vitamin D3', color:'#f59e0b', role:'Testosterone synthesis, muscle protein synthesis, calcium absorption',
+    rda:600, optimal:2000, unit:'IU',
+    importance:'critical',
+    foods:'Fatty fish (salmon, mackerel), egg yolks, fortified milk, sunlight exposure',
+    hyp_note:'Deficiency directly suppresses testosterone and IGF-1 — two primary anabolic hormones'
+  },
+  {
+    name:'Magnesium', color:'#10b981', role:'ATP production, protein synthesis, sleep quality, testosterone',
+    rda:400, optimal:500, unit:'mg',
+    importance:'critical',
+    foods:'Pumpkin seeds, dark chocolate, almonds, spinach, black beans',
+    hyp_note:'~48% of athletes are deficient. Magnesium glycinate before sleep measurably improves REM and recovery'
+  },
+  {
+    name:'Zinc', color:'#3b82f6', role:'Testosterone production, immune function, protein synthesis co-factor',
+    rda:11, optimal:25, unit:'mg',
+    importance:'critical',
+    foods:'Oysters, beef, pumpkin seeds, chickpeas, cashews',
+    hyp_note:'Zinc is rate-limiting for testosterone synthesis. Sweating during training accelerates depletion'
+  },
+  {
+    name:'Omega-3 (EPA+DHA)', color:'#a855f7', role:'mTOR activation, inflammation reduction, muscle protein synthesis',
+    rda:1100, optimal:3000, unit:'mg',
+    importance:'critical',
+    foods:'Salmon, mackerel, sardines, fish oil supplement, algae oil',
+    hyp_note:'Directly activates mTOR pathway — 3g/day shown to augment MPS by ~30% in resistance training'
+  },
+  {
+    name:'Creatine', color:'#f97316', role:'ATP regeneration, cell volumization, strength output',
+    rda:0, optimal:5000, unit:'mg',
+    importance:'critical',
+    foods:'Red meat, herring (dietary); supplement for full dose',
+    hyp_note:'Most evidence-backed supplement. 5g/day increases strength 5–15%, cell hydration, satellite cell activity'
+  },
+  {
+    name:'Vitamin B12', color:'#ec4899', role:'Red blood cell formation, nerve function, energy metabolism',
+    rda:2.4, optimal:10, unit:'mcg',
+    importance:'high',
+    foods:'Beef liver, sardines, tuna, eggs, dairy',
+    hyp_note:'Critical for oxygen delivery to muscle tissue. Deficiency causes fatigue and impaired protein metabolism'
+  },
+  {
+    name:'Iron', color:'#ef4444', role:'Oxygen transport (hemoglobin), energy production, endurance',
+    rda:8, optimal:18, unit:'mg',
+    importance:'high',
+    foods:'Red meat, liver, lentils, spinach + vitamin C for absorption',
+    hyp_note:'VO₂ max directly limited by hemoglobin iron. Low iron = ceiling on aerobic capacity'
+  },
+  {
+    name:'Potassium', color:'#14b8a6', role:'Muscle contraction, glycogen storage, electrolyte balance',
+    rda:2600, optimal:4700, unit:'mg',
+    importance:'high',
+    foods:'Bananas, sweet potato, avocado, salmon, white beans',
+    hyp_note:'High-volume training depletes potassium rapidly — low levels impair muscle contraction efficiency'
+  },
+  {
+    name:'Calcium', color:'#60a5fa', role:'Muscle contraction, bone density, nerve signaling',
+    rda:1000, optimal:1200, unit:'mg',
+    importance:'moderate',
+    foods:'Dairy, fortified plant milk, sardines with bones, kale, tofu',
+    hyp_note:'High protein diets increase urinary calcium loss — active individuals need upper end of range'
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FOOD RECOMMENDATIONS — per meal window and macro emphasis
+// ═══════════════════════════════════════════════════════════════════════════
+const FOOD_DB = {
+  protein_high:  ['Chicken breast', 'Salmon', 'Greek yogurt', 'Eggs', 'Lean beef', 'Cottage cheese', 'Tuna', 'Turkey', 'Shrimp'],
+  protein_fast:  ['Whey protein shake', 'Egg whites', 'Chicken breast', 'Low-fat yogurt'],
+  carb_high:     ['White rice', 'Oats', 'Sweet potato', 'Banana', 'Bread', 'Pasta', 'Dates', 'Fruit'],
+  carb_fast:     ['White rice', 'Banana', 'Fruit juice', 'Dates', 'Rice cakes', 'Dextrose'],
+  carb_slow:     ['Oats', 'Sweet potato', 'Quinoa', 'Beans', 'Brown rice', 'Vegetables'],
+  fat_healthy:   ['Avocado', 'Olive oil', 'Almonds', 'Walnuts', 'Salmon', 'Egg yolks', 'Dark chocolate'],
+  greens:        ['Spinach', 'Broccoli', 'Kale', 'Asparagus', 'Zucchini', 'Bell peppers'],
+};
+
+function pickFoods(cats, n=3) {
+  const pool = cats.flatMap(c => FOOD_DB[c]||[]);
+  const shuffled = pool.sort(()=>Math.random()-0.5);
+  return [...new Set(shuffled)].slice(0,n).join(', ');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SLIDER UI
+// ═══════════════════════════════════════════════════════════════════════════
+function updSliders() {
+  const vals = { lbm:+document.getElementById('pri_lbm').value, bf:+document.getElementById('pri_bf').value, vo2:+document.getElementById('pri_vo2').value, str:+document.getElementById('pri_str').value };
+  const total = vals.lbm+vals.bf+vals.vo2+vals.str||1;
+  const colors = { lbm:'var(--blue)',bf:'var(--orange)',vo2:'var(--green)',str:'var(--purple)' };
+  Object.keys(vals).forEach(k => {
+    document.getElementById('lbl_'+k).textContent = vals[k];
+    const pct = (vals[k]/10)*100;
+    document.getElementById('pri_'+k).style.background = `linear-gradient(to right,${colors[k]} ${pct}%,var(--border2) ${pct}%)`;
+  });
+  const segs = document.querySelectorAll('#weightPie .pie-seg');
+  ['lbm','bf','vo2','str'].forEach((k,i) => { segs[i].style.width=((vals[k]/total)*100)+'%'; });
+  document.getElementById('weightLabels').innerHTML = ['lbm','bf','vo2','str'].map((k,i)=>
+    `<span style="color:${['var(--blue)','var(--orange)','var(--green)','var(--purple)'][i]}">${k.toUpperCase()} ${Math.round(vals[k]/total*100)}%</span>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CORE NUTRITION ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function computeMacros(inputs) {
+  const { weight_lbs, bf_pct, age, sex, neat, dayType, years, tdee, w, cur_bf, goal_bf, cur_lbm, goal_lbm, cur_vo2, goal_vo2, cur_str, goal_str, digestSpeed } = inputs;
+
+  const weight_kg = weight_lbs * 0.453592;
+  const lbm_lbs   = weight_lbs * (1 - bf_pct/100);
+  const lbm_kg    = lbm_lbs * 0.453592;
+
+  // ── CALORIC TARGET ────────────────────────────────────────────────────────
+  // Base from TDEE. Adjust by day type and goals.
+  const neatMods = { sedentary:-150, light:-50, moderate:0, active:+100, very_active:+200 };
+  const neatAdj  = neatMods[neat] || 0;
+
+  // Day type caloric modifier
+  const dayMods = { training:+250, double:+450, double_training:+500, double_cardio:+300, cardio:+150, rest:-200 };
+  const dayAdj  = dayMods[dayType] || 0;
+
+  // Goal direction — net caloric delta
+  const bf_gap   = goal_bf  - cur_bf;   // negative = need deficit
+  const lbm_gap  = goal_lbm - cur_lbm;  // positive = need surplus
+  const bf_delta = bf_gap  < 0 ? Math.max(-500, bf_gap  * 35) : 0;  // ~35 kcal per 0.1pp BF loss rate
+  const lbm_delta= lbm_gap > 0 ? Math.min(400,  lbm_gap * 50) : 0;  // ~50 kcal surplus per lb LBM goal
+
+  // Weighted net by priority
+  const goalDelta = (bf_delta*w.bf + lbm_delta*w.lbm) / (w.bf+w.lbm||1);
+
+  // Age-related metabolic adjustment: RMR declines ~1-2% per decade after 30
+  const agePenalty = age > 30 ? -(age-30)*0.008*tdee : 0;
+
+  const dailyKcal = Math.round(tdee + neatAdj + dayAdj + goalDelta + agePenalty);
+
+  // ── PROTEIN ──────────────────────────────────────────────────────────────
+  // Base: 0.8g/lb LBM (conservative floor)
+  // Hypertrophy: 1.0–1.1g/lb LBM
+  // Age >35: anabolic resistance → +0.15g/lb
+  // High BF loss goal: +0.1g/lb (preserve LBM in deficit)
+  // Sex: females have slightly lower MPS ceiling → ~0.9g/lb floor
+  let proteinPerLb = sex === 'male' ? 0.9 : 0.82;
+  proteinPerLb += w.lbm * 0.12;                          // LBM goal adds protein
+  proteinPerLb += w.str * 0.08;                          // strength goal adds protein
+  if (age > 35) proteinPerLb += 0.12;                    // anabolic resistance
+  if (bf_gap < 0) proteinPerLb += 0.08;                  // deficit protection
+  proteinPerLb = Math.min(proteinPerLb, sex==='male'?1.2:1.1); // natural ceiling
+  const proteinG = Math.round(lbm_lbs * proteinPerLb);
+  const proteinKcal = proteinG * 4;
+
+  // ── FAT ──────────────────────────────────────────────────────────────────
+  // Floor: 0.35g/lb BW for hormonal function (testosterone synthesis needs fat)
+  // Deficit phase → stay closer to floor; surplus → moderate increase
+  // Male testosterone synthesis requires higher fat floor than female
+  const fatFloorPerLb = sex === 'male' ? 0.38 : 0.32;
+  const fatBonus = w.str * 0.04;  // strength goal raises fat slightly (hormone support)
+  const fatPerLb = Math.min(fatFloorPerLb + fatBonus, 0.55);
+  const fatG = Math.round(weight_lbs * fatPerLb);
+  const fatKcal = fatG * 9;
+
+  // ── CARBS ─────────────────────────────────────────────────────────────────
+  // Fills remaining calories — carbs are the primary performance lever
+  const carbKcal = Math.max(0, dailyKcal - proteinKcal - fatKcal);
+  const carbG    = Math.round(carbKcal / 4);
+
+  // ── REST DAY ADJUSTMENTS ─────────────────────────────────────────────────
+  // Rest day: reduce carbs, keep protein, slight fat increase
+  const restKcal   = Math.round(dailyKcal * 0.82);
+  const restCarbG  = Math.round(Math.max(0, restKcal - proteinKcal - (fatG*9)) / 4);
+  const restProtG  = proteinG;  // protein stays constant
+  const restFatG   = Math.round((restKcal - proteinKcal - restCarbG*4) / 9);
+
+  return { dailyKcal, proteinG, carbG, fatG, proteinKcal, carbKcal, fatKcal,
+           restKcal, restCarbG, restProtG, restFatG, lbm_lbs, lbm_kg,
+           weight_kg, proteinPerLb: proteinPerLb.toFixed(2), bf_gap, lbm_gap };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MEAL TIMING ENGINE
+// Distributes macros across meals based on frequency, training window, day type
+// ─────────────────────────────────────────────────────────────────────────────
+function buildMealPlan(macros, inputs) {
+  const { mealFreq, trainingWindow, dayType, digestSpeed } = inputs;
+  const { dailyKcal, proteinG, carbG, fatG } = macros;
+
+  // Protein per meal cap — based on digestion speed and MPS refractory period
+  // Fast digest: can handle 50g+ / meal. Slow: max ~35g effective absorption
+  const protPerMealCap = digestSpeed==='fast' ? 55 : digestSpeed==='slow' ? 35 : 45;
+  const minMeals = Math.ceil(proteinG / protPerMealCap);
+  const effectiveMeals = Math.max(mealFreq, minMeals);
+
+  // Window times based on training time
+  const windowTimes = {
+    morning:   { wake:'6:00 AM', pre:'7:00 AM', post:'9:30 AM', lunch:'12:30 PM', afternoon:'3:30 PM', dinner:'6:30 PM', evening:'9:00 PM' },
+    midday:    { wake:'7:00 AM', pre:'9:30 AM', post:'12:30 PM', lunch:'3:00 PM', afternoon:'5:30 PM', dinner:'7:30 PM', evening:'9:30 PM' },
+    afternoon: { wake:'7:00 AM', pre:'1:30 PM', post:'5:00 PM', lunch:'10:30 AM', afternoon:'1:00 PM', dinner:'7:00 PM', evening:'9:30 PM' },
+    evening:   { wake:'7:00 AM', pre:'5:00 PM', post:'8:00 PM', lunch:'10:30 AM', afternoon:'2:00 PM', dinner:'5:30 PM', evening:'10:00 PM' },
+  };
+  const times = windowTimes[trainingWindow] || windowTimes.afternoon;
+
+  // Pre-training: moderate carbs, moderate protein, low fat (fat slows gastric emptying)
+  // Post-training: high carbs (insulin spike for glycogen repletion), high protein (MPS window)
+  // Other meals: balanced, fat distributed evenly
+
+  const isTraining = ['training','double','double_training'].includes(dayType);
+  const isCardio   = ['cardio','double','double_cardio'].includes(dayType);
+
+  // Carb distribution: ~40% peri-workout on training days
+  const periCarbPct = isTraining ? 0.40 : isCardio ? 0.30 : 0.25;
+  const periCarbG   = Math.round(carbG * periCarbPct);
+  const preCarbG    = Math.round(periCarbG * 0.40);
+  const postCarbG   = Math.round(periCarbG * 0.60);
+  const remainCarbG = carbG - preCarbG - postCarbG;
+
+  // Protein distributed evenly across meals (maximize MPS frequency)
+  const protPerMeal = Math.round(proteinG / effectiveMeals);
+
+  const meals = [];
+
+  if (effectiveMeals === 3) {
+    if (isTraining || isCardio) {
+      meals.push({
+        time: times.wake,
+        label: 'Breakfast — Morning Fuel',
+        window: '',
+        protein: protPerMeal,
+        carbs: Math.round(remainCarbG * 0.35),
+        fat: Math.round(fatG * 0.25),
+        foods: pickFoods(['protein_high','carb_slow','fat_healthy']),
+        note: 'Sustained energy before the day begins. Prioritize whole food protein and complex carbs.'
+      });
+      meals.push({
+        time: times.pre,
+        label: 'Pre-Training Meal',
+        window: 'PRE-WORKOUT',
+        protein: protPerMeal,
+        carbs: preCarbG,
+        fat: Math.round(fatG * 0.15),
+        foods: pickFoods(['protein_fast','carb_fast']),
+        note: '60–90 min before training. High carb, moderate protein, very low fat for fast digestion.'
+      });
+      meals.push({
+        time: times.post,
+        label: 'Post-Training Recovery',
+        window: 'POST-WORKOUT',
+        protein: protPerMeal,
+        carbs: postCarbG,
+        fat: Math.round(fatG * 0.20),
+        foods: pickFoods(['protein_fast','carb_fast','protein_high']),
+        note: 'Within 30–60 min of training. Fast carbs + fast protein maximizes glycogen repletion and MPS.'
+      });
+    } else {
+      // Rest day: 3 balanced meals, reduced carbs
+      meals.push({ time:times.wake,      label:'Meal 1 — Morning',   window:'', protein:protPerMeal, carbs:Math.round(remainCarbG*0.40), fat:Math.round(fatG*0.30), foods:pickFoods(['protein_high','carb_slow','greens']), note:'Balanced morning meal. Keep carbs moderate on rest days.' });
+      meals.push({ time:times.lunch,     label:'Meal 2 — Midday',    window:'', protein:protPerMeal, carbs:Math.round(remainCarbG*0.35), fat:Math.round(fatG*0.35), foods:pickFoods(['protein_high','carb_slow','greens','fat_healthy']), note:'Largest meal of the day on rest days. Prioritize vegetables and lean protein.' });
+      meals.push({ time:times.dinner,    label:'Meal 3 — Evening',   window:'', protein:protPerMeal, carbs:Math.round(remainCarbG*0.25), fat:Math.round(fatG*0.35), foods:pickFoods(['protein_high','fat_healthy','greens']), note:'Lower carb evening meal. Higher fat supports testosterone production overnight.' });
+    }
+  } else if (effectiveMeals === 4) {
+    meals.push({ time:times.wake,      label:'Meal 1 — Breakfast',    window:'', protein:protPerMeal, carbs:Math.round(remainCarbG*0.30), fat:Math.round(fatG*0.25), foods:pickFoods(['protein_high','carb_slow','fat_healthy']), note:'First MPS window of the day.' });
+    if (isTraining) {
+      meals.push({ time:times.pre,     label:'Pre-Training',          window:'PRE-WORKOUT', protein:protPerMeal, carbs:preCarbG, fat:Math.round(fatG*0.10), foods:pickFoods(['carb_fast','protein_fast']), note:'Fast digesting. Low fat.' });
+      meals.push({ time:times.post,    label:'Post-Training Recovery', window:'POST-WORKOUT', protein:protPerMeal, carbs:postCarbG, fat:Math.round(fatG*0.20), foods:pickFoods(['protein_fast','carb_fast']), note:'Priority meal. Maximize MPS and glycogen.' });
+    } else {
+      meals.push({ time:times.lunch,   label:'Meal 2 — Lunch',        window:'', protein:protPerMeal, carbs:Math.round(remainCarbG*0.35), fat:Math.round(fatG*0.25), foods:pickFoods(['protein_high','carb_slow','greens']), note:'' });
+      meals.push({ time:times.afternoon,label:'Meal 3 — Afternoon',   window:'', protein:protPerMeal, carbs:Math.round(remainCarbG*0.20), fat:Math.round(fatG*0.25), foods:pickFoods(['protein_high','fat_healthy']), note:'Protein and healthy fats to bridge to dinner.' });
+    }
+    meals.push({ time:times.dinner,    label:'Final Meal — Dinner',   window:'', protein:protPerMeal, carbs:Math.round(remainCarbG*0.25), fat:Math.round(fatG*0.30), foods:pickFoods(['protein_high','fat_healthy','greens']), note:'Higher fat pre-sleep supports overnight testosterone synthesis.' });
+  } else {
+    // 5–6 meals: distribute evenly with peri-workout emphasis
+    const carbPerRegMeal = Math.round(remainCarbG / Math.max(1, effectiveMeals-2));
+    const fatPerMeal = Math.round(fatG / effectiveMeals);
+    const mealNames = ['Breakfast','Mid-Morning','Lunch','Afternoon','Dinner','Evening'];
+    const mealTimes = [times.wake, times.pre, times.lunch, times.afternoon, times.dinner, times.evening];
+    for (let i=0; i<effectiveMeals; i++) {
+      const isPreMeal  = isTraining && i===1;
+      const isPostMeal = isTraining && i===2;
+      meals.push({
+        time: mealTimes[i] || '',
+        label: `Meal ${i+1} — ${mealNames[i]||''}`,
+        window: isPreMeal?'PRE-WORKOUT':isPostMeal?'POST-WORKOUT':'',
+        protein: protPerMeal,
+        carbs: isPreMeal?preCarbG:isPostMeal?postCarbG:carbPerRegMeal,
+        fat: isPreMeal?Math.round(fatPerMeal*0.5):fatPerMeal,
+        foods: pickFoods(isPreMeal?['carb_fast','protein_fast']:isPostMeal?['protein_fast','carb_fast']:['protein_high','carb_slow','fat_healthy','greens']),
+        note: isPreMeal?'Low fat pre-workout for fast digestion':isPostMeal?'Priority recovery window':''
+      });
+    }
+  }
+
+  return meals;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MICRONUTRIENT RELEVANCE SCORER — weights each micro by goal priorities
+// ─────────────────────────────────────────────────────────────────────────────
+function scoreMicros(w, dayType, sex, age) {
+  return MICROS.map(m => {
+    let urgency = 0.5; // base
+    if (m.name === 'Vitamin D3')     urgency = 0.6 + w.str*0.2 + w.lbm*0.2;
+    if (m.name === 'Magnesium')      urgency = 0.6 + w.lbm*0.15 + w.str*0.15;
+    if (m.name === 'Zinc')           urgency = 0.5 + w.str*0.3 + (sex==='male'?0.1:0);
+    if (m.name === 'Omega-3 (EPA+DHA)') urgency = 0.5 + w.lbm*0.25 + w.vo2*0.15;
+    if (m.name === 'Creatine')       urgency = 0.5 + w.str*0.3 + w.lbm*0.2;
+    if (m.name === 'Vitamin B12')    urgency = 0.4 + w.vo2*0.3;
+    if (m.name === 'Iron')           urgency = 0.3 + w.vo2*0.4 + (sex==='female'?0.2:0);
+    if (m.name === 'Potassium')      urgency = 0.4 + w.vo2*0.2 + (dayType==='double'?0.15:0);
+    if (m.name === 'Calcium')        urgency = 0.3 + (age>35?0.2:0);
+    if (age > 35) urgency += 0.08; // anabolic resistance — all micros more important
+    return { ...m, urgency: Math.min(1, urgency) };
+  }).sort((a,b) => b.urgency - a.urgency);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN GENERATE
+// ═══════════════════════════════════════════════════════════════════════════
+function generate() {
+  const age    = +document.getElementById('age').value;
+  const sex    = document.getElementById('sex').value;
+  const weight = +document.getElementById('weight').value;
+  const bf_pct = +document.getElementById('cur_bf').value; // sourced from physiological targets — bf_pct input removed from biometrics
+  const height = +document.getElementById('height').value;
+  const years  = +document.getElementById('years').value;
+  const neat   = document.getElementById('neat').value;
+  const mealFreq = +document.getElementById('mealFreq').value;
+  const digestSpeed = document.getElementById('digestSpeed').value;
+  const dayType = document.getElementById('dayType').value;
+  const trainingWindow = document.getElementById('trainingWindow').value;
+  const tdee   = +document.getElementById('tdee').value;
+  const cur_bf = +document.getElementById('cur_bf').value;
+  const goal_bf= +document.getElementById('goal_bf').value;
+  const cur_lbm= +document.getElementById('cur_lbm').value;
+  const goal_lbm=+document.getElementById('goal_lbm').value;
+  const cur_vo2= +document.getElementById('cur_vo2').value;
+  const goal_vo2=+document.getElementById('goal_vo2').value;
+  const cur_str= +document.getElementById('cur_str').value;
+  const goal_str=+document.getElementById('goal_str').value;
+
+  const raw = { lbm:+document.getElementById('pri_lbm').value, bf:+document.getElementById('pri_bf').value, vo2:+document.getElementById('pri_vo2').value, str:+document.getElementById('pri_str').value };
+  const total = raw.lbm+raw.bf+raw.vo2+raw.str||1;
+  const w = { lbm:raw.lbm/total, bf:raw.bf/total, vo2:raw.vo2/total, str:raw.str/total };
+
+
+  // ── Persist age + sex to localStorage for milestone tracker ────────────────
+  try {
+    const existing = JSON.parse(localStorage.getItem('sba_profile') || '{}');
+    localStorage.setItem('sba_profile', JSON.stringify({
+      ...existing,
+      age:  +document.getElementById('age').value,
+      sex:  document.getElementById('sex').value,
+      nf_saved: Date.now(),
+    }));
+  } catch(e) { console.warn('localStorage write failed', e); }
+
+  const inputs = { weight_lbs:weight, bf_pct, age, sex, neat, dayType, years, tdee, w, cur_bf, goal_bf, cur_lbm, goal_lbm, cur_vo2, goal_vo2, cur_str, goal_str, mealFreq, trainingWindow, digestSpeed };
+  const macros = computeMacros(inputs);
+  const meals  = buildMealPlan(macros, inputs);
+  const micros = scoreMicros(w, dayType, sex, age);
+
+  const { dailyKcal, proteinG, carbG, fatG, proteinKcal, carbKcal, fatKcal, restKcal, restCarbG, restProtG, restFatG, lbm_lbs, proteinPerLb, bf_gap, lbm_gap } = macros;
+
+  const pPct = Math.round(proteinKcal/dailyKcal*100);
+  const cPct = Math.round(carbKcal/dailyKcal*100);
+  const fPct = Math.round(fatKcal/dailyKcal*100);
+
+  const dayLabel = {training:'Resistance Training',double:'Training + Cardio',double_training:'Double Training',double_cardio:'Double Cardio',cardio:'Cardio Day',rest:'Rest Day'}[dayType];
+  const isTraining = ['training','double','double_training'].includes(dayType);
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
+  document.getElementById('output').innerHTML = `
+
+    <!-- Logic note -->
+    <div class="logic-note">
+      <strong>Formulation basis:</strong>
+      ${age}yr ${sex} · ${weight}lbs · ${bf_pct}% BF · LBM ${Math.round(lbm_lbs)}lbs · ${years}yr training.
+      Protein set at <strong>${proteinPerLb}g/lb LBM</strong>
+      ${age>35?' (elevated for anabolic resistance)':''}
+      ${bf_gap<0?` + BF deficit protection (+0.08g/lb)`:''}
+      ${sex==='male'?' · Fat floor elevated for testosterone synthesis':''}.
+      Day type: <strong>${dayLabel}</strong> · Caloric target adjusted ${isTraining?'+250':'−200'} kcal.
+    </div>
+
+    <!-- Master calorie + macro bar -->
+    <div class="section-title">Daily Macro Targets — ${dayLabel}</div>
+    <div class="macro-master">
+      <div class="macro-total-row">
+        <div><div class="macro-total-kcal">${dailyKcal.toLocaleString()} <span>kcal / day</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:var(--muted);margin-top:3px">
+            P ${pPct}% · C ${cPct}% · F ${fPct}%
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--muted);line-height:1.8">
+            TDEE reference: ${tdee.toLocaleString()} kcal<br>
+            ${dayType==='rest'?`Rest day: ${restKcal.toLocaleString()} kcal`:`Training surplus: +${(dailyKcal-tdee>0?'+':'')}${dailyKcal-tdee} kcal`}
+          </div>
+        </div>
+      </div>
+      <div class="macro-stacked-bar">
+        <div class="macro-seg" style="width:${pPct}%;background:var(--protein)"><span class="macro-seg-label">PROTEIN ${proteinG}g</span></div>
+        <div class="macro-seg" style="width:${cPct}%;background:var(--carbs)"><span class="macro-seg-label">CARBS ${carbG}g</span></div>
+        <div class="macro-seg" style="width:${fPct}%;background:var(--fat)"><span class="macro-seg-label">FAT ${fatG}g</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted)">
+        <span style="color:var(--protein)">← Protein ${pPct}%</span>
+        <span style="color:var(--carbs)">Carbs ${cPct}%</span>
+        <span style="color:var(--fat)">Fat ${fPct}% →</span>
+      </div>
+    </div>
+
+    <!-- Macro detail cards -->
+    <div class="macro-cards">
+      ${[
+        { name:'Protein', g:proteinG, kcal:proteinKcal, color:'var(--protein)', pct:pPct, per:`${proteinPerLb}g / lb LBM`, note:`${Math.round(lbm_lbs)}lb LBM · MPS frequency: ${mealFreq} windows` },
+        { name:'Carbohydrates', g:carbG, kcal:carbKcal, color:'var(--carbs)', pct:cPct, per:`${(carbG/weight).toFixed(1)}g / lb BW`, note:`${isTraining?'~40% peri-workout':'Reduced on rest/cardio days'}` },
+        { name:'Fat', g:fatG, kcal:fatKcal, color:'var(--fat)', pct:fPct, per:`${(fatG/weight).toFixed(2)}g / lb BW`, note:`Testosterone synthesis floor ${sex==='male'?'0.38':'0.32'}g/lb BW` },
+      ].map(m => `
+        <div class="macro-card">
+          <div class="macro-card-fill" style="height:${m.pct}%;background:${m.color}"></div>
+          <div class="macro-card-content">
+            <div class="macro-card-name" style="color:${m.color}">${m.name}</div>
+            <div class="macro-card-grams" style="color:${m.color}">${m.g}<span class="macro-card-g">g</span></div>
+            <div class="macro-card-kcal">${m.kcal.toLocaleString()} kcal · ${m.pct}%</div>
+            <div class="macro-card-per-lb" style="color:${m.color}">${m.per}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:var(--muted);margin-top:2px">${m.note}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Training vs Rest comparison -->
+    <div class="section-title">Training Day vs Rest Day</div>
+    <div class="day-type-grid">
+      <div class="day-type-card" style="border-color:var(--carbs)33">
+        <div class="day-type-label" style="color:var(--carbs)">Training Day</div>
+        ${[['Calories',dailyKcal.toLocaleString(),'var(--white)'],['Protein',proteinG+'g','var(--protein)'],['Carbs',carbG+'g','var(--carbs)'],['Fat',fatG+'g','var(--fat)']].map(([n,v,c])=>
+          `<div class="day-macro-row"><div class="day-macro-name">${n}</div><div class="day-macro-val" style="color:${c}">${v}</div></div>`).join('')}
+      </div>
+      <div class="day-type-card" style="border-color:var(--muted)33">
+        <div class="day-type-label" style="color:var(--muted)">Rest Day</div>
+        ${[['Calories',restKcal.toLocaleString(),'var(--white)'],['Protein',restProtG+'g','var(--protein)'],['Carbs',restCarbG+'g','var(--carbs)'],['Fat',restFatG+'g','var(--fat)']].map(([n,v,c])=>
+          `<div class="day-macro-row"><div class="day-macro-name">${n}</div><div class="day-macro-val" style="color:${c}">${v}</div></div>`).join('')}
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:var(--muted);margin-top:6px">−${dailyKcal-restKcal} kcal · carbs reduced, protein held, fat slightly elevated</div>
+      </div>
+    </div>
+
+    <!-- Anabolic window alert if training day -->
+    ${isTraining ? `
+    <div class="anabolic-alert">
+      ⚡ <strong>Peri-workout window active:</strong>
+      Pre-training meal ~60–90 min before session (${meals.find(m=>m.window==='PRE-WORKOUT')?.time||'see plan'}) — fast carbs + protein, minimal fat.
+      Post-training within 30–60 min (${meals.find(m=>m.window==='POST-WORKOUT')?.time||'see plan'}) — priority recovery window. ${Math.round(carbG*0.25)}g fast carbs + ${Math.round(proteinG/mealFreq)}g protein.
+    </div>` : ''}
+
+    <!-- Meal timing plan -->
+    <div class="section-title">Meal Timing Plan — ${mealFreq} Meals / Day</div>
+    <div class="meal-timeline">
+      ${meals.map(m => {
+        const mKcal = m.protein*4 + m.carbs*4 + m.fat*9;
+        return `
+          <div class="meal-block">
+            <div>
+              <div class="meal-time">${m.time}</div>
+              ${m.window?`<span class="meal-window-tag" style="background:var(--timing)22;color:var(--timing);border:1px solid var(--timing)33">${m.window}</span>`:''}
+            </div>
+            <div>
+              <div class="meal-label">${m.label}</div>
+              <div class="meal-macros">
+                <span style="color:var(--protein)">P ${m.protein}g</span> ·
+                <span style="color:var(--carbs)">C ${m.carbs}g</span> ·
+                <span style="color:var(--fat)">F ${m.fat}g</span>
+              </div>
+              ${m.note?`<div class="meal-foods">${m.note}</div>`:''}
+              <div class="meal-foods">Foods: ${m.foods}</div>
+            </div>
+            <div class="meal-kcal-badge">${mKcal}<div style="font-size:0.5rem;color:var(--muted);font-family:'JetBrains Mono',monospace">kcal</div></div>
+          </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Micronutrients -->
+    <div class="section-title">Hypertrophy-Critical Micronutrients</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:var(--muted);margin-bottom:10px;line-height:1.7">
+      Ranked by relevance to your goal weights and biometrics. Priority driven by highest marginal impact on hypertrophy, hormonal output, and VO₂ capacity.
+    </div>
+    <div class="micro-grid">
+      ${micros.map(m => {
+        const urgPct = Math.round(m.urgency*100);
+        const urgColor = m.urgency>=0.8?'#ef4444':m.urgency>=0.65?'#f97316':m.urgency>=0.5?'#f59e0b':'#10b981';
+        const urgLabel = m.urgency>=0.8?'CRITICAL':m.urgency>=0.65?'HIGH':m.urgency>=0.5?'ELEVATED':'MONITOR';
+        return `
+          <div class="micro-card" style="border-color:${m.color}33">
+            <div class="micro-name" style="color:${m.color}">${m.name}</div>
+            <div class="micro-status" style="color:${urgColor}">${urgLabel}</div>
+            <div class="micro-bar-wrap"><div class="micro-bar" style="width:${urgPct}%;background:${urgColor}"></div></div>
+            <div class="micro-note">${m.optimal.toLocaleString()} ${m.unit}/day optimal · ${m.role}</div>
+            <div class="micro-note" style="color:var(--purple);margin-top:3px">${m.hyp_note}</div>
+            <div class="micro-foods">↳ ${m.foods}</div>
+          </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Age/sex specific notes -->
+    ${age <= 25 ? `<div class="logic-note"><strong>Age advantage (${age}yr):</strong> Peak anabolic sensitivity — protein synthesis response to training is maximized. Lower protein threshold applies. Prioritize progressive overload over nutritional complexity at this stage.</div>` : ''}
+    ${age > 35 ? `<div class="logic-note" style="border-color:var(--warn)"><strong>Anabolic resistance flag (${age}yr):</strong> Protein per meal threshold increases with age — each dose needs to be larger to achieve equivalent MPS. Protein set at elevated rate. Leucine-rich sources (whey, eggs, beef) preferentially over plant protein for MPS trigger.</div>` : ''}
+    ${sex === 'female' ? `<div class="logic-note"><strong>Sex-specific adjustments applied:</strong> Fat floor reduced to 0.32g/lb BW (lower testosterone floor requirement). Protein ceiling adjusted to 1.1g/lb LBM. Iron flagged as elevated priority. Calcium critical for hormonal bone density maintenance during high training volume.</div>` : ''}
+  `;
+}
+
+// Init
+updSliders();
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BF PICKER — global reusable module
+// Usage: bfPickerOpen('inputElementId', currentValue, sex)
+// On confirm: writes selected value back to input, dispatches 'input' event
+// ─────────────────────────────────────────────────────────────────────────────
+
+const BFP_TIERS = {
+  male: [
+    { max:6,  label:'Essential Fat',   color:'#10b981', desc:'Minimum fat required for organ function. Competition-lean. Not sustainable long-term — hormonal and immune suppression risk.' },
+    { max:9,  label:'Stage Ready',     color:'#14b8a6', desc:'Competition bodybuilding range. Visible striations on all muscle groups. Requires careful monitoring.' },
+    { max:12, label:'Athletic — Peak', color:'#3b82f6', desc:'Peak health composition. Maximum testosterone:estrogen ratio. Vascularity high. Optimal across all health markers.' },
+    { max:15, label:'Athletic',        color:'#60a5fa', desc:'Athletic body composition. All major muscle groups clearly visible. Excellent hormonal and cardiovascular profile.' },
+    { max:18, label:'Fitness',         color:'#f59e0b', desc:'Fit, healthy composition. Muscle definition visible. Good metabolic health. Minor visceral fat beginning.' },
+    { max:22, label:'Average — Active',color:'#f97316', desc:'Average active adult. Some abdominal fat. Hormonal and metabolic health still solid. Visible softness over muscle groups.' },
+    { max:26, label:'Average',         color:'#fb923c', desc:'Population average. Moderate visceral fat. Insulin sensitivity declining. Testosterone:estrogen ratio shifting.' },
+    { max:30, label:'Overweight',      color:'#ef4444', desc:'Elevated visceral fat. Insulin resistance likely. Aromatase increasing — testosterone converting to estrogen.' },
+    { max:40, label:'Obese',           color:'#dc2626', desc:'High visceral fat burden. Systemic chronic inflammation. Significant metabolic and cardiovascular disease risk.' },
+  ],
+  female: [
+    { max:14, label:'Essential Fat',   color:'#10b981', desc:'At or below essential fat for females. Hormonal disruption likely — estrogen suppression affects bone density.' },
+    { max:18, label:'Athletic — Peak', color:'#14b8a6', desc:'Athletic competition range. Excellent definition. Monitor — sustained periods below 16% may affect hormonal cycling.' },
+    { max:22, label:'Athletic',        color:'#3b82f6', desc:'Healthy athletic composition. Excellent cardiovascular and metabolic profile. Optimal health range for active females.' },
+    { max:26, label:'Fitness',         color:'#60a5fa', desc:'Fit composition. Good metabolic health. Muscle definition visible. Healthy hormonal profile maintained.' },
+    { max:30, label:'Average — Active',color:'#f59e0b', desc:'Healthy active female range. Minor fat accumulation but metabolically sound.' },
+    { max:34, label:'Average',         color:'#f97316', desc:'Population average. Moderate fat accumulation. Insulin sensitivity declining. Cardiovascular markers manageable.' },
+    { max:42, label:'Above Average',   color:'#ef4444', desc:'Elevated adiposity. Increasing visceral fat. Metabolic and cardiovascular risk rising.' },
+  ]
+};
+
+let _bfpTargetId = null;
+let _bfpSex = 'male';
+let _bfpVal = 14;
+
+
+window._bfOpen = function(inputId) {
+  var el = document.getElementById(inputId);
+  if (!el) return;
+  var sex = 'male';
+  try { var s = document.getElementById('sex'); if (s) sex = s.value; } catch(e) {}
+  bfPickerOpen(inputId, parseFloat(el.value) || 14, sex);
+};
+
+function bfPickerOpen(targetInputId, currentVal, sex) {
+  _bfpTargetId = targetInputId;
+  _bfpSex      = sex || 'male';
+  _bfpVal      = currentVal || 14;
+
+  // Set sex buttons
+  document.getElementById('bfpBtnMale').classList.toggle('active',   _bfpSex==='male');
+  document.getElementById('bfpBtnFemale').classList.toggle('active', _bfpSex==='female');
+
+  // Set slider range
+  const sl = document.getElementById('bfpSlider');
+  sl.min   = _bfpSex==='female' ? 10 : 4;
+  sl.max   = _bfpSex==='female' ? 42 : 40;
+  sl.value = _bfpVal;
+  _buildTicks();
+  bfpOnSlide(_bfpVal);
+
+  // Store starting BF% as baseline for marginal calculations
+  _bfpBaseBF = currentVal || 14;
+  document.getElementById('bfPickerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function bfPickerClose() {
+  document.getElementById('bfPickerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function bfPickerConfirm() {
+  if (_bfpTargetId) {
+    const el = document.getElementById(_bfpTargetId);
+    if (el) {
+      el.value = _bfpVal;
+      el.dispatchEvent(new Event('input', { bubbles:true }));
+      el.dispatchEvent(new Event('change',{ bubbles:true }));
+    }
+  }
+  bfPickerClose();
+}
+
+function bfpSetSex(sex) {
+  _bfpSex = sex;
+  document.getElementById('bfpBtnMale').classList.toggle('active',   sex==='male');
+  document.getElementById('bfpBtnFemale').classList.toggle('active', sex==='female');
+  const sl = document.getElementById('bfpSlider');
+  sl.min = sex==='female'?10:4;
+  sl.max = sex==='female'?42:40;
+  if (+sl.value < +sl.min) sl.value = +sl.min;
+  _buildTicks();
+  bfpOnSlide(sl.value);
+}
+
+function _buildTicks() {
+  const sl    = document.getElementById('bfpSlider');
+  const min   = +sl.min, max = +sl.max;
+  const steps = [min, Math.round(min+(max-min)*0.25), Math.round(min+(max-min)*0.5), Math.round(min+(max-min)*0.75), max];
+  document.getElementById('bfpTicks').innerHTML = steps.map(v=>`<span>${v}%</span>`).join('');
+}
+
+function bfpOnSlide(val) {
+  _bfpVal = +val;
+  const tiers = BFP_TIERS[_bfpSex];
+  const tier  = tiers.find(t => _bfpVal <= t.max) || tiers[tiers.length-1];
+
+  // Update slider track fill
+  const sl = document.getElementById('bfpSlider');
+  if (sl) {
+    const pct = ((+val - +sl.min) / (+sl.max - +sl.min)) * 100;
+    sl.style.background = `linear-gradient(to right,${tier.color} ${pct}%,#1e1e38 ${pct}%)`;
+  }
+
+  // Update big pct display
+  const bigEl = document.getElementById('bfpPctBig');
+  bigEl.textContent = (+val).toFixed(1);
+  bigEl.style.color = tier.color;
+
+  // Tier label
+  const tlEl = document.getElementById('bfpTierLabel');
+  tlEl.textContent   = tier.label;
+  tlEl.style.background = tier.color + '20';
+  tlEl.style.color   = tier.color;
+  tlEl.style.border  = `1px solid ${tier.color}40`;
+
+  // Tier description
+  document.getElementById('bfpTierDesc').textContent = tier.desc;
+  document.getElementById('bfpTierDesc').style.color = tier.color + 'cc';
+
+  // Confirm button
+  document.getElementById('bfpConfirmVal').textContent = (+val).toFixed(1);
+
+  // Health scores — bars show absolute level, label shows marginal delta vs start
+  const sc = _bfpScores(+val, _bfpSex);
+  // Bar width = absolute health score (where on the curve is this BF%)
+  // Label = marginal delta from starting point (positive = improvement)
+  _setBarMarginal('bfpBarH',    'bfpValH',    sc.hormonalAbs,  sc.hormonal,  100);
+  _setBarMarginal('bfpBarC',    'bfpValC',    sc.cardioAbs,    sc.cardio,    100);
+  _setBarMarginal('bfpBarM',    'bfpValM',    sc.metabolicAbs, sc.metabolic, 100);
+  _setBarMarginalMort('bfpBarMort','bfpValMort', sc.mortalityAbs, sc.mortality, 30);
+
+  // Redraw silhouette
+  _bfpDrawBody(+val, _bfpSex, tier.color);
+}
+
+function _setBar(barId, valId, val, max, prefix, suffix) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) b.style.width = Math.round(val/max*100)+'%';
+  if(v) v.textContent = (prefix||'')+val+(suffix||'');
+}
+
+// Bar width = absolute score position on curve
+// Label = marginal delta from starting BF% (+ good, - bad)
+function _setBarMarginal(barId, valId, absVal, delta, max) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) {
+    b.style.width = Math.round(absVal/max*100)+'%';
+    // Color shift: green if improving, orange if same, red if worse
+    b.style.background = delta > 2 ? '#10b981' : delta < -2 ? '#ef4444' : '#f59e0b';
+  }
+  if(v) {
+    const sign = delta > 0 ? '+' : '';
+    v.textContent = sign + delta;
+    v.style.color  = delta > 2 ? '#10b981' : delta < -2 ? '#ef4444' : '#f59e0b';
+  }
+}
+function _setBarMarginalMort(barId, valId, absVal, delta, max) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) {
+    b.style.width = Math.round(absVal/max*100)+'%';
+    b.style.background = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#f59e0b';
+  }
+  if(v) {
+    const sign = delta > 0 ? '-' : delta < 0 ? '+' : '';
+    v.textContent = sign + Math.abs(delta) + '%';
+    v.style.color  = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#f59e0b';
+  }
+}
+
+let _bfpBaseBF = 14; // set when picker opens
+
+// _bfpScores returns MARGINAL benefit scores relative to starting BF%
+// Bars show: how much does moving from _bfpBaseBF to 'bf' improve each category
+// Positive delta = improvement, negative = regression
+// Each category peaks at its optimal BF% — not at the leanest point
+function _bfpAbsScores(bf, sex) {
+  const male = sex === 'male';
+  // Hormonal — peaks at ~11% male, ~21% female (aromatase minimum)
+  // Drops on both sides: too lean suppresses hormones, too heavy converts T→E
+  const hormonalPeak = male ? 11 : 21;
+  const hormonal  = Math.max(5,  Math.min(100, 100 - Math.pow(Math.abs(bf - hormonalPeak)*3.5, 1.1)));
+  // Cardiovascular — monotonically better as BF falls (to a floor around essential fat)
+  // At 4% it's not the best — risk curve reverses at extremes
+  const cardioFloor = male ? 6 : 13;
+  const cardio = bf < cardioFloor
+    ? Math.max(40, 90 - (cardioFloor - bf) * 8)   // reversal below essential fat
+    : Math.max(10, Math.min(90, 100 - (bf - cardioFloor) * 2.6));
+  // Metabolic / insulin — best between 8-12% male, 16-20% female
+  const metPeak = male ? 10 : 18;
+  const metabolic = Math.max(8, Math.min(95,
+    bf < metPeak
+      ? 95 - Math.pow((metPeak - bf) * 2.5, 1.2)   // too lean impairs metabolic flexibility
+      : 95 - Math.max(0, bf - metPeak) * 3.0));
+  // Mortality — peaks around 10-12% male, nonlinear curve
+  // Very low BF reverses the mortality benefit
+  const mortPeak = male ? 11 : 20;
+  const mortality = Math.max(0, Math.min(30,
+    bf < mortPeak
+      ? 30 - Math.pow((mortPeak - bf) * 2, 1.3) * 0.5   // slight reversal at extremes
+      : Math.max(0, 30 - (bf - mortPeak) * 1.0)));
+  return {
+    hormonal:  Math.round(Math.max(0, Math.min(100, hormonal))),
+    cardio:    Math.round(Math.max(0, Math.min(100, cardio))),
+    metabolic: Math.round(Math.max(0, Math.min(100, metabolic))),
+    mortality: Math.round(Math.max(0, Math.min(30,  mortality))),
+  };
+}
+
+function _bfpScores(bf, sex) {
+  // Returns marginal delta vs the starting BF% when picker was opened
+  const base = _bfpAbsScores(_bfpBaseBF || bf, sex);
+  const curr = _bfpAbsScores(bf, sex);
+  return {
+    hormonal:  curr.hormonal  - base.hormonal,
+    cardio:    curr.cardio    - base.cardio,
+    metabolic: curr.metabolic - base.metabolic,
+    mortality: curr.mortality - base.mortality,
+    // Also expose absolute for bar width calculation
+    hormonalAbs:  curr.hormonal,
+    cardioAbs:    curr.cardio,
+    metabolicAbs: curr.metabolic,
+    mortalityAbs: curr.mortality,
+  };
+}
+
+// Procedural SVG body — same morphing logic as body-composition-visual.html
+function _bfpDrawBody(bf, sex, col) {
+  const svg = document.getElementById('bfpBodySvg');
+  if (!svg) return;
+  const isMale = sex === 'male';
+  const MIN = isMale ? 4 : 10, MAX = isMale ? 40 : 42;
+  const t = Math.max(0, Math.min(1, (bf - MIN) / (MAX - MIN)));
+  // t=0 → lean/shredded, t=1 → high BF
+  const L = (a, b) => a + (b - a) * t;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // ── Canvas: 220 wide × 480 tall ──────────────────────────────────────────
+  const cx = 110;
+
+  // ── Detail opacity curves ─────────────────────────────────────────────────
+  // Striations / vascularity: only below ~10% male
+  const vascOp   = clamp((0.12 - bf) / 0.08, 0, 0.9);   // peaks at 4%
+  // Muscle separation lines: 4–18%
+  const sepOp    = clamp(1 - t * 1.8, 0, 0.85);
+  // Abs definition: 4–16%
+  const absOp    = clamp(1 - t * 2.2, 0, 0.9);
+  // Chest/pec line: 4–20%
+  const pecOp    = clamp(1 - t * 1.6, 0, 0.85);
+  // Oblique lines: 4–18%
+  const oblOp    = clamp(1 - t * 1.9, 0, 0.8);
+
+  // ── Key measurements ──────────────────────────────────────────────────────
+  const headR    = 20;
+  const headCY   = 36;
+  const headW    = 19; // slightly oval
+
+  // Neck
+  const neckW    = L(isMale ? 11 : 9,  isMale ? 13 : 12);
+  const neckTop  = headCY + headR - 3;
+  const neckBot  = neckTop + 16;
+
+  // Trapezius sweep — wider at lean
+  const trapW    = L(isMale ? 10 : 7, isMale ? 6 : 4); // trap peak above shoulder
+  const shoulderY = neckBot + 5;
+  // Shoulder width — deltoid caps visible at lean
+  const shoulderW = L(isMale ? 57 : 50, isMale ? 65 : 62);
+  // Deltoid cap protrusion at lean
+  const deltCap   = L(isMale ? 6 : 4, isMale ? 2 : 1);
+
+  // Chest
+  const chestY   = shoulderY + 18;
+  const chestW   = L(isMale ? 44 : 38, isMale ? 56 : 54);
+  // Pec lower border Y
+  const pecBotY  = chestY + L(isMale ? 28 : 22, isMale ? 32 : 26);
+
+  // Waist
+  const waistW   = L(isMale ? 29 : 25, isMale ? 52 : 50);
+  const waistY   = pecBotY + L(isMale ? 20 : 18, isMale ? 26 : 22);
+
+  // Belly bulge — nonlinear, only appears above ~18%
+  const bellyT   = Math.max(0, (t - 0.3) / 0.7);
+  const belly    = bellyT * bellyT * (isMale ? 32 : 24);
+
+  // Hips / iliac crest
+  const hipsW    = L(isMale ? 40 : 48, isMale ? 58 : 68);
+  const hipsY    = waistY + L(18, 24);
+  // Iliac crest visible protrusion at lean
+  const iliacPop = L(isMale ? 4 : 3, 0);
+
+  // Crotch / legs
+  const crotchY  = hipsY + 20;
+  const thighTopW = L(isMale ? 24 : 28, isMale ? 34 : 42);
+  const thighMidW = L(isMale ? 20 : 23, isMale ? 29 : 36);
+  const kneeW     = L(isMale ? 14 : 13, isMale ? 20 : 19);
+  const calfPeakW = L(isMale ? 16 : 15, isMale ? 22 : 21);
+  const ankleW    = L(isMale ? 8 : 7,   isMale ? 12 : 11);
+  const kneeY     = crotchY + 80;
+  const calfPeakY = kneeY + 50;
+  const ankleY    = kneeY + 110;
+
+  // Arms
+  const shoulderCapY = shoulderY + 8;
+  const bicepPeakW   = L(isMale ? 14 : 10, isMale ? 18 : 14);
+  const forearmW     = L(isMale ? 10 : 8,  isMale ? 13 : 11);
+  const wristW       = L(isMale ? 6 : 5,   isMale ? 8 : 7);
+  const elbowY       = shoulderCapY + 75;
+  const wristY       = elbowY + 80;
+  const armOutX      = cx + shoulderW + deltCap;
+  const armInX       = cx + shoulderW - 8;
+
+  // ── BODY OUTLINE (right side, mirrored) ───────────────────────────────────
+  // Uses cubic bezier curves for organic shape
+  const bodyR = `
+    M ${cx + neckW} ${neckTop}
+    L ${cx + neckW} ${neckBot}
+    C ${cx + neckW + trapW} ${neckBot + 4}, ${cx + shoulderW - deltCap*2} ${shoulderY - 4}, ${cx + shoulderW} ${shoulderY}
+    C ${cx + shoulderW + deltCap} ${shoulderY + 6}, ${cx + shoulderW + deltCap} ${shoulderCapY + 6}, ${cx + shoulderW} ${shoulderCapY + 10}
+    C ${cx + chestW + 2} ${chestY}, ${cx + chestW} ${chestY + 10}, ${cx + chestW - 2} ${pecBotY}
+    C ${cx + chestW - 4} ${pecBotY + 8}, ${cx + waistW + belly + 4} ${waistY - 10}, ${cx + waistW + belly} ${waistY}
+    C ${cx + waistW + belly - 2} ${waistY + 8}, ${cx + hipsW - iliacPop} ${hipsY - 6}, ${cx + hipsW} ${hipsY}
+    C ${cx + hipsW + 2} ${hipsY + 8}, ${cx + thighTopW + 4} ${crotchY - 4}, ${cx + thighTopW} ${crotchY}
+    C ${cx + thighMidW + 3} ${crotchY + 30}, ${cx + thighMidW + 2} ${kneeY - 20}, ${cx + kneeW + 2} ${kneeY}
+    C ${cx + kneeW} ${kneeY + 10}, ${cx + calfPeakW + 3} ${calfPeakY}, ${cx + calfPeakW} ${calfPeakY + 8}
+    C ${cx + calfPeakW - 4} ${calfPeakY + 30}, ${cx + ankleW + 2} ${ankleY - 10}, ${cx + ankleW} ${ankleY}
+  `;
+  const bodyL = `
+    M ${cx - neckW} ${neckTop}
+    L ${cx - neckW} ${neckBot}
+    C ${cx - neckW - trapW} ${neckBot + 4}, ${cx - shoulderW + deltCap*2} ${shoulderY - 4}, ${cx - shoulderW} ${shoulderY}
+    C ${cx - shoulderW - deltCap} ${shoulderY + 6}, ${cx - shoulderW - deltCap} ${shoulderCapY + 6}, ${cx - shoulderW} ${shoulderCapY + 10}
+    C ${cx - chestW - 2} ${chestY}, ${cx - chestW} ${chestY + 10}, ${cx - chestW + 2} ${pecBotY}
+    C ${cx - chestW + 4} ${pecBotY + 8}, ${cx - waistW - belly - 4} ${waistY - 10}, ${cx - waistW - belly} ${waistY}
+    C ${cx - waistW - belly + 2} ${waistY + 8}, ${cx - hipsW + iliacPop} ${hipsY - 6}, ${cx - hipsW} ${hipsY}
+    C ${cx - hipsW - 2} ${hipsY + 8}, ${cx - thighTopW - 4} ${crotchY - 4}, ${cx - thighTopW} ${crotchY}
+    C ${cx - thighMidW - 3} ${crotchY + 30}, ${cx - thighMidW - 2} ${kneeY - 20}, ${cx - kneeW - 2} ${kneeY}
+    C ${cx - kneeW} ${kneeY + 10}, ${cx - calfPeakW - 3} ${calfPeakY}, ${cx - calfPeakW} ${calfPeakY + 8}
+    C ${cx - calfPeakW + 4} ${calfPeakY + 30}, ${cx - ankleW - 2} ${ankleY - 10}, ${cx - ankleW} ${ankleY}
+  `;
+  const bodyBase = `L ${cx - ankleW} ${ankleY} L ${cx + ankleW} ${ankleY}`;
+  const fullBody = bodyR + bodyBase + bodyL.split('M')[1].split('\n').reverse().join('\n') + ' Z';
+
+  // ── RIGHT ARM (hanging at side, slight bend) ──────────────────────────────
+  const rArm = `
+    M ${cx + shoulderW - 4} ${shoulderCapY + 8}
+    C ${armOutX + 4} ${shoulderCapY + 20}, ${armOutX + bicepPeakW} ${elbowY - 30}, ${armOutX + forearmW - 4} ${elbowY}
+    C ${armOutX + forearmW - 6} ${elbowY + 30}, ${armOutX + wristW} ${wristY - 10}, ${armOutX + wristW - 2} ${wristY}
+    L ${armOutX - wristW - 2} ${wristY}
+    C ${armOutX - wristW} ${wristY - 10}, ${armOutX - forearmW + 4} ${elbowY + 30}, ${armOutX - forearmW + 2} ${elbowY}
+    C ${armInX - 4} ${elbowY - 20}, ${armInX - 2} ${shoulderCapY + 24}, ${cx + shoulderW - 6} ${shoulderCapY + 12}
+    Z
+  `;
+  const lArm = `
+    M ${cx - shoulderW + 4} ${shoulderCapY + 8}
+    C ${cx - armOutX + cx - 4} ${shoulderCapY + 20}, ${cx - armOutX + cx - bicepPeakW} ${elbowY - 30}, ${cx - armOutX + cx - forearmW + 4} ${elbowY}
+    C ${cx - armOutX + cx - forearmW + 6} ${elbowY + 30}, ${cx - armOutX + cx - wristW} ${wristY - 10}, ${cx - armOutX + cx - wristW + 2} ${wristY}
+    L ${cx - armOutX + cx + wristW + 2} ${wristY}
+    C ${cx - armOutX + cx + wristW} ${wristY - 10}, ${cx - armOutX + cx + forearmW - 4} ${elbowY + 30}, ${cx - armOutX + cx + forearmW - 2} ${elbowY}
+    C ${cx - armInX + cx + 4} ${elbowY - 20}, ${cx - armInX + cx + 2} ${shoulderCapY + 24}, ${cx - shoulderW + 6} ${shoulderCapY + 12}
+    Z
+  `;
+
+  // ── MUSCLE DETAIL LINES ────────────────────────────────────────────────────
+  // All fade with increasing BF%
+
+  // Pec / chest lower border — curved shelf shape
+  const pecLine = `M ${cx - chestW + 6} ${pecBotY - 2}
+    Q ${cx - 12} ${pecBotY + 4} ${cx} ${pecBotY + 2}
+    Q ${cx + 12} ${pecBotY + 4} ${cx + chestW - 6} ${pecBotY - 2}`;
+
+  // Pec center line (sternal groove)
+  const sternalLine = `M ${cx} ${chestY + 4} L ${cx} ${pecBotY + 2}`;
+
+  // Pec upper border / clavicular head
+  const pecUpperR = `M ${cx + 4} ${chestY + 2} Q ${cx + 22} ${chestY - 2} ${cx + shoulderW - 16} ${shoulderCapY + 14}`;
+  const pecUpperL = `M ${cx - 4} ${chestY + 2} Q ${cx - 22} ${chestY - 2} ${cx - shoulderW + 16} ${shoulderCapY + 14}`;
+
+  // Serratus lines (saw-tooth at lateral ribcage, lean indicator)
+  const serratusR = [0,1,2].map(i =>
+    `M ${cx + chestW - 10} ${pecBotY + 4 + i*9} Q ${cx + chestW - 2} ${pecBotY + 8 + i*9} ${cx + chestW - 12} ${pecBotY + 14 + i*9}`
+  ).join(' ');
+  const serratusL = [0,1,2].map(i =>
+    `M ${cx - chestW + 10} ${pecBotY + 4 + i*9} Q ${cx - chestW + 2} ${pecBotY + 8 + i*9} ${cx - chestW + 12} ${pecBotY + 14 + i*9}`
+  ).join(' ');
+
+  // Rectus abdominis — 3 horizontal tendinous intersections + linea alba
+  const lineaAlba = `M ${cx} ${pecBotY + 4} L ${cx} ${waistY - 4}`;
+  const absLines  = [0,1,2].map(i => {
+    const y = pecBotY + 10 + i * 13;
+    return `M ${cx - 10} ${y} Q ${cx} ${y - 2} ${cx + 10} ${y}`;
+  }).join(' ');
+  // Oblique lines — diagonal sweep from ribs to hip
+  const obliqueR = `M ${cx + chestW - 8} ${pecBotY + 12} Q ${cx + waistW + 8} ${waistY - 8} ${cx + hipsW - 10} ${hipsY - 4}`;
+  const obliqueL = `M ${cx - chestW + 8} ${pecBotY + 12} Q ${cx - waistW - 8} ${waistY - 8} ${cx - hipsW + 10} ${hipsY - 4}`;
+
+  // Deltoid separation lines
+  const deltFrontR = `M ${cx + shoulderW - 4} ${shoulderY + 4} Q ${cx + shoulderW + deltCap - 2} ${shoulderY + 14} ${cx + chestW + 2} ${chestY + 6}`;
+  const deltFrontL = `M ${cx - shoulderW + 4} ${shoulderY + 4} Q ${cx - shoulderW - deltCap + 2} ${shoulderY + 14} ${cx - chestW - 2} ${chestY + 6}`;
+
+  // Bicep peak line (arm)
+  const bicepR = `M ${armOutX + 2} ${shoulderCapY + 30} Q ${armOutX + bicepPeakW - 2} ${elbowY - 40} ${armOutX + forearmW - 2} ${elbowY - 4}`;
+  const bicepL = `M ${cx-armOutX+cx - 2} ${shoulderCapY + 30} Q ${cx-armOutX+cx - bicepPeakW + 2} ${elbowY - 40} ${cx-armOutX+cx - forearmW + 2} ${elbowY - 4}`;
+
+  // Quad sweep — VMO teardrop at knee
+  const quadR = `M ${cx + thighTopW - 4} ${crotchY + 20} Q ${cx + thighMidW + 6} ${kneeY - 40} ${cx + kneeW + 6} ${kneeY - 6}`;
+  const quadL = `M ${cx - thighTopW + 4} ${crotchY + 20} Q ${cx - thighMidW - 6} ${kneeY - 40} ${cx - kneeW - 6} ${kneeY - 6}`;
+  // VMO teardrop
+  const vmoR = `M ${cx + kneeW + 4} ${kneeY - 14} Q ${cx + kneeW + 10} ${kneeY - 4} ${cx + kneeW + 2} ${kneeY + 2}`;
+  const vmoL = `M ${cx - kneeW - 4} ${kneeY - 14} Q ${cx - kneeW - 10} ${kneeY - 4} ${cx - kneeW - 2} ${kneeY + 2}`;
+
+  // Iliac crest line (V-cut / hip flexor line at very lean)
+  const iliacR = `M ${cx + waistW + belly - 2} ${waistY + 4} Q ${cx + hipsW - 2} ${hipsY - 10} ${cx + thighTopW + 2} ${crotchY - 2}`;
+  const iliacL = `M ${cx - waistW - belly + 2} ${waistY + 4} Q ${cx - hipsW + 2} ${hipsY - 10} ${cx - thighTopW - 2} ${crotchY - 2}`;
+  const vCutOp  = clamp((0.14 - bf) / 0.10, 0, 0.85); // only visible below ~14%
+
+  // ── VASCULAR LINES (only at very lean — below ~10%) ──────────────────────
+  // Bicep vein
+  const bvR = `M ${armOutX + bicepPeakW - 4} ${shoulderCapY + 25} Q ${armOutX + bicepPeakW - 3} ${elbowY - 30} ${armOutX + forearmW} ${elbowY + 10}`;
+  const bvL = `M ${cx-armOutX+cx - bicepPeakW + 4} ${shoulderCapY + 25} Q ${cx-armOutX+cx - bicepPeakW + 3} ${elbowY - 30} ${cx-armOutX+cx - forearmW} ${elbowY + 10}`;
+  // Forearm veins
+  const fvR  = `M ${armOutX + forearmW - 2} ${elbowY + 8} Q ${armOutX + forearmW - 3} ${elbowY + 50} ${armOutX + wristW} ${wristY - 8}`;
+  // Abdominal vein (linea semilunaris)
+  const abVR = `M ${cx + 12} ${pecBotY + 6} Q ${cx + 14} ${waistY - 10} ${cx + 10} ${waistY + 2}`;
+  const abVL = `M ${cx - 12} ${pecBotY + 6} Q ${cx - 14} ${waistY - 10} ${cx - 10} ${waistY + 2}`;
+
+  // ── SKIN TONE / GRADIENT ──────────────────────────────────────────────────
+  // Lean: more contrast, visible light/shadow gradient
+  // Heavy: flatter, softer gradient
+  const gradContrast = L(0.95, 0.70);
+  const shadowDepth  = L(0.55, 0.30);
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="bfpBodyGrad" x1="0.2" y1="0" x2="0.8" y2="1">
+        <stop offset="0%"   stop-color="${col}" stop-opacity="${gradContrast}"/>
+        <stop offset="45%"  stop-color="${col}" stop-opacity="${(gradContrast+shadowDepth)/2}"/>
+        <stop offset="100%" stop-color="${col}" stop-opacity="${shadowDepth}"/>
+      </linearGradient>
+      <linearGradient id="bfpArmGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="${col}" stop-opacity="${shadowDepth + 0.1}"/>
+        <stop offset="50%"  stop-color="${col}" stop-opacity="${gradContrast}"/>
+        <stop offset="100%" stop-color="${col}" stop-opacity="${shadowDepth}"/>
+      </linearGradient>
+      <filter id="bfpSoften">
+        <feGaussianBlur stdDeviation="${L(0, 0.8)}"/>
+      </filter>
+    </defs>
+
+    <!-- Ground shadow -->
+    <ellipse cx="${cx}" cy="${ankleY + 10}" rx="${L(28,44)}" ry="5"
+      fill="rgba(0,0,0,0.2)"/>
+
+    <!-- Body fill -->
+    <path d="${fullBody}" fill="url(#bfpBodyGrad)" filter="url(#bfpSoften)"/>
+
+    <!-- Arms -->
+    <path d="${rArm}" fill="url(#bfpArmGrad)" opacity="0.92"/>
+    <path d="${lArm}" fill="url(#bfpArmGrad)" opacity="0.92"/>
+
+    <!-- Body outline -->
+    <path d="${fullBody}" fill="none" stroke="${col}" stroke-width="0.8" opacity="0.5"/>
+    <path d="${rArm}"     fill="none" stroke="${col}" stroke-width="0.6" opacity="0.4"/>
+    <path d="${lArm}"     fill="none" stroke="${col}" stroke-width="0.6" opacity="0.4"/>
+
+    <!-- Neck trapezius shaping -->
+    <path d="M ${cx - neckW} ${neckBot} Q ${cx} ${neckBot - 4} ${cx + neckW} ${neckBot}"
+      fill="none" stroke="${col}" stroke-width="0.5" opacity="${sepOp * 0.4}"/>
+
+    <!-- Pec shelf and sternal groove -->
+    <path d="${pecLine}"    fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.2" opacity="${pecOp}"/>
+    <path d="${sternalLine}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.7" opacity="${pecOp * 0.8}"/>
+    <path d="${pecUpperR}"  fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${pecOp * 0.7}"/>
+    <path d="${pecUpperL}"  fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${pecOp * 0.7}"/>
+
+    <!-- Serratus anterior -->
+    <path d="${serratusR}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.7" opacity="${clamp(oblOp * 0.8, 0, 0.8)}"/>
+    <path d="${serratusL}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.7" opacity="${clamp(oblOp * 0.8, 0, 0.8)}"/>
+
+    <!-- Abs: linea alba + intersections -->
+    <path d="${lineaAlba}" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="0.8" opacity="${absOp}"/>
+    <path d="${absLines}"  fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="0.8" opacity="${absOp}"/>
+
+    <!-- Obliques -->
+    <path d="${obliqueR}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${oblOp}"/>
+    <path d="${obliqueL}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${oblOp}"/>
+
+    <!-- Deltoid separation -->
+    <path d="${deltFrontR}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${sepOp}"/>
+    <path d="${deltFrontL}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${sepOp}"/>
+
+    <!-- Bicep line -->
+    <path d="${bicepR}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.7" opacity="${sepOp * 0.9}"/>
+    <path d="${bicepL}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.7" opacity="${sepOp * 0.9}"/>
+
+    <!-- Quad sweep + VMO teardrop -->
+    <path d="${quadR}" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="0.8" opacity="${sepOp * 0.8}"/>
+    <path d="${quadL}" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="0.8" opacity="${sepOp * 0.8}"/>
+    <path d="${vmoR}"  fill="none" stroke="rgba(0,0,0,0.3)"  stroke-width="0.7" opacity="${absOp * 0.9}"/>
+    <path d="${vmoL}"  fill="none" stroke="rgba(0,0,0,0.3)"  stroke-width="0.7" opacity="${absOp * 0.9}"/>
+
+    <!-- Iliac V-cut -->
+    <path d="${iliacR}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.8" opacity="${vCutOp}"/>
+    <path d="${iliacL}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.8" opacity="${vCutOp}"/>
+
+    <!-- Vascularity — bicep vein -->
+    <path d="${bvR}" fill="none" stroke="${col}" stroke-width="1.2" opacity="${vascOp * 0.9}"
+      stroke-dasharray="none"/>
+    <path d="${bvL}" fill="none" stroke="${col}" stroke-width="1.2" opacity="${vascOp * 0.9}"
+      stroke-dasharray="none"/>
+    <!-- Forearm vein -->
+    <path d="${fvR}" fill="none" stroke="${col}" stroke-width="0.9" opacity="${vascOp * 0.7}"/>
+    <!-- Abdominal veins -->
+    <path d="${abVR}" fill="none" stroke="${col}" stroke-width="0.8" opacity="${vascOp * 0.6}"/>
+    <path d="${abVL}" fill="none" stroke="${col}" stroke-width="0.8" opacity="${vascOp * 0.6}"/>
+
+    <!-- Head -->
+    <ellipse cx="${cx}" cy="${headCY}" rx="${headW}" ry="${headR}"
+      fill="url(#bfpBodyGrad)" stroke="${col}" stroke-width="0.6" opacity="0.9"/>
+
+    <!-- BF% label on torso -->
+    <text x="${cx}" y="${waistY - 6}" text-anchor="middle"
+      font-family="'Barlow Condensed',sans-serif" font-size="15" font-weight="800"
+      fill="rgba(255,255,255,${L(0.9, 0.5)})">${bf.toFixed(1)}%</text>
+  `;
+}
+
+// Close on backdrop click
+document.getElementById('bfPickerOverlay').addEventListener('click', function(e) {
+  if (e.target === this) bfPickerClose();
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') bfPickerClose();
+});
+
+// Init ticks
+_buildTicks();
+
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BIDIRECTIONAL LBM ↔ BF% AUTO-CALCULATION
+// Anchor: bodyweight. Change BF% → LBM updates. Change LBM → BF% updates.
+// ─────────────────────────────────────────────────────────────────────────────
+function _lbmFromBf(bw, bf)  { return Math.round((bw * (1 - bf/100)) * 10) / 10; }
+function _bfFromLbm(bw, lbm) { return Math.round(((1 - lbm/bw) * 100) * 10) / 10; }
+
+function _syncBfToLbm(bwId, bfId, lbmId) {
+  const bw  = +document.getElementById(bwId)?.value;
+  const bf  = +document.getElementById(bfId)?.value;
+  const lbmEl = document.getElementById(lbmId);
+  if (!bw || !bf || !lbmEl) return;
+  const lbm = _lbmFromBf(bw, bf);
+  if (lbm > 0 && lbm < bw) {
+    lbmEl.value = lbm;
+    lbmEl.dispatchEvent(new Event('change', { bubbles:true }));
+    _flashInput(lbmEl);
+  }
+}
+
+function _syncLbmToBf(bwId, bfId, lbmId) {
+  const bw   = +document.getElementById(bwId)?.value;
+  const lbm  = +document.getElementById(lbmId)?.value;
+  const bfEl = document.getElementById(bfId);
+  if (!bw || !lbm || !bfEl) return;
+  const bf = _bfFromLbm(bw, lbm);
+  if (bf > 2 && bf < 65) {
+    bfEl.value = bf;
+    bfEl.dispatchEvent(new Event('change', { bubbles:true }));
+    _flashInput(bfEl);
+  }
+}
+
+function _flashInput(el) {
+  if (!el) return;
+  el.style.transition = 'border-color 0.15s, box-shadow 0.15s';
+  el.style.borderColor = '#10b981';
+  el.style.boxShadow   = '0 0 0 2px rgba(16,185,129,0.18)';
+  setTimeout(() => {
+    el.style.borderColor = '';
+    el.style.boxShadow   = '';
+  }, 900);
+}
+
+// Wire all bidirectional pairs on the page
+// Format: [weightId, curBfId, curLbmId, goalBfId, goalLbmId]
+function _wireBidir(weightId, curBfId, curLbmId, goalBfId, goalLbmId, extraBfIds) {
+  const bwEl = document.getElementById(weightId);
+  if (bwEl) bwEl.addEventListener('input', () => {
+    if (document.activeElement === bwEl) {
+      // Recalc LBM from current BF% when weight changes
+      _syncBfToLbm(weightId, curBfId,  curLbmId);
+      if (goalBfId && goalLbmId) _syncBfToLbm(weightId, goalBfId, goalLbmId);
+    }
+  });
+
+  // cur_bf change → cur_lbm
+  const cbf = document.getElementById(curBfId);
+  if (cbf) cbf.addEventListener('change', () => _syncBfToLbm(weightId, curBfId, curLbmId));
+
+  // cur_lbm change → cur_bf
+  const clbm = document.getElementById(curLbmId);
+  if (clbm) {
+    // Make LBM editable (remove readonly if set)
+    clbm.removeAttribute('readonly');
+    clbm.style.cursor = '';
+    clbm.addEventListener('input', () => {
+      if (document.activeElement === clbm) _syncLbmToBf(weightId, curBfId, curLbmId);
+    });
+  }
+
+  // goal_bf change → goal_lbm
+  if (goalBfId && goalLbmId) {
+    const gbf = document.getElementById(goalBfId);
+    if (gbf) gbf.addEventListener('change', () => _syncBfToLbm(weightId, goalBfId, goalLbmId));
+
+    // goal_lbm change → goal_bf
+    const glbm = document.getElementById(goalLbmId);
+    if (glbm) {
+      glbm.removeAttribute('readonly');
+      glbm.style.cursor = '';
+      glbm.addEventListener('input', () => {
+        if (document.activeElement === glbm) _syncLbmToBf(weightId, goalBfId, goalLbmId);
+      });
+    }
+  }
+
+  // Extra BF% inputs (e.g. bf_pct in nutrition) that should also trigger LBM sync
+  if (extraBfIds) extraBfIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => _syncBfToLbm(weightId, id, curLbmId));
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // weight = main bodyweight, bf_pct = primary BF input
+  _wireBidir("weight","cur_bf","cur_lbm","goal_bf","goal_lbm");
+  _syncBfToLbm("weight","cur_bf","cur_lbm");
+  _syncBfToLbm("weight","goal_bf","goal_lbm");
+});
+
+
+
+
+// ── TDEE Modal ────────────────────────────────────────────────────────────────
+let _tmResult = 0;
+
+window._tdeeOpen = function() {
+  document.getElementById('tmResult').style.display      = 'none';
+  document.getElementById('tmConfirmBtn').style.display  = 'none';
+  document.getElementById('tdeeModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+function _tdeeClose() {
+  document.getElementById('tdeeModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function _tdeeConfirm() {
+  if (_tmResult > 0) {
+    const el = document.getElementById('tdee');
+    if (el) { el.value = _tmResult; el.dispatchEvent(new Event('input',{bubbles:true})); }
+  }
+  _tdeeClose();
+}
+
+function _tdeeCalc() {
+  // Pull biometrics from localStorage profile or page inputs
+  let wlbs = 180, bf = 0.14, age = 22, sex = 'male';
+  try {
+    const p = JSON.parse(localStorage.getItem('sba_profile') || '{}');
+    wlbs = p.bodyweight || +document.getElementById('weight')?.value || 180;
+    bf   = (p.cur_bf   || +document.getElementById('cur_bf')?.value  || 14) / 100;
+    age  = p.age       || +document.getElementById('age')?.value     || 22;
+    sex  = p.sex       || document.getElementById('sex')?.value      || 'male';
+  } catch(e) {}
+
+  const tDays = +document.getElementById('tm_trainDays').value;
+  const sDur  = +document.getElementById('tm_sessionDur').value;
+  const cDays = +document.getElementById('tm_cardioDays').value;
+  const cDur  = +document.getElementById('tm_cardioDur').value;
+  const zone  =  document.getElementById('tm_zone').value;
+  const mod   =  document.getElementById('tm_modality').value;
+  const steps = +document.getElementById('tm_steps').value;
+  const occ   =  document.getElementById('tm_occupation').value;
+
+  const wkg   = wlbs * 0.453592;
+  const lbmkg = wkg  * (1 - bf);
+
+  // BMR — Katch-McArdle + Cunningham blend (LBM-based, best for athletes)
+  const bmrK = 370 + 21.6 * lbmkg;
+  const bmrC = 500 + 22   * lbmkg;
+  const bw   = bf < 0.12 ? 0.4 : bf < 0.18 ? 0.25 : 0.1;
+  const bmr  = bmrK*(1-bw) + bmrC*bw;
+
+  // Resistance EAT — MET 4.5 average for moderate-high intensity training
+  // (sets/rest removed — too variable and marginally correlated at population level)
+  // Duration × bodyweight × MET is the research-supported primary driver
+  const eatR = 4.5 * wkg * sDur * 0.95;
+
+  // Endurance EAT
+  const zMET  = {z1:2.8,z2:5.5,z3:7.5,z4:9.5,z5:12.0,intermittent:7.2};
+  const mMod  = {running:1.05,cycling:0.92,rowing:1.00,elliptical:0.88,
+                 stairmaster:1.02,sport:0.97,swimming:0.95,hiit:1.03};
+  const eatE  = zMET[zone] * (mMod[mod]||1) * wkg * cDur * 0.93;
+
+  // Multipliers
+  const cOffDays   = Math.min(cDays, 7-tDays);
+  const cTrainDays = cDays - cOffDays;
+  const trainMult  = 1.2 + eatR/bmr + (cTrainDays>0 ? eatE/bmr : 0);
+  const offMult    = 1.2 + (cOffDays>0 ? eatE/bmr : 0);
+
+  // TEF (athlete defaults)
+  const tef = Math.round(wlbs*4*0.25 + wlbs*2*4*0.07 + wlbs*0.4*9*0.02);
+
+  // NEAT
+  const stepN  = Math.round(steps*0.038*(wkg*0.9));
+  const occN   = {seated:0,mixed:120,standing:280,active:500}[occ];
+  const spa    = tDays >= 4 ? 80 : 120;
+  const neatT  = Math.round(stepN*0.85 + occN + spa);
+  const neatO  = Math.round(stepN      + occN + spa);
+
+  // Day TDEEs
+  const trainDay = Math.round(bmr*trainMult) + tef + neatT;
+  const offDay   = Math.round(bmr*offMult)   + tef + neatO;
+  const offDays  = 7 - tDays;
+  const weekly   = Math.round((trainDay*tDays + offDay*offDays) / 7);
+
+  _tmResult = weekly;
+
+  document.getElementById('tmResult').style.display     = 'block';
+  document.getElementById('tmResultNum').textContent    = weekly.toLocaleString();
+  document.getElementById('tmResultBd').innerHTML       =
+    `BMR ${Math.round(bmr)} · R-EAT ${Math.round(eatR)} · E-EAT ${Math.round(eatE)} · TEF ${tef} · NEAT ~${neatT}<br>` +
+    `Training day ${trainDay.toLocaleString()} kcal · Off day ${offDay.toLocaleString()} kcal · ${tDays}×/${offDays}× split`;
+  document.getElementById('tmConfirmVal').textContent   = weekly.toLocaleString();
+  document.getElementById('tmConfirmBtn').style.display = 'block';
+}
+
+document.getElementById('tdeeModal').addEventListener('click', function(e) {
+  if (e.target === this) _tdeeClose();
+});
+
+
+// ── Wire BF match buttons via addEventListener ────────────────────────────
+(function() {
+  function wireMatchBtns() {
+    document.querySelectorAll('[data-bf-input]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var inputId = btn.getAttribute('data-bf-input');
+        var el = document.getElementById(inputId);
+        var sex = 'male';
+        try { var s = document.getElementById('sex'); if (s) sex = s.value || 'male'; } catch(e2) {}
+        if (typeof bfPickerOpen === 'function') {
+          bfPickerOpen(inputId, parseFloat(el ? el.value : 14) || 14, sex);
+        } else if (typeof window._bfOpen === 'function') {
+          window._bfOpen(inputId);
+        }
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireMatchBtns);
+  } else {
+    wireMatchBtns();
+  }
+})();
+
+(function() {
+  function wireTdeeBtn() {
+    var btn = document.querySelector('[data-tdee-open]');
+    if (btn) btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (typeof window._tdeeOpen === 'function') window._tdeeOpen();
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireTdeeBtn);
+  } else {
+    wireTdeeBtn();
+  }
+})();
+
+
+// ── Wire static picker + TDEE modal buttons ───────────────────────────────
+(function() {
+  function wireStaticBtns() {
+    // BF picker buttons
+    document.querySelectorAll('[data-picker-action="close"]').forEach(function(el) {
+      el.addEventListener('click', function() { if(typeof bfPickerClose==='function') bfPickerClose(); });
+    });
+    document.querySelectorAll('[data-picker-action="confirm"]').forEach(function(el) {
+      el.addEventListener('click', function() { if(typeof bfPickerConfirm==='function') bfPickerConfirm(); });
+    });
+    document.querySelectorAll('[data-picker-sex]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var sex = el.getAttribute('data-picker-sex');
+        if(typeof bfpSetSex==='function') bfpSetSex(sex);
+      });
+    });
+    // TDEE modal buttons
+    document.querySelectorAll('[data-tdee-action]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var action = el.getAttribute('data-tdee-action');
+        if(action==='close'   && typeof _tdeeClose==='function')   _tdeeClose();
+        if(action==='calc'    && typeof _tdeeCalc==='function')    _tdeeCalc();
+        if(action==='confirm' && typeof _tdeeConfirm==='function') _tdeeConfirm();
+      });
+    });
+    // Generate / compute button
+    document.querySelectorAll('[data-action="generate"],[data-action="compute"]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var fn = el.getAttribute('data-action') === 'generate' ? window.generate : window.compute;
+        if(typeof fn === 'function') fn();
+      });
+    });
+    // TDEE open button
+    document.querySelectorAll('[data-tdee-open]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if(typeof window._tdeeOpen === 'function') window._tdeeOpen();
+      });
+    });
+    // Backdrop close
+    var overlay = document.getElementById('bfPickerOverlay');
+    if(overlay) overlay.addEventListener('click', function(e) {
+      if(e.target===this && typeof bfPickerClose==='function') bfPickerClose();
+    });
+    var tdeeModal = document.getElementById('tdeeModal');
+    if(tdeeModal) tdeeModal.addEventListener('click', function(e) {
+      if(e.target===this && typeof _tdeeClose==='function') _tdeeClose();
+    });
+  }
+  if(document.readyState==='loading') {
+    document.addEventListener('DOMContentLoaded', wireStaticBtns);
+  } else {
+    wireStaticBtns();
+  }
+})();
+
+
+
+// Window assignments for sandbox scope
+window.generate = generate;
+window.bfPickerOpen = bfPickerOpen;
+window.bfPickerClose = bfPickerClose;
+window.bfpOnSlide = bfpOnSlide;
+window._tdeeClose = _tdeeClose;
+window._tdeeCalc = _tdeeCalc;
+window._tdeeConfirm = _tdeeConfirm;
+window.updSliders = updSliders;
+
+
+// ── Direct button wiring (sandbox-safe) ──────────────────────────────────
+(function() {
+  function wire() {
+    var allBtns = document.getElementsByTagName('button');
+    for(var i=0; i<allBtns.length; i++) {
+      (function(btn) {
+        var action = btn.getAttribute('data-action');
+        if(action === 'generate') {
+          btn.onclick = function() { if(typeof window.generate==='function') window.generate(); };
+        }
+        var bfInput = btn.getAttribute('data-bf-input');
+        if(bfInput) {
+          btn.onclick = function() {
+            var el = document.getElementById(bfInput);
+            var sex = 'male';
+            try { var s=document.getElementById('sex'); if(s) sex=s.value||'male'; } catch(x){}
+            if(typeof window.bfPickerOpen==='function')
+              window.bfPickerOpen(bfInput, parseFloat(el?el.value:14)||14, sex);
+          };
+        }
+        var tdeeOpen = btn.getAttribute('data-tdee-open');
+        if(tdeeOpen !== null) {
+          btn.onclick = function() { if(typeof window._tdeeOpen==='function') window._tdeeOpen(); };
+        }
+        var tdeeAction = btn.getAttribute('data-tdee-action');
+        if(tdeeAction) {
+          btn.onclick = function() {
+            if(tdeeAction==='close'   && typeof window._tdeeClose==='function')   window._tdeeClose();
+            if(tdeeAction==='calc'    && typeof window._tdeeCalc==='function')    window._tdeeCalc();
+            if(tdeeAction==='confirm' && typeof window._tdeeConfirm==='function') window._tdeeConfirm();
+          };
+        }
+        var pickerAction = btn.getAttribute('data-picker-action');
+        if(pickerAction) {
+          btn.onclick = function() {
+            if(pickerAction==='close'   && typeof window.bfPickerClose==='function')   window.bfPickerClose();
+            if(pickerAction==='confirm' && typeof window.bfPickerConfirm==='function') window.bfPickerConfirm();
+          };
+        }
+        var pickerSex = btn.getAttribute('data-picker-sex');
+        if(pickerSex) {
+          btn.onclick = function() { if(typeof window.bfpSetSex==='function') window.bfpSetSex(pickerSex); };
+        }
+      })(allBtns[i]);
+    }
+    ['pri_lbm','pri_bf','pri_vo2','pri_str'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if(el) el.oninput = function() { 
+        if(typeof window.updSliders==='function') window.updSliders();
+        else if(typeof window.updateSliders==='function') window.updateSliders();
+      };
+    });
+    var bfsl = document.getElementById('bfpSlider');
+    if(bfsl) bfsl.oninput = function() { if(typeof window.bfpOnSlide==='function') window.bfpOnSlide(this.value); };
+    var ov = document.getElementById('bfPickerOverlay');
+    if(ov) ov.onclick = function(e) { if(e.target===this && typeof window.bfPickerClose==='function') window.bfPickerClose(); };
+    var tm = document.getElementById('tdeeModal');
+    if(tm) tm.onclick = function(e) { if(e.target===this && typeof window._tdeeClose==='function') window._tdeeClose(); };
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+  setTimeout(wire, 50);
+})();
+
+// ── Firebase save hook ────────────────────────────────────────────────────────
+function sbaSave() {
+  try {
+    const data = {
+      age:        +document.getElementById('age')?.value,
+      sex:         document.getElementById('sex')?.value,
+      bodyweight: +document.getElementById('bodyweight')?.value,
+      cur_bf:     +document.getElementById('cur_bf')?.value,
+      goal_bf:    +document.getElementById('goal_bf')?.value,
+      cur_lbm:    +document.getElementById('cur_lbm')?.value,
+      goal_lbm:   +document.getElementById('goal_lbm')?.value,
+      cur_vo2:    +document.getElementById('cur_vo2')?.value,
+      goal_vo2:   +document.getElementById('goal_vo2')?.value,
+      cur_str:    +document.getElementById('cur_str')?.value,
+      goal_str:   +document.getElementById('goal_str')?.value,
+      tdee:       +document.getElementById('tdeeInput')?.value,
+      goalWeights: {
+        lbm: +document.getElementById('pri_lbm')?.value,
+        bf:  +document.getElementById('pri_bf')?.value,
+        vo2: +document.getElementById('pri_vo2')?.value,
+        str: +document.getElementById('pri_str')?.value,
+      },
+      savedAt: new Date().toISOString(),
+    };
+    window.parent.postMessage({ type:'sba-save', module:'nutrition', data }, '*');
+    window.parent.postMessage({ type:'sba-log-metric', data:{
+      date:  new Date().toISOString().split('T')[0],
+      bf:    data.cur_bf,
+      lbm:   data.cur_lbm,
+      vo2:   data.cur_vo2,
+      str:   data.cur_str,
+      bodyweight: data.bodyweight,
+      source:'nutrition',
+    }}, '*');
+  } catch(e) { console.warn('sbaSave error', e); }
+}
+
+window.addEventListener('message', e => {
+  const d = e.data;
+  if (!d || d.type !== 'sba-load' || !d.nutrition) return;
+  const n = d.nutrition;
+  const set = (id, val) => { const el=document.getElementById(id); if(el&&val!=null&&val!==0) el.value=val; };
+  set('age',        n.age);
+  set('sex',        n.sex);
+  set('bodyweight', n.bodyweight);
+  set('cur_bf',     n.cur_bf);
+  set('goal_bf',    n.goal_bf);
+  set('cur_lbm',    n.cur_lbm);
+  set('goal_lbm',   n.goal_lbm);
+  set('cur_vo2',    n.cur_vo2);
+  set('goal_vo2',   n.goal_vo2);
+  set('cur_str',    n.cur_str);
+  set('goal_str',   n.goal_str);
+  if (n.tdee) set('tdeeInput', n.tdee);
+  if (n.goalWeights) {
+    set('pri_lbm', n.goalWeights.lbm);
+    set('pri_bf',  n.goalWeights.bf);
+    set('pri_vo2', n.goalWeights.vo2);
+    set('pri_str', n.goalWeights.str);
+  }
+  if (typeof updSliders === 'function') updSliders();
+});
+</script>
+</body>
+</html>
