@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milestone Tracker — Science Based App</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --bg:#030306;--s1:#06060e;--s2:#0b0b18;--s3:#101020;
+  --border:#161628;--border2:#1e1e38;
+  --text:#d0d5f0;--muted:#4a4a72;--dim:#2a2a50;--white:#eaecff;
+  --vo2:#10b981;--lbm:#3b82f6;--bf:#f97316;--str:#a855f7;
+  --gold:#f59e0b;--platinum:#94a3b8;--diamond:#67e8f9;
+  --health-crit:#ef4444;--health-high:#f97316;--health-med:#f59e0b;--health-low:#10b981;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh;}
+
+header{padding:36px 32px 24px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+header::before{content:'MRK';position:absolute;right:-8px;top:-12px;font-family:'Barlow Condensed',sans-serif;font-size:180px;font-weight:800;color:rgba(255,255,255,0.014);line-height:1;pointer-events:none;letter-spacing:-8px;}
+.nav-back{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);text-decoration:none;margin-bottom:18px;transition:color 0.2s;}
+.nav-back:hover{color:var(--lbm);}
+.header-tag{font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:3px;color:var(--gold);margin-bottom:8px;opacity:0.8;}
+header h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);font-weight:800;letter-spacing:-1px;line-height:0.92;color:var(--white);text-transform:uppercase;}
+header h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.18);}
+header .sub{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:12px;}
+
+/* ── Layout ── */
+.page{max-width:1300px;margin:0 auto;padding:28px 20px 80px;}
+
+/* ── Input panel ── */
+.input-panel{background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:20px 22px;margin-bottom:24px;}
+.panel-title{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.input-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:800px){.input-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.input-grid{grid-template-columns:1fr;}}
+.metric-input-card{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:12px 14px;}
+.mic-label{font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+.mic-field{margin-bottom:6px;}
+.mic-field label{display:block;font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:3px;}
+.mic-field input{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.82rem;padding:6px 8px;outline:none;transition:border-color 0.15s;}
+.mic-field input:focus{border-color:var(--gold);}
+
+/* Goal priority row */
+.priority-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.pri-chip{font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1px;padding:5px 12px;border-radius:2px;border:1px solid var(--border);background:var(--s2);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.pri-chip.active{font-weight:500;}
+
+/* Compute button */
+.compute-btn{background:var(--white);color:var(--bg);border:none;border-radius:3px;padding:11px 28px;font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;}
+.compute-btn:hover{background:var(--gold);color:#000;}
+
+/* ── Overall health score ── */
+.health-hero{background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:24px 26px;margin-bottom:20px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px;}
+@media(max-width:600px){.health-hero{grid-template-columns:1fr;}}
+.health-score-ring{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;flex-shrink:0;}
+.health-score-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
+.health-score-num{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;line-height:1;position:relative;z-index:1;}
+.health-score-label{font-family:'JetBrains Mono',monospace;font-size:0.42rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);position:relative;z-index:1;}
+.health-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.health-bar-row{display:flex;align-items:center;gap:8px;}
+.health-bar-name{font-family:'JetBrains Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:1px;min-width:60px;}
+.health-bar-wrap{flex:1;background:var(--border);border-radius:2px;height:6px;overflow:hidden;}
+.health-bar{height:100%;border-radius:2px;transition:width 0.6s ease;}
+.health-bar-pct{font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;min-width:36px;text-align:right;}
+.health-tier{text-align:right;}
+.health-tier-label{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:2px;}
+.health-tier-sub{font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* ── Metric sections ── */
+.metric-section{margin-bottom:28px;}
+.metric-header{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.metric-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.metric-name{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;}
+.metric-current{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--muted);margin-left:auto;}
+.metric-progress-wrap{background:var(--border);border-radius:3px;height:8px;overflow:hidden;margin-bottom:6px;position:relative;}
+.metric-progress{height:100%;border-radius:3px;transition:width 0.7s cubic-bezier(0.16,1,0.3,1);}
+.metric-scale{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:var(--muted);margin-bottom:14px;}
+
+/* ── Milestone cards ── */
+.milestones-grid{display:grid;gap:8px;}
+.milestone-card{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:13px 15px;display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:12px;transition:border-color 0.2s;position:relative;overflow:hidden;}
+.milestone-card.achieved{border-color:var(--border2);}
+.milestone-card.achieved::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.milestone-card.next-target{box-shadow:0 0 0 1px rgba(245,158,11,0.2);}
+.milestone-card.locked{opacity:0.45;}
+
+/* Achievement glow fill */
+.milestone-fill{position:absolute;inset:0;opacity:0.04;pointer-events:none;transition:opacity 0.3s;}
+
+.ms-icon{font-size:1.4rem;line-height:1;margin-top:2px;flex-shrink:0;}
+.ms-body{}
+.ms-threshold{font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:2px;}
+.ms-label{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--white);margin-bottom:4px;}
+.ms-health-benefit{font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:var(--dim);line-height:1.65;margin-bottom:5px;}
+.ms-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.ms-tag{font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:8px;}
+.ms-right{text-align:right;flex-shrink:0;}
+.ms-pct-to{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);margin-bottom:3px;}
+.ms-value{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;line-height:1;}
+.ms-achieved-stamp{font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:2px;}
+
+/* Health impact bar */
+.health-impact-bar{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.hib-label{font-family:'JetBrains Mono',monospace;font-size:0.46rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);min-width:72px;}
+.hib-wrap{flex:1;background:var(--dim);border-radius:2px;height:4px;overflow:hidden;}
+.hib-bar{height:100%;border-radius:2px;}
+.hib-val{font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:500;min-width:32px;text-align:right;}
+
+/* Next milestone spotlight */
+.next-spotlight{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:4px;padding:12px 15px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.ns-icon{font-size:1.2rem;flex-shrink:0;}
+.ns-label{font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);}
+.ns-val{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--white);}
+.ns-sub{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);margin-top:2px;line-height:1.5;}
+.ns-gap{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:800;color:var(--gold);margin-left:auto;text-align:right;flex-shrink:0;}
+
+/* Priority weighting panel */
+.weight-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.wbr-label{font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:1px;min-width:72px;}
+.wbr-wrap{flex:1;background:var(--border);border-radius:2px;height:5px;overflow:hidden;}
+.wbr-bar{height:100%;border-radius:2px;transition:width 0.4s ease;}
+.wbr-val{font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:500;min-width:32px;text-align:right;}
+input[type="range"].mini{width:100%;height:3px;border-radius:2px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;margin:3px 0;}
+input[type="range"].mini::-webkit-slider-thumb{appearance:none;width:12px;height:12px;border-radius:50%;cursor:pointer;}
+
+
+/* ── Potential panel ── */
+.potential-panel {
+  background:var(--s1);border:1px solid var(--border);border-radius:6px;
+  padding:24px 26px;margin-bottom:20px;
+}
+.potential-grid {
+  display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:center;
+}
+@media(max-width:700px){.potential-grid{grid-template-columns:1fr;}}
+.radar-wrap {
+  display:flex;align-items:center;justify-content:center;
+}
+.potential-metrics { display:grid;gap:14px; }
+.pm-row { display:grid;grid-template-columns:80px 1fr 48px 48px;align-items:center;gap:10px; }
+.pm-label {
+  font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;
+  letter-spacing:1px;font-weight:500;
+}
+.pm-bar-wrap {
+  background:var(--border);border-radius:3px;height:10px;overflow:hidden;
+  position:relative;
+}
+.pm-bar-cur {
+  position:absolute;top:0;left:0;height:100%;border-radius:3px;
+  transition:width 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.pm-bar-goal {
+  position:absolute;top:0;height:100%;border-radius:0 3px 3px 0;opacity:0.3;
+  transition:all 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.pm-bar-max {
+  position:absolute;top:0;height:100%;border-radius:0 3px 3px 0;opacity:0.1;
+  right:0;
+}
+.pm-val {
+  font-family:'Barlow Condensed',sans-serif;font-size:0.95rem;font-weight:700;
+  text-align:right;line-height:1;
+}
+.pm-max {
+  font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:var(--muted);
+  text-align:right;line-height:1.4;
+}
+.potential-legend {
+  display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;
+  font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--muted);
+}
+.potential-legend span { display:flex;align-items:center;gap:5px; }
+.leg-dot { width:8px;height:8px;border-radius:2px;flex-shrink:0; }
+.gap-to-goal {
+  font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:var(--muted);
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--border);
+  line-height:1.8;
+}
+.gap-to-goal strong { color:var(--text);font-weight:500; }
+
+.section-divider{height:1px;background:var(--border);margin:24px 0;}
+
+/* ── BF Picker overlay (injected) ──*/
+
+
+/* ── Module nav ── */
+.module-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.module-nav a{font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:1.5px;padding:5px 12px;border-radius:2px;border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:all 0.15s;}
+.module-nav a:hover{border-color:var(--blue);color:var(--blue);}
+.module-nav a.active{color:var(--white);border-color:var(--white);background:rgba(255,255,255,0.05);}
+
+</style>
+</head>
+<body>
+<div id="bfPickerOverlay" style="display:none">
+  <div id="bfPickerModal">
+
+    <div class="bfp-header">
+      <div>
+        <div class="bfp-title">Match Your Body</div>
+        <div class="bfp-subtitle">Slide until the silhouette matches your physique → confirm to set BF%</div>
+      </div>
+      <button class="bfp-close" data-picker-action="close">✕</button>
+    </div>
+
+    <div class="bfp-body">
+
+      <!-- Silhouette -->
+      <div class="bfp-silhouette">
+        <svg id="bfpBodySvg" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="bfp-pct-on-body" id="bfpPctBig">14</div>
+        <div class="bfp-tier-label" id="bfpTierLabel">Athletic</div>
+      </div>
+
+      <!-- Controls -->
+      <div class="bfp-controls">
+
+        <div class="bfp-sex-row">
+          <button class="bfp-sex-btn active" id="bfpBtnMale"   data-picker-sex="male">Male</button>
+          <button class="bfp-sex-btn"        id="bfpBtnFemale" data-picker-sex="female">Female</button>
+        </div>
+
+        <div class="bfp-slider-section">
+          <span class="bfp-slider-label">Drag to match your body</span>
+          <div class="bfp-track-wrap">
+            <input type="range" class="bfp-slider" id="bfpSlider"
+              min="4" max="40" value="14" step="0.5"
+              data-oninput="bfpOnSlide">
+            <div class="bfp-ticks" id="bfpTicks"></div>
+          </div>
+        </div>
+
+        <div class="bfp-tier-desc" id="bfpTierDesc"></div>
+
+        <div class="bfp-bars">
+          <div class="bfp-bar-row">
+            <div class="bfp-bar-name" style="color:#a855f7">Δ Hormonal</div>
+            <div class="bfp-bar-track"><div class="bfp-bar-fill" id="bfpBarH" style="background:#a855f7"></div></div>
+            <div class="bfp-bar-val" id="bfpValH" style="color:#a855f7"></div>
+          </div>
+          <div class="bfp-bar-row">
+            <div class="bfp-bar-name" style="color:#ef4444">Δ Cardiovascular</div>
+            <div class="bfp-bar-track"><div class="bfp-bar-fill" id="bfpBarC" style="background:#ef4444"></div></div>
+            <div class="bfp-bar-val" id="bfpValC" style="color:#ef4444"></div>
+          </div>
+          <div class="bfp-bar-row">
+            <div class="bfp-bar-name" style="color:#3b82f6">Δ Metabolic</div>
+            <div class="bfp-bar-track"><div class="bfp-bar-fill" id="bfpBarM" style="background:#3b82f6"></div></div>
+            <div class="bfp-bar-val" id="bfpValM" style="color:#3b82f6"></div>
+          </div>
+          <div class="bfp-bar-row">
+            <div class="bfp-bar-name" style="color:#10b981">Δ Mortality risk</div>
+            <div class="bfp-bar-track"><div class="bfp-bar-fill" id="bfpBarMort" style="background:#10b981"></div></div>
+            <div class="bfp-bar-val" id="bfpValMort" style="color:#10b981"></div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- end bfp-body -->
+
+    <div class="bfp-footer">
+      <div class="bfp-hint">Silhouette is a visual reference — match overall shape and definition level, not exact proportions</div>
+      <button class="bfp-cancel" data-picker-action="close">Cancel</button>
+      <button class="bfp-confirm" data-picker-action="confirm">Set <span id="bfpConfirmVal">14</span>%</button>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+<header>
+<div class="module-nav">
+  <a href="#" onclick="window.parent.switchTo('workout'); return false;">Workout Formulation</a>
+  <a href="#" onclick="window.parent.switchTo('nutrition'); return false;">Nutrition Formulation</a>
+  <a href="#" onclick="window.parent.switchTo('milestone'); return false;" class="active">Milestone Tracker</a>
+</div>
+  <div class="header-tag">Science Based App · Module 05</div>
+  <h1>Milestone<br><em>Tracker</em></h1>
+  <div class="sub">Marginal gains · Health impact weighting · Physiological thresholds</div>
+</header>
+
+<div class="page">
+
+  <div class="input-panel">
+    <div class="panel-title">Current Metrics</div>
+    <div class="input-grid">
+      <div class="metric-input-card" style="border-color:var(--vo2)33">
+        <div class="mic-label" style="color:var(--vo2)">VO&#x2082; Max</div>
+        <div class="mic-field"><label>Current (ml/kg/min)</label><input type="number" id="cur_vo2" value="50" min="15" max="90" step="0.5"></div>
+        <div class="mic-field"><label>Target (ml/kg/min)</label><input type="number" id="goal_vo2" value="60" min="15" max="90" step="0.5"></div>
+      </div>
+      <div class="metric-input-card" style="border-color:var(--lbm)33">
+        <div class="mic-label" style="color:var(--lbm)">Lean Mass</div>
+        <div class="mic-field"><label>Current (lbs)</label><input type="number" id="cur_lbm" value="155" min="60" max="300"></div>
+        <div class="mic-field"><label>Target (lbs)</label><input type="number" id="goal_lbm" value="170" min="60" max="300"></div>
+      </div>
+      <div class="metric-input-card" style="border-color:var(--bf)33">
+        <div class="mic-label" style="color:var(--bf)">Body Fat %</div>
+        <div class="mic-field"><label>Current (%)</label>
+          <div style="display:flex;gap:4px;align-items:center">
+            <input type="number" id="cur_bf" value="14" min="4" max="45" step="0.5" style="flex:1">
+            <button type="button" style="flex-shrink:0;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.4);border-radius:2px;color:rgba(249,115,22,0.9);font-family:monospace;font-size:0.44rem;letter-spacing:1px;text-transform:uppercase;padding:4px 6px;cursor:pointer" data-bf-input="cur_bf">match</button>
+          </div>
+        </div>
+        <div class="mic-field"><label>Target (%)</label>
+          <div style="display:flex;gap:4px;align-items:center">
+            <input type="number" id="goal_bf" value="11" min="4" max="40" step="0.5" style="flex:1">
+            <button type="button" style="flex-shrink:0;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.4);border-radius:2px;color:rgba(249,115,22,0.9);font-family:monospace;font-size:0.44rem;letter-spacing:1px;text-transform:uppercase;padding:4px 6px;cursor:pointer" data-bf-input="goal_bf">match</button>
+          </div>
+        </div>
+      </div>
+      <div class="metric-input-card" style="border-color:var(--str)33">
+        <div class="mic-label" style="color:var(--str)">Strength</div>
+        <div class="mic-field"><label>Current (x bodyweight)</label><input type="number" id="cur_str" value="1.5" min="0.2" max="4" step="0.05"></div>
+        <div class="mic-field"><label>Target (x bodyweight)</label><input type="number" id="goal_str" value="2.0" min="0.2" max="4" step="0.05"></div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="panel-title">Health Impact Priority Weights</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <div class="weight-bar-row"><span class="wbr-label" style="color:var(--vo2)">VO2 Max</span><div class="wbr-wrap"><div class="wbr-bar" id="wb_vo2" style="background:var(--vo2);width:45%"></div></div><span class="wbr-val" id="wv_vo2" style="color:var(--vo2)">45%</span></div>
+        <input type="range" class="mini" id="pw_vo2" min="0" max="10" value="9" style="accent-color:var(--vo2)" data-oninput="updWeights">
+        <div class="weight-bar-row" style="margin-top:8px"><span class="wbr-label" style="color:var(--lbm)">Lean Mass</span><div class="wbr-wrap"><div class="wbr-bar" id="wb_lbm" style="background:var(--lbm);width:25%"></div></div><span class="wbr-val" id="wv_lbm" style="color:var(--lbm)">25%</span></div>
+        <input type="range" class="mini" id="pw_lbm" min="0" max="10" value="5" style="accent-color:var(--lbm)" data-oninput="updWeights">
+      </div>
+      <div>
+        <div class="weight-bar-row"><span class="wbr-label" style="color:var(--bf)">Body Fat</span><div class="wbr-wrap"><div class="wbr-bar" id="wb_bf" style="background:var(--bf);width:20%"></div></div><span class="wbr-val" id="wv_bf" style="color:var(--bf)">20%</span></div>
+        <input type="range" class="mini" id="pw_bf" min="0" max="10" value="4" style="accent-color:var(--bf)" data-oninput="updWeights">
+        <div class="weight-bar-row" style="margin-top:8px"><span class="wbr-label" style="color:var(--str)">Strength</span><div class="wbr-wrap"><div class="wbr-bar" id="wb_str" style="background:var(--str);width:10%"></div></div><span class="wbr-val" id="wv_str" style="color:var(--str)">10%</span></div>
+        <input type="range" class="mini" id="pw_str" min="0" max="10" value="2" style="accent-color:var(--str)" data-oninput="updWeights">
+      </div>
+    </div>
+    <button class="compute-btn" onclick="compute()">Compute Milestones</button>
+  </div>
+
+  <div id="results" style="display:none">
+    <div class="health-hero" id="healthHero"></div>
+    <div class="potential-panel" id="potentialPanel"></div>
+    <div id="metricSections"></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// MILESTONE DATABASE
+// Each milestone has:
+//   threshold: the value at which this milestone is reached
+//   label: name of the milestone
+//   healthBenefit: what changes in the body at this threshold (evidence-based)
+//   healthImpact: 0–100 score on all-cause mortality / longevity impact
+//   mortalityShift: estimated % reduction in all-cause mortality risk at this threshold
+//   tags: categories
+//   icon: emoji marker
+// ═══════════════════════════════════════════════════════════════════════════
+
+const MILESTONES = {
+
+  vo2: {
+    color:'#10b981', unit:'ml/kg/min', label:'VO₂ Max',
+    description:'Cardiorespiratory fitness — strongest single predictor of all-cause mortality',
+    scaleMin:20, scaleMax:75,
+    tiers:[
+      { threshold:28, label:'Baseline Survival', icon:'🫁', healthImpact:20, mortalityShift:0,
+        healthBenefit:`<strong>Mortality:</strong> Below this threshold, risk of cardiovascular events is severely elevated — equivalent mortality risk to heavy smoking. <strong>Cardiovascular:</strong> Resting cardiac output insufficient for moderate sustained effort. Heart must work at near-maximal capacity during basic daily tasks. <strong>Metabolic:</strong> Insulin resistance almost universal at this fitness level. Resting glucose disposal impaired. <strong>Mental:</strong> Oxygen delivery to prefrontal cortex is suboptimal — working memory, processing speed, and mood regulation measurably impaired. <strong>Energy:</strong> Chronic fatigue is the norm — mitochondrial density too low to sustain aerobic metabolism.`,
+        tags:['cardiovascular','metabolic','baseline'] },
+      { threshold:35, label:'Poor → Below Average', icon:'📈', healthImpact:38, mortalityShift:12,
+        healthBenefit:`<strong>Mortality:</strong> Crossing 35 reduces all-cause mortality risk ~12% vs below 28. <strong>Cardiovascular:</strong> Resting heart rate begins declining. Left ventricular stroke volume improving — heart pumps more blood per beat, reducing chronic cardiac strain. <strong>Body composition:</strong> Metabolic rate increases as mitochondrial density rises — fat oxidation capacity begins to improve noticeably. <strong>Mental:</strong> BDNF (brain-derived neurotrophic factor) begins increasing — the primary growth factor for new neurons and synaptic connections. Mild depression symptoms measurably reduced. <strong>Energy:</strong> Sustained daily energy improves — less reliance on anaerobic metabolism for routine activity.`,
+        tags:['cardiovascular','metabolic','cognitive'] },
+      { threshold:42, label:'Below Average → Average', icon:'❤️', healthImpact:52, mortalityShift:21,
+        healthBenefit:`<strong>Mortality:</strong> 21% lower all-cause mortality vs lowest tier. <strong>Cardiovascular:</strong> VO₂ 42 corresponds to the population 50th percentile. Blood pressure reduction becomes clinically meaningful — systolic drops 5–8 mmHg on average. Arterial stiffness measurably reduced. <strong>Metabolic:</strong> Insulin sensitivity improves ~18%. Type 2 diabetes risk begins declining meaningfully. Resting triglycerides and LDL improve. <strong>Hormonal:</strong> Cortisol baseline drops — chronic aerobic capacity reduces the HPA axis stress response. Testosterone begins rising as cortisol falls. <strong>Mental:</strong> Anxiety symptom scores decline significantly in this range. Cognitive processing speed improves measurably.`,
+        tags:['metabolic','insulin','cardiac','hormonal'] },
+      { threshold:50, label:'Average → Good', icon:'⚡', healthImpact:68, mortalityShift:34,
+        healthBenefit:`<strong>Mortality:</strong> Each MET increase above this threshold reduces cardiovascular mortality ~15% per the Kokkinos 2022 dataset. <strong>Cardiovascular:</strong> Stroke risk reduced measurably. Coronary artery calcium progression rate slows. Resting cardiac efficiency significantly improved — elite-adjacent parasympathetic dominance. <strong>Metabolic:</strong> Fasting glucose typically normalizes if previously elevated. Metabolic flexibility (ability to switch between fat and glucose as fuel) reaches healthy range. <strong>Body composition:</strong> Fat oxidation at rest is substantially higher than lower tiers — passive fat burning accelerates. <strong>Hormonal:</strong> IGF-1 output elevated. Growth hormone pulse amplitude increases. <strong>Mental:</strong> Hippocampal volume measurably greater vs low-fitness peers at equivalent age — direct cognitive protection.`,
+        tags:['mortality','cardiovascular','longevity','hormonal'] },
+      { threshold:55, label:'Good → Excellent', icon:'🔥', healthImpact:80, mortalityShift:44,
+        healthBenefit:`<strong>Mortality:</strong> 44% lower all-cause mortality vs sedentary baseline. Top 20% cardiorespiratory fitness for age-matched adults. <strong>Cardiovascular:</strong> Resting heart rate typically 48–55 bpm. Maximum oxygen extraction at near-elite efficiency. Cardiac hypertrophy (healthy enlargement) provides mechanical advantage. <strong>Cancer:</strong> Cancer risk reduction documented at this fitness tier — improved immune surveillance, reduced inflammatory signaling, better hormonal regulation all contribute. <strong>Cognitive:</strong> Cognitive decline rate measurably reduced. BDNF levels significantly elevated. Brain aging estimated 5–8 years behind chronological age in neuroimaging studies. <strong>Mental:</strong> Antidepressant-equivalent effect size documented in clinical trials at this aerobic capacity. Stress resilience markedly elevated.`,
+        tags:['longevity','cognitive','mortality','mental'] },
+      { threshold:60, label:'Excellent → Superior', icon:'🏆', healthImpact:88, mortalityShift:52,
+        healthBenefit:`<strong>Mortality:</strong> Top 10% cardiorespiratory fitness. 52% lower all-cause mortality. Telomere length measurably greater vs low-fitness peers — direct biological aging marker. <strong>Cardiovascular:</strong> Essentially no measurable coronary artery disease progression in prospective studies at this tier. <strong>Cancer:</strong> Breast, colon, and lung cancer risk all measurably reduced — estimated 20–30% lower incidence vs sedentary tier. <strong>Cognitive:</strong> Alzheimer's risk reduced ~35% vs lowest fitness tier in prospective cohort data. Executive function, working memory, and processing speed at peak adult levels. <strong>Hormonal:</strong> Optimal testosterone:cortisol ratio. Excellent insulin sensitivity. IGF-1 and growth hormone output at near-peak natural levels for age. <strong>Energy:</strong> Subjective energy and vitality scores at top population percentile.`,
+        tags:['longevity','cancer','telomeres','cognitive'] },
+      { threshold:68, label:'Superior → Elite', icon:'💎', healthImpact:95, mortalityShift:58,
+        healthBenefit:`<strong>Mortality:</strong> Elite aerobic capacity. 58% lower all-cause mortality vs sedentary baseline. Biological cardiovascular age estimated 10–15 years below chronological. <strong>Cardiovascular:</strong> Maximal mitochondrial efficiency. VO₂ kinetics reach elite athlete profile — oxygen delivery and utilization near physiological ceiling. <strong>Longevity:</strong> Associated with exceptional health outcomes and functional independence into 7th and 8th decade. Compression of morbidity — longer health span relative to lifespan. <strong>Cognitive:</strong> Neuroprotection at maximum achievable through exercise. BDNF, VEGF, and IGF-1 all elevated simultaneously. <strong>Hormonal:</strong> Optimal endocrine profile across all major axes — thyroid, adrenal, gonadal all operating efficiently. <strong>Mental:</strong> Psychological resilience, emotional regulation, and stress response at elite level.`,
+        tags:['elite','biological-age','longevity','cognitive'] },
+    ]
+  },
+
+  lbm: {
+    color:'#3b82f6', unit:'lbs', label:'Lean Mass',
+    description:'Skeletal muscle mass — metabolic organ, insulin sink, longevity predictor',
+    scaleMin:80, scaleMax:220,
+    tiers:[
+      { threshold:100, label:'Minimum Functional Mass', icon:'🦴', healthImpact:22, mortalityShift:0,
+        healthBenefit:`<strong>Mortality:</strong> Below 100lbs LBM in adult males: sarcopenia risk begins — sarcopenia is an independent mortality predictor comparable to obesity. <strong>Metabolic:</strong> Resting metabolic rate severely suppressed — muscle is the primary metabolically active tissue. Caloric expenditure at rest significantly reduced. <strong>Insulin:</strong> Glucose disposal capacity critically impaired — muscle is responsible for ~80% of post-meal glucose uptake. Insulin resistance risk high. <strong>Body composition:</strong> Without sufficient lean mass, fat accumulation is difficult to resist even at moderate caloric intake. <strong>Energy:</strong> Fatigue threshold extremely low — basic physical tasks exhaust available ATP rapidly.`,
+        tags:['sarcopenia','metabolic','baseline'] },
+      { threshold:120, label:'Metabolic Floor', icon:'⚗️', healthImpact:38, mortalityShift:8,
+        healthBenefit:`<strong>Mortality:</strong> 8% lower all-cause mortality vs minimum baseline. <strong>Metabolic:</strong> Resting metabolic rate reaches a level where basic homeostasis is metabolically supported. Mitochondrial density in muscle tissue beginning to provide meaningful energy buffering. <strong>Insulin:</strong> Glucose disposal improving — insulin sensitivity measurably better than lowest tier. Type 2 diabetes trajectory begins improving. <strong>Bone:</strong> Mechanical loading from maintaining this muscle mass begins improving bone mineral density — musculoskeletal injury risk begins declining. <strong>Hormonal:</strong> Testosterone production responds to muscle mass — even at this tier, having adequate LBM supports baseline androgen output.`,
+        tags:['metabolic','insulin','injury','hormonal'] },
+      { threshold:140, label:'Active Maintenance', icon:'💪', healthImpact:54, mortalityShift:14,
+        healthBenefit:`<strong>Mortality:</strong> 14% lower all-cause mortality. <strong>Insulin:</strong> Meaningfully improved insulin sensitivity — ~14% reduction in type 2 diabetes risk vs 100lb baseline. Post-meal glucose spikes smaller and shorter. <strong>Metabolic:</strong> Resting energy expenditure elevated enough to support meaningful body composition management without extreme dietary restriction. <strong>Cardiovascular:</strong> Myokines secreted by muscle tissue during contraction begin having measurable anti-inflammatory effects on cardiovascular tissue. <strong>Hormonal:</strong> IGF-1 output improving. Anabolic hormone profile becomes favorable for both body composition and cellular repair. <strong>Mental:</strong> Reduced depression risk — skeletal muscle is now understood to be an endocrine organ that produces mood-regulating compounds including BDNF precursors.`,
+        tags:['insulin','metabolic','diabetes','mental'] },
+      { threshold:155, label:'Performance Threshold', icon:'🎯', healthImpact:65, mortalityShift:19,
+        healthBenefit:`<strong>Mortality:</strong> 19% lower all-cause mortality. NHANES data: LBM in this range associated with significantly lower cardiovascular risk. <strong>Cardiovascular:</strong> Anti-inflammatory myokine secretion (IL-6, irisin, BDNF) at meaningful levels — muscle acting as an active cardiovascular protector, not just passive mass. <strong>Bone:</strong> Bone mineral density peaks — fracture risk substantially lower. Connective tissue integrity high. <strong>Metabolic:</strong> Basal metabolic rate elevated to the point where body fat self-regulates within a narrower range. <strong>Insulin:</strong> Fasting insulin typically in optimal range. Metabolic flexibility (fat vs glucose switching) well developed. <strong>Hormonal:</strong> Testosterone, IGF-1, and growth hormone all elevated relative to low LBM states.`,
+        tags:['cardiovascular','inflammation','bone','hormonal'] },
+      { threshold:165, label:'Hypertrophy Inflection', icon:'📊', healthImpact:73, mortalityShift:24,
+        healthBenefit:`<strong>Mortality:</strong> Each additional 5lbs LBM above 155 reduces all-cause mortality ~3–4% in prospective studies. Grip strength at this LBM level is a leading mortality predictor in its own right. <strong>Hormonal:</strong> Testosterone:estrogen ratio improved — muscle tissue reduces aromatase activity that converts testosterone to estrogen. IGF-1 output at levels associated with cellular repair efficiency. <strong>Cancer:</strong> Cancer risk reduction partially attributable to improved insulin signaling and reduced systemic inflammation at this muscle mass level. <strong>Cognitive:</strong> Muscle-derived BDNF precursors and irisin cross the blood-brain barrier — cognitive protection begins compounding with LBM gains above this threshold. <strong>Mental:</strong> Body image satisfaction, self-efficacy, and mood regulation all significantly improved at this composition.`,
+        tags:['mortality','hormonal','longevity','cognitive'] },
+      { threshold:175, label:'Optimal Composition Zone', icon:'⭐', healthImpact:80, mortalityShift:28,
+        healthBenefit:`<strong>Mortality:</strong> 28% lower all-cause mortality. Near-optimal muscle-to-bone ratio for long-term functional independence. <strong>Metabolic:</strong> Metabolic reserve extremely high — can sustain demanding physical work without depleting glucose stores rapidly. Oxidative capacity near-elite. <strong>Cardiovascular:</strong> Cardiac output supported by peripheral muscle efficiency — heart works less hard to deliver equivalent oxygen. <strong>Longevity:</strong> Physical capacity at this LBM level supports functional independence deep into advanced age — critical health span metric. <strong>Hormonal:</strong> IGF-1 output elevated throughout the day, not just post-training. Growth hormone pulse amplitude increased. <strong>Bone:</strong> Bone density substantially above population norm — osteoporosis risk effectively eliminated.`,
+        tags:['longevity','hormonal','independence','bone'] },
+      { threshold:190, label:'Peak Natural Capacity', icon:'🏔️', healthImpact:85, mortalityShift:30,
+        healthBenefit:`<strong>Mortality:</strong> 30% lower all-cause mortality. Approaching genetic ceiling for natural LBM. <strong>Metabolic:</strong> Resting metabolic rate at absolute peak — passive energy expenditure highest achievable through training. Fat accumulation essentially self-limiting. <strong>Hormonal:</strong> Testosterone, IGF-1, growth hormone all at or near natural upper bounds for training age. Endocrine environment maximally anabolic. <strong>Cardiovascular:</strong> Cardiac output efficiency, peripheral oxygen extraction, and mitochondrial density all at near-elite levels. <strong>Focus shifts:</strong> Diminishing returns on additional mass beyond this point. Priority becomes maintaining LBM quality — fiber type distribution, mitochondrial efficiency, and neuromuscular coordination rather than raw mass accumulation.`,
+        tags:['peak','genetic-ceiling','hormonal','metabolic'] },
+    ]
+  },
+
+  bf: {
+    color:'#f97316', unit:'%', label:'Body Fat %',
+    description:'Adiposity — nonlinear mortality curve with distinct health inflection points',
+    scaleMin:4, scaleMax:40, scaleInvert:true,
+    tiers:[
+      { threshold:30, label:'Obesity Threshold Exit', icon:'⚠️', healthImpact:18, mortalityShift:0,
+        healthBenefit:`<strong>Mortality:</strong> Above 30% BF all-cause mortality risk severely elevated. <strong>Cardiovascular:</strong> Visceral fat releases pro-inflammatory cytokines continuously — chronic low-grade inflammation damages arterial walls and promotes atherosclerosis. Hypertension almost universal. <strong>Metabolic:</strong> Insulin resistance typically severe — pancreatic beta cells under chronic stress. Type 2 diabetes on trajectory. <strong>Hormonal:</strong> Aromatase (concentrated in fat tissue) converting significant testosterone to estrogen — androgen deficiency despite normal testicular function. <strong>Mental:</strong> Adipose-derived inflammatory cytokines cross the blood-brain barrier and contribute to depression, brain fog, and cognitive slowing. <strong>Energy:</strong> Carrying excess mass dramatically increases energy cost of all movement — chronic fatigue is structural.`,
+        tags:['inflammation','insulin','cardiovascular','hormonal'] },
+      { threshold:25, label:'Overweight → Normal Range', icon:'📉', healthImpact:34, mortalityShift:11,
+        healthBenefit:`<strong>Mortality:</strong> 11% lower all-cause mortality. Below 25%: visceral fat deposits begin declining meaningfully. <strong>Cardiovascular:</strong> Triglycerides improve. HDL cholesterol rises. Arterial stiffness begins reversing. Blood pressure typically drops 5–10 mmHg. <strong>Metabolic:</strong> Insulin sensitivity improving — post-meal glucose spikes smaller. Pancreatic stress reduced. <strong>Hormonal:</strong> Aromatase activity declining — testosterone:estrogen ratio beginning to normalize. Free testosterone rises even without any change in total testosterone. <strong>Mental:</strong> Systemic inflammation declining — inflammatory cytokine burden on the brain reducing. Depression and anxiety symptoms typically improve. <strong>Energy:</strong> Mechanical load reduced — joints, cardiovascular system, and musculature all working more efficiently.`,
+        tags:['visceral-fat','cholesterol','metabolic','hormonal'] },
+      { threshold:20, label:'Normal → Athletic', icon:'🎯', healthImpact:52, mortalityShift:20,
+        healthBenefit:`<strong>Mortality:</strong> 20% lower all-cause mortality vs highest tier. <strong>Hormonal:</strong> Aromatase activity substantially reduced — testosterone production increases measurably. Free testosterone and total testosterone both rise. This is one of the most impactful hormonal interventions available without pharmacology. <strong>Cardiovascular:</strong> Systemic inflammatory markers (CRP, IL-6) normalize. Arterial plaque progression effectively halted. <strong>Insulin:</strong> Insulin sensitivity reaches healthy range for most individuals. Fasting glucose typically normalizes. <strong>Mental:</strong> Cortisol baseline drops as inflammatory burden decreases — anxiety, stress reactivity, and depression risk all measurably improve. <strong>Sleep:</strong> Visceral fat reduction removes airway compression pressure — sleep quality improves, apnea risk falls.`,
+        tags:['testosterone','insulin','inflammation','sleep'] },
+      { threshold:15, label:'Athletic Body Composition', icon:'⚡', healthImpact:65, mortalityShift:26,
+        healthBenefit:`<strong>Mortality:</strong> 26% lower all-cause mortality. <strong>Hormonal:</strong> Cortisol:testosterone ratio optimal. Free testosterone at healthy athletic levels. IGF-1 output improved as anabolic signaling environment normalizes. <strong>Cardiovascular:</strong> Cardiovascular strain at rest and during exercise significantly reduced. Heart rate variability elevated — parasympathetic dominance increasing. <strong>Sleep:</strong> Sleep architecture measurably improved at this body composition — deeper slow-wave sleep, better REM proportion, lower AHI on sleep studies. <strong>Metabolic:</strong> Metabolic flexibility at healthy range — body can efficiently switch between fat and glucose as primary fuel. <strong>Mental:</strong> Body image, confidence, and psychological wellbeing consistently highest at this composition tier in survey data. Stress resilience elevated.`,
+        tags:['hormonal','sleep','cardiovascular','mental'] },
+      { threshold:12, label:'Peak Health Composition', icon:'🔥', healthImpact:76, mortalityShift:29,
+        healthBenefit:`<strong>Mortality:</strong> 29% lower all-cause mortality. 12% BF represents the optimal zone for male health across most measured biomarkers. <strong>Hormonal:</strong> Testosterone:estrogen ratio maximized without entering the low body fat zone where hormonal suppression risk begins. Research consistently shows this range maximizes free testosterone output. Cortisol baseline at lowest achievable through body composition alone. <strong>Cardiovascular:</strong> Optimal cardiovascular risk profile — virtually all modifiable lipid, pressure, and inflammatory markers in healthy range. <strong>Insulin:</strong> Insulin sensitivity at peak achievable through body composition — cells respond to insulin with maximum efficiency. <strong>Cancer:</strong> Adipose-derived estrogen and inflammatory signaling (breast, colon, endometrial cancer drivers) minimized. <strong>Energy:</strong> Subjective energy and vitality at peak — carrying minimal non-functional mass, metabolic efficiency maximized.`,
+        tags:['optimal','hormonal','testosterone','cancer'] },
+      { threshold:10, label:'High Performance Zone', icon:'💎', healthImpact:80, mortalityShift:30,
+        healthBenefit:`<strong>Mortality:</strong> 30% lower all-cause mortality — approaching the ceiling of body composition contribution to mortality reduction. <strong>Body composition:</strong> Peak fat-free mass ratio. Maximum vascularity and muscle definition. Fat-to-lean ratio at physiological minimum compatible with optimal health. <strong>Hormonal:</strong> Free testosterone typically at upper end of natural range. Anabolic:catabolic hormone ratio maximally favorable. <strong>Cardiovascular:</strong> Resting heart rate typically 45–55 bpm. Cardiovascular efficiency near-elite. <strong>Caution zone approaching:</strong> Below 8% BF the health curve begins reversing — this tier (8–10%) is the sustainable peak before risk begins emerging. Not recommended for sustained periods below 8% without careful monitoring.`,
+        tags:['performance','vascular','hormonal','caution'] },
+      { threshold:7, label:'Competition Lean', icon:'⚠️', healthImpact:62, mortalityShift:22,
+        healthBenefit:`<strong>Caution — health impact curve reverses below 8%:</strong> <strong>Hormonal:</strong> Testosterone suppression risk — below 8% the body begins downregulating reproductive hormones as a survival response. LH and FSH can drop measurably. <strong>Immune:</strong> Immune function declines — white blood cell production and natural killer cell activity both impaired at very low body fat. Illness susceptibility increases. <strong>Bone:</strong> Bone density risk if sustained — low body fat correlates with lower estrogen (even in males) which is critical for bone maintenance. <strong>Sleep:</strong> Sleep quality often degrades below 8% — insufficient fat for adipokine signaling that supports normal sleep architecture. <strong>Mental:</strong> Cognitive function and mood often decline at competition leanness — caloric restriction combined with very low fat creates neurological stress. Sustainable only for short competitive periods.`,
+        tags:['competition','risk','monitoring','hormonal'] },
+    ]
+  },
+
+  str: {
+    color:'#a855f7', unit:'× BW', label:'Relative Strength',
+    description:'Strength relative to bodyweight — functional independence and longevity predictor',
+    scaleMin:0.3, scaleMax:3.0,
+    tiers:[
+      { threshold:0.5, label:'Below Functional Threshold', icon:'⚠️', healthImpact:15, mortalityShift:0,
+        healthBenefit:`<strong>Mortality:</strong> Significant frailty risk — below this threshold, all-cause mortality risk is substantially elevated independent of other health metrics. <strong>Functional independence:</strong> Unable to perform basic functional tasks under load. Fall risk extremely high — most falls resulting in serious injury occur in people below functional strength thresholds. <strong>Bone:</strong> Insufficient mechanical loading to maintain bone mineral density — osteoporosis trajectory without intervention. <strong>Metabolic:</strong> Insufficient muscle mass to provide meaningful glucose buffering. Insulin resistance risk high. <strong>Mental:</strong> Physical incapacity at this level strongly predicts depression and anxiety — loss of physical agency has direct psychological consequences. <strong>Energy:</strong> Fatigue from basic tasks is norm — no strength reserve for unexpected demands.`,
+        tags:['frailty','injury','baseline','bone'] },
+      { threshold:0.75, label:'Functional Independence', icon:'🦶', healthImpact:30, mortalityShift:8,
+        healthBenefit:`<strong>Mortality:</strong> 8% lower all-cause mortality. <strong>Functional:</strong> Basic functional independence maintained. Can perform daily tasks under load without significant fatigue. Fall risk declining — improved reactive balance and deceleration strength. <strong>Bone:</strong> Mechanical loading from strength training begins stimulating bone mineral density improvements. Osteoblast activity increasing. <strong>Cardiovascular:</strong> Resistance training at this level begins improving endothelial function and arterial compliance independently of aerobic training. Blood pressure response to exercise improving. <strong>Metabolic:</strong> Glucose disposal capacity meaningfully improved. Insulin sensitivity improving. <strong>Mental:</strong> Physical self-efficacy begins recovering — meaningful correlations with reduced depression risk at this strength tier.`,
+        tags:['independence','bone','fall-risk','mental'] },
+      { threshold:1.0, label:'Active Population Average', icon:'📊', healthImpact:44, mortalityShift:15,
+        healthBenefit:`<strong>Mortality:</strong> 15% lower all-cause mortality. Population average for active adults. Grip strength (highly correlated proxy) predicts cardiovascular mortality in prospective studies across dozens of countries. <strong>Cardiovascular:</strong> Regular resistance training to maintain this strength level produces measurable improvements in resting heart rate, cardiac output efficiency, and arterial stiffness. <strong>Hormonal:</strong> Testosterone rises in response to progressive overload at this intensity. Growth hormone pulse amplitude increased. Cortisol baseline lower than sedentary population. <strong>Metabolic:</strong> Resting energy expenditure meaningfully elevated. Insulin sensitivity solid. Body composition self-regulating more effectively. <strong>Injury:</strong> Musculoskeletal injury resilience substantially better — tendons, ligaments, and connective tissue all strengthened proportionally to muscle.`,
+        tags:['cardiovascular','mortality','hormonal','injury'] },
+      { threshold:1.25, label:'Above Average — Health Inflection', icon:'💪', healthImpact:58, mortalityShift:21,
+        healthBenefit:`<strong>Mortality:</strong> 21% lower all-cause mortality. Clear all-cause mortality benefit vs below-average. Ruiz et al. 2008: highest muscular strength quintile had 60% lower cardiovascular mortality vs lowest. <strong>Hormonal:</strong> IGF-1 output elevated — both muscle and liver IGF-1 production upregulated by heavy resistance training. Growth hormone response to training significantly amplified. Testosterone levels consistently above population average. <strong>Cardiovascular:</strong> Post-exercise hypotension effect — blood pressure reduction lasting 12–24 hours after each training session. Cumulative arterial health benefit. <strong>Cancer:</strong> Strength training at this level associated with reduced cancer incidence — improved immune surveillance and insulin signaling both contribute. <strong>Mental:</strong> Executive function and processing speed measurably improved — strength training upregulates BDNF independently of aerobic training.`,
+        tags:['mortality','cardiovascular','IGF-1','cancer'] },
+      { threshold:1.5, label:'Strong — Longevity Zone', icon:'⭐', healthImpact:70, mortalityShift:27,
+        healthBenefit:`<strong>Mortality:</strong> 27% lower all-cause mortality. Demonstrated longevity association across multiple independent cohort studies. <strong>Hormonal:</strong> Testosterone:cortisol ratio at its most favorable — training stimulus strong enough to maximize anabolic response without exceeding recovery capacity. This ratio predicts both body composition and systemic health. IGF-1 chronically elevated. <strong>Immune:</strong> Immune system receives powerful hormetic benefit from heavy resistance training at this level — natural killer cell activity elevated, pro-inflammatory cytokine production reduced at rest. <strong>Bone:</strong> Bone density significantly above population norm. Fracture risk in the lowest population percentile. <strong>Cognitive:</strong> Hippocampal volume and white matter integrity both positively associated with strength at this level. <strong>Energy:</strong> Physical reserve capacity means routine tasks require a small fraction of maximum capacity — subjective energy and vitality elevated.`,
+        tags:['longevity','hormonal','immune','cognitive'] },
+      { threshold:1.75, label:'Highly Trained', icon:'🔥', healthImpact:78, mortalityShift:30,
+        healthBenefit:`<strong>Mortality:</strong> 30% lower all-cause mortality. <strong>Neuromuscular:</strong> Motor unit recruitment efficiency at elite level — neuromuscular system operating near-peak coordination. Type IIa fiber dominance supports both metabolic health (high oxidative capacity) and strength output simultaneously. <strong>Bone:</strong> Bone density substantially above population norm across all sites. Connective tissue integrity — tendons, ligaments, and cartilage — at maximum strength relative to muscle force production. <strong>Metabolic:</strong> Resting metabolic rate at highest achievable through resistance training. Basal fat oxidation elevated significantly. Insulin sensitivity at near-optimal level from combined muscle mass and training stimulus. <strong>Hormonal:</strong> Endocrine environment as anabolic as naturally achievable — testosterone, IGF-1, and growth hormone all in optimal ranges. <strong>Cardiovascular:</strong> Peripheral vascular resistance reduced — capillary density in muscle tissue high.`,
+        tags:['neuromuscular','bone','metabolic','hormonal'] },
+      { threshold:2.0, label:'Elite Relative Strength', icon:'🏆', healthImpact:83, mortalityShift:32,
+        healthBenefit:`<strong>Mortality:</strong> 32% lower all-cause mortality — approaching the ceiling of strength contribution to mortality reduction. Top 5% relative strength for trained natural athletes. <strong>Hormonal:</strong> Testosterone, IGF-1, growth hormone all at or near natural upper bounds for training age. Endocrine milieu maximally favorable for both performance and longevity. <strong>Longevity:</strong> Physical capacity at 2.0× BW sustains functional independence regardless of age-related decline — even losing 30% of strength over decades leaves you above functional independence threshold. This buffer is the longevity dividend. <strong>Cognitive:</strong> Neuromuscular system integration at elite level — coordination, reaction time, and proprioception all peak. These predict fall prevention and cognitive aging rate. <strong>Immune:</strong> Hormetic training stress at this level provides maximum immune system benefit. Natural killer cell activity, T-cell function, and inflammatory regulation all optimized. <strong>Metabolic:</strong> Full metabolic protection — insulin sensitivity, resting energy expenditure, and body composition self-regulation all at ceiling.`,
+        tags:['elite','plateau','hormetic','longevity'] },
+      { threshold:2.5, label:'Competitive Strength Level', icon:'💎', healthImpact:82, mortalityShift:32,
+        healthBenefit:`<strong>Health impact plateau reached beyond 2.0×:</strong> For non-strength sport athletes, health returns from additional relative strength plateau at 2.0×. Training beyond this point continues providing performance benefit but marginal health return diminishes. <strong>Body composition tradeoff:</strong> Pursuing strength beyond 2.0× may require caloric surplus that shifts body composition away from optimal health range. The strength:health tradeoff becomes relevant here. <strong>Joint loading:</strong> Cumulative joint loading from maximum strength training carries injury risk that partially offsets health benefit at extremes. <strong>Focus:</strong> At this tier, training goal shifts from health optimization to performance maximization. Both are valid — but they require different program design priorities.`,
+        tags:['competitive','diminishing-returns','performance'] },
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HEALTH IMPACT WEIGHTS (all-cause mortality basis, defaults)
+// VO₂ max: strongest single predictor
+// LBM: muscle mass as metabolic organ
+// BF%: nonlinear adiposity curve
+// Strength: functional longevity predictor
+// ═══════════════════════════════════════════════════════════════════════════
+let WEIGHTS = { vo2:0.45, lbm:0.25, bf:0.20, str:0.10 };
+
+function updWeights() {
+  const raw = {
+    vo2: +document.getElementById('pw_vo2').value,
+    lbm: +document.getElementById('pw_lbm').value,
+    bf:  +document.getElementById('pw_bf').value,
+    str: +document.getElementById('pw_str').value,
+  };
+  const total = raw.vo2+raw.lbm+raw.bf+raw.str||1;
+  Object.keys(raw).forEach(k => {
+    WEIGHTS[k] = raw[k]/total;
+    const pct = Math.round(WEIGHTS[k]*100);
+    document.getElementById('wb_'+k).style.width = pct+'%';
+    document.getElementById('wv_'+k).textContent = pct+'%';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPUTE MILESTONE STATUS
+// ═══════════════════════════════════════════════════════════════════════════
+function getMilestoneStatus(current, tiers, invert) {
+  // For BF%: lower is better (invert). For all others: higher is better.
+  return tiers.map((t, i) => {
+    const achieved = invert ? current <= t.threshold : current >= t.threshold;
+    const isNext   = !achieved && (i === 0 || (invert ? current > tiers[i-1].threshold : current < tiers[i-1].threshold) ||
+                     tiers.slice(0,i).every(prev => invert ? current<=prev.threshold : current>=prev.threshold));
+    const gap      = invert ? current - t.threshold : t.threshold - current;
+    const pctToGo  = Math.max(0, Math.round(Math.abs(gap) / Math.abs(t.threshold - (i>0?tiers[i-1].threshold:t.threshold*0.5)) * 100));
+    return { ...t, achieved, gap: Math.abs(gap), pctToGo };
+  });
+}
+
+function computeMetricScore(current, tiers, invert) {
+  // Score 0–100 based on which milestones achieved and position between them
+  const achieved = tiers.filter(t => invert ? current <= t.threshold : current >= t.threshold);
+  if (achieved.length === 0) return 0;
+  const topAchieved = achieved[achieved.length-1];
+  const nextTier = tiers[tiers.indexOf(topAchieved)+1];
+  let score = topAchieved.healthImpact;
+  if (nextTier) {
+    const progress = invert
+      ? (topAchieved.threshold - current) / (topAchieved.threshold - nextTier.threshold)
+      : (current - topAchieved.threshold) / (nextTier.threshold - topAchieved.threshold);
+    score = topAchieved.healthImpact + Math.max(0,progress) * (nextTier.healthImpact - topAchieved.healthImpact);
+  }
+  return Math.min(100, Math.round(score));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function healthColor(score) {
+  if (score >= 80) return '#10b981';
+  if (score >= 60) return '#3b82f6';
+  if (score >= 40) return '#f59e0b';
+  if (score >= 20) return '#f97316';
+  return '#ef4444';
+}
+
+function healthTierLabel(score) {
+  if (score >= 85) return { label:'EXCEPTIONAL', sub:'Top longevity tier' };
+  if (score >= 70) return { label:'EXCELLENT',   sub:'Above average health span' };
+  if (score >= 55) return { label:'GOOD',         sub:'Solid health foundation' };
+  if (score >= 40) return { label:'MODERATE',     sub:'Meaningful improvement available' };
+  if (score >= 25) return { label:'DEVELOPING',   sub:'High marginal gain potential' };
+  return                  { label:'CRITICAL',     sub:'Urgent health investment zone' };
+}
+
+function renderSVGRing(score, color) {
+  const r=42, cx=50, cy=50;
+  const circ = 2*Math.PI*r;
+  const dash = (score/100)*circ;
+  return `<svg width="100" height="100" viewBox="0 0 100 100">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border2)" stroke-width="7"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="7"
+      stroke-dasharray="${dash} ${circ}" stroke-linecap="round"
+      style="transition:stroke-dasharray 0.8s cubic-bezier(0.16,1,0.3,1)"/>
+  </svg>`;
+}
+
+function renderMetricSection(key, cur, goal) {
+  const def = MILESTONES[key];
+  const invert = def.scaleInvert || false;
+  const statuses = getMilestoneStatus(cur, def.tiers, invert);
+  const score = computeMetricScore(cur, def.tiers, invert);
+
+  const progressPct = Math.min(100, Math.max(0,
+    ((cur - def.scaleMin) / (def.scaleMax - def.scaleMin)) * 100
+  ));
+
+  const nextMs = statuses.find(s => !s.achieved);
+  const achievedCount = statuses.filter(s=>s.achieved).length;
+
+  const impactColor = s => s.healthImpact>=80?'#10b981':s.healthImpact>=60?'#3b82f6':s.healthImpact>=40?'#f59e0b':'#f97316';
+
+  const nextSpotlight = nextMs ? `
+    <div class="next-spotlight">
+      <div class="ns-icon">${nextMs.icon}</div>
+      <div>
+        <div class="ns-label">Next milestone</div>
+        <div class="ns-val">${nextMs.label}</div>
+        <div class="ns-sub">Gap: ${nextMs.gap.toFixed(invert?1:1)} ${def.unit} · Health impact: ${nextMs.healthImpact}/100 · −${nextMs.mortalityShift}% mortality risk</div>
+      </div>
+      <div class="ns-gap">${nextMs.gap.toFixed(1)}<div style="font-family:'JetBrains Mono',monospace;font-size:0.45rem;color:var(--muted)">${def.unit} to go</div></div>
+    </div>` : `
+    <div class="next-spotlight" style="background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.2)">
+      <div class="ns-icon">🏆</div>
+      <div><div class="ns-label" style="color:var(--green)">All milestones achieved</div><div class="ns-val">Peak tier reached</div></div>
+    </div>`;
+
+  // Category scores lookup
+  const CAT_SCORES = {'vo2': [{'cardiovascular': 12, 'cognitive': 8, 'hormonal': 5}, {'cardiovascular': 28, 'cognitive': 18, 'hormonal': 15}, {'cardiovascular': 45, 'cognitive': 30, 'hormonal': 28}, {'cardiovascular': 62, 'cognitive': 48, 'hormonal': 42}, {'cardiovascular': 75, 'cognitive': 65, 'hormonal': 55}, {'cardiovascular': 85, 'cognitive': 78, 'hormonal': 68}, {'cardiovascular': 92, 'cognitive': 88, 'hormonal': 80}], 'lbm': [{'metabolic': 12, 'hormonal': 8, 'cardiovascular': 5}, {'metabolic': 28, 'hormonal': 20, 'cardiovascular': 15}, {'metabolic': 48, 'hormonal': 35, 'cardiovascular': 28}, {'metabolic': 62, 'hormonal': 52, 'cardiovascular': 45}, {'metabolic': 72, 'hormonal': 65, 'cardiovascular': 58}, {'metabolic': 80, 'hormonal': 75, 'cardiovascular': 68}, {'metabolic': 88, 'hormonal': 85, 'cardiovascular': 75}], 'bf': [{'hormonal': 8, 'metabolic': 10, 'cardiovascular': 12}, {'hormonal': 25, 'metabolic': 28, 'cardiovascular': 30}, {'hormonal': 55, 'metabolic': 48, 'cardiovascular': 45}, {'hormonal': 68, 'metabolic': 58, 'cardiovascular': 55}, {'hormonal': 82, 'metabolic': 70, 'cardiovascular': 65}, {'hormonal': 88, 'metabolic': 78, 'cardiovascular': 72}, {'hormonal': 50, 'metabolic': 45, 'cardiovascular': 40}], 'str': [{'hormonal': 8, 'bone': 10, 'cardiovascular': 6}, {'hormonal': 22, 'bone': 28, 'cardiovascular': 18}, {'hormonal': 40, 'bone': 42, 'cardiovascular': 35}, {'hormonal': 58, 'bone': 52, 'cardiovascular': 50}, {'hormonal': 70, 'bone': 62, 'cardiovascular': 62}, {'hormonal': 80, 'bone': 72, 'cardiovascular': 72}, {'hormonal': 88, 'bone': 78, 'cardiovascular': 80}, {'hormonal': 85, 'bone': 75, 'cardiovascular': 78}]};
+  const CAT_META   = {'cardiovascular': {'label': 'Cardiovascular', 'color': '#ef4444', 'max': 100}, 'cognitive': {'label': 'Cognitive', 'color': '#6366f1', 'max': 100}, 'hormonal': {'label': 'Hormonal', 'color': '#a855f7', 'max': 100}, 'metabolic': {'label': 'Metabolic', 'color': '#3b82f6', 'max': 100}, 'bone': {'label': 'Bone density', 'color': '#f59e0b', 'max': 100}};
+
+  const msCards = statuses.map((s,i) => {
+    const tagColors = { cardiovascular:'#ef4444',mortality:'#f97316',longevity:'#10b981',metabolic:'#3b82f6',hormonal:'#a855f7',elite:'#f59e0b',baseline:'#64748b',optimal:'#10b981',performance:'#3b82f6',cognitive:'#6366f1' };
+    const isNextTarget = !s.achieved && statuses.slice(0,i).every(prev=>prev.achieved);
+
+    // Get category scores for this tier
+    const catData = (CAT_SCORES[key] || [])[i] || {};
+    const catBars = Object.entries(catData).map(([cat,val]) => {
+      const m = CAT_META[cat] || {label:cat,color:'#64748b',max:100};
+      const pct = Math.round(val/m.max*100);
+      return `
+        <div class="health-impact-bar" style="margin-top:3px">
+          <span class="hib-label" style="color:${m.color}">${m.label}</span>
+          <div class="hib-wrap"><div class="hib-bar" style="width:${pct}%;background:${m.color}"></div></div>
+          <span class="hib-val" style="color:${m.color}">${val}</span>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="milestone-card ${s.achieved?'achieved':isNextTarget?'next-target':'locked'}" style="${s.achieved?`border-color:${def.color}40`:''}">
+        ${s.achieved?`<div class="milestone-fill" style="background:${def.color}"></div><div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${def.color}"></div>`:''}
+        <div class="ms-icon">${s.icon}</div>
+        <div class="ms-body">
+          <div class="ms-threshold">${invert?'≤':'≥'}${s.threshold} ${def.unit}</div>
+          <div class="ms-label">${s.label}</div>
+          <div class="health-impact-bar">
+            <span class="hib-label">Health impact</span>
+            <div class="hib-wrap"><div class="hib-bar" style="width:${s.healthImpact}%;background:${impactColor(s)}"></div></div>
+            <span class="hib-val" style="color:${impactColor(s)}">${s.healthImpact}</span>
+          </div>
+          <div class="health-impact-bar" style="margin-top:3px">
+            <span class="hib-label">Mortality −%</span>
+            <div class="hib-wrap"><div class="hib-bar" style="width:${s.mortalityShift/60*100}%;background:#10b981"></div></div>
+            <span class="hib-val" style="color:#10b981">−${s.mortalityShift}%</span>
+          </div>
+          ${catBars}
+          <details style="margin-top:8px">
+            <summary style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);cursor:pointer;user-select:none;list-style:none">▶ Health detail</summary>
+            <div class="ms-health-benefit" style="margin-top:6px">${s.healthBenefit}</div>
+          </details>
+        </div>
+        <div class="ms-right">
+          ${s.achieved
+            ? `<div class="ms-achieved-stamp" style="background:${def.color}18;color:${def.color};border:1px solid ${def.color}30">✓ ACHIEVED</div>`
+            : isNextTarget
+              ? `<div class="ms-pct-to" style="color:var(--gold)">NEXT TARGET</div><div class="ms-value" style="color:var(--gold)">${s.gap.toFixed(1)}<div style="font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:var(--muted)">${def.unit} gap</div></div>`
+              : `<div class="ms-pct-to">LOCKED</div><div class="ms-value" style="color:var(--dim)">${s.gap.toFixed(1)}<div style="font-family:'JetBrains Mono',monospace;font-size:0.42rem;color:var(--muted)">${def.unit} away</div></div>`
+          }
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="metric-section">
+      <div class="metric-header">
+        <div class="metric-dot" style="background:${def.color}"></div>
+        <div class="metric-name" style="color:${def.color}">${def.label}</div>
+        <div class="metric-current">${cur} ${def.unit} · ${achievedCount}/${def.tiers.length} milestones · Score ${score}/100</div>
+      </div>
+      <div class="metric-progress-wrap">
+        <div class="metric-progress" style="width:${progressPct}%;background:${def.color}"></div>
+      </div>
+      <div class="metric-scale">
+        <span>${def.scaleMin}</span>
+        <span style="color:${def.color}">${cur} ${def.unit} (current)</span>
+        <span>${def.scaleMax}</span>
+      </div>
+      ${nextSpotlight}
+      <div class="milestones-grid">${msCards}</div>
+    </div>
+    <div class="section-divider"></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RADAR SVG — 4-axis spider chart showing current / goal / max potential
+// ═══════════════════════════════════════════════════════════════════════════
+function renderRadar(metrics) {
+  // metrics: [{key, label, color, cur, goal, max, curPct, goalPct}]
+  const cx=130, cy=130, r=95;
+  const n=metrics.length;
+  const axes = metrics.map((_,i) => {
+    const angle = (i/n)*2*Math.PI - Math.PI/2;
+    return { x: cx + Math.cos(angle)*r, y: cy + Math.sin(angle)*r,
+             mx: cx + Math.cos(angle)*(r+18), my: cy + Math.sin(angle)*(r+18) };
+  });
+
+  const polyPoints = (pcts) => pcts.map((p,i) => {
+    const angle=(i/n)*2*Math.PI-Math.PI/2;
+    const d=p/100*r;
+    return `${cx+Math.cos(angle)*d},${cy+Math.sin(angle)*d}`;
+  }).join(' ');
+
+  // Grid rings at 25/50/75/100%
+  const rings = [25,50,75,100].map(pct => {
+    const pts = metrics.map((_,i)=>{
+      const angle=(i/n)*2*Math.PI-Math.PI/2;
+      const d=pct/100*r;
+      return `${cx+Math.cos(angle)*d},${cy+Math.sin(angle)*d}`;
+    }).join(' ');
+    return `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>`;
+  }).join('');
+
+  // Axis lines
+  const axisLines = axes.map(a =>
+    `<line x1="${cx}" y1="${cy}" x2="${a.x}" y2="${a.y}" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"/>`
+  ).join('');
+
+  // Max potential polygon (outermost — already 100%)
+  const maxPoly = `<polygon points="${polyPoints(metrics.map(()=>100))}"
+    fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>`;
+
+  // Goal polygon
+  const goalPoly = `<polygon points="${polyPoints(metrics.map(m=>m.goalPct))}"
+    fill="none" stroke="rgba(245,158,11,0.35)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+
+  // Current polygon — filled
+  const curPoly = `<polygon points="${polyPoints(metrics.map(m=>m.curPct))}"
+    fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>`;
+
+  // Colored dots at each current point
+  const dots = metrics.map((m,i)=>{
+    const angle=(i/n)*2*Math.PI-Math.PI/2;
+    const d=m.curPct/100*r;
+    const x=cx+Math.cos(angle)*d, y=cy+Math.sin(angle)*d;
+    return `<circle cx="${x}" cy="${y}" r="5" fill="${m.color}" stroke="var(--bg)" stroke-width="2"/>`;
+  }).join('');
+
+  // Goal dots
+  const goalDots = metrics.map((m,i)=>{
+    const angle=(i/n)*2*Math.PI-Math.PI/2;
+    const d=m.goalPct/100*r;
+    const x=cx+Math.cos(angle)*d, y=cy+Math.sin(angle)*d;
+    return `<circle cx="${x}" cy="${y}" r="3.5" fill="rgba(245,158,11,0.7)" stroke="var(--bg)" stroke-width="1.5"/>`;
+  }).join('');
+
+  // Axis labels
+  const labels = metrics.map((m,i)=>{
+    const a=axes[i];
+    const anchor = a.mx > cx+5 ? 'start' : a.mx < cx-5 ? 'end' : 'middle';
+    return `<text x="${a.mx}" y="${a.my+4}" text-anchor="${anchor}"
+      font-family="'JetBrains Mono',monospace" font-size="9" fill="${m.color}"
+      font-weight="500" text-transform="uppercase">${m.label}</text>`;
+  }).join('');
+
+  // Center score
+  const avgPct = Math.round(metrics.reduce((s,m)=>s+m.curPct,0)/metrics.length);
+
+  return `<svg viewBox="0 0 260 260" width="260" height="260">
+    ${rings}${axisLines}${maxPoly}${goalPoly}${curPoly}${dots}${goalDots}${labels}
+    <text x="${cx}" y="${cy-8}" text-anchor="middle"
+      font-family="'Barlow Condensed',sans-serif" font-size="28" font-weight="800"
+      fill="rgba(255,255,255,0.85)">${avgPct}</text>
+    <text x="${cx}" y="${cy+12}" text-anchor="middle"
+      font-family="'JetBrains Mono',monospace" font-size="8" fill="rgba(255,255,255,0.35)">AVG SCORE</text>
+  </svg>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAXIMUM POTENTIAL COMPUTATION
+// Peak health score achievable = top milestone health impact for each metric
+// ─────────────────────────────────────────────────────────────────────────────
+function getMaxPotential(key) {
+  const tiers = MILESTONES[key].tiers;
+  // Optimal peak excludes the "competition/risk" tier that reverses health impact
+  const safeTiers = tiers.filter(t => !t.tags.includes('risk') && !t.tags.includes('competition'));
+  return Math.max(...safeTiers.map(t=>t.healthImpact));
+}
+
+function renderPotentialPanel(cur_vo2,cur_lbm,cur_bf,cur_str,goal_vo2,goal_lbm,goal_bf,goal_str,scores) {
+  const maxScores = {
+    vo2: getMaxPotential('vo2'),
+    lbm: getMaxPotential('lbm'),
+    bf:  getMaxPotential('bf'),
+    str: getMaxPotential('str'),
+  };
+
+  const goalScores = {
+    vo2: computeMetricScore(goal_vo2, MILESTONES.vo2.tiers, false),
+    lbm: computeMetricScore(goal_lbm, MILESTONES.lbm.tiers, false),
+    bf:  computeMetricScore(goal_bf,  MILESTONES.bf.tiers,  true),
+    str: computeMetricScore(goal_str, MILESTONES.str.tiers, false),
+  };
+
+  const metrics = [
+    { key:'vo2', label:'VO₂', color:'#10b981', cur:scores.vo2, goal:goalScores.vo2, max:maxScores.vo2,
+      curPct: Math.round(scores.vo2/maxScores.vo2*100),
+      goalPct: Math.round(goalScores.vo2/maxScores.vo2*100) },
+    { key:'lbm', label:'LBM',  color:'#3b82f6', cur:scores.lbm, goal:goalScores.lbm, max:maxScores.lbm,
+      curPct: Math.round(scores.lbm/maxScores.lbm*100),
+      goalPct: Math.round(goalScores.lbm/maxScores.lbm*100) },
+    { key:'bf',  label:'BF%',  color:'#f97316', cur:scores.bf,  goal:goalScores.bf,  max:maxScores.bf,
+      curPct: Math.round(scores.bf/maxScores.bf*100),
+      goalPct: Math.round(goalScores.bf/maxScores.bf*100) },
+    { key:'str', label:'STR',  color:'#a855f7', cur:scores.str, goal:goalScores.str, max:maxScores.str,
+      curPct: Math.round(scores.str/maxScores.str*100),
+      goalPct: Math.round(goalScores.str/maxScores.str*100) },
+  ];
+
+  const overallGoal = Math.round(
+    goalScores.vo2*WEIGHTS.vo2 + goalScores.lbm*WEIGHTS.lbm +
+    goalScores.bf*WEIGHTS.bf   + goalScores.str*WEIGHTS.str
+  );
+  const overallMax = Math.round(
+    maxScores.vo2*WEIGHTS.vo2 + maxScores.lbm*WEIGHTS.lbm +
+    maxScores.bf*WEIGHTS.bf   + maxScores.str*WEIGHTS.str
+  );
+  const overallCur = Math.round(
+    scores.vo2*WEIGHTS.vo2 + scores.lbm*WEIGHTS.lbm +
+    scores.bf*WEIGHTS.bf   + scores.str*WEIGHTS.str
+  );
+
+  const metricRows = metrics.map(m => {
+    const curBarW  = Math.round(m.curPct);
+    const goalBarW = Math.max(0, Math.round(m.goalPct) - curBarW);
+    const maxBarW  = Math.max(0, 100 - curBarW - goalBarW);
+    return `
+      <div class="pm-row">
+        <div class="pm-label" style="color:${m.color}">${MILESTONES[m.key].label.split(' ')[0]}</div>
+        <div>
+          <div class="pm-bar-wrap">
+            <div class="pm-bar-cur"  style="width:${curBarW}%;background:${m.color}"></div>
+            <div class="pm-bar-goal" style="left:${curBarW}%;width:${goalBarW}%;background:${m.color}"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:var(--muted);margin-top:3px">
+            <span style="color:${m.color}">${m.cur}/100 now</span>
+            <span style="color:rgba(245,158,11,0.7)">→ ${m.goal}/100 goal</span>
+            <span>/ ${m.max} max</span>
+          </div>
+        </div>
+        <div class="pm-val" style="color:${m.color}">${m.curPct}%</div>
+        <div class="pm-max">of<br>potential</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('potentialPanel').innerHTML = `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+      Maximum Potential — Current · Goal · Peak
+    </div>
+    <div class="potential-grid">
+      <div class="radar-wrap">${renderRadar(metrics)}</div>
+      <div>
+        <div class="potential-metrics">${metricRows}</div>
+        <div class="potential-legend">
+          <span><span class="leg-dot" style="background:rgba(255,255,255,0.5)"></span>Current</span>
+          <span><span class="leg-dot" style="background:rgba(245,158,11,0.6)"></span>Goal target</span>
+          <span><span class="leg-dot" style="background:rgba(255,255,255,0.1)"></span>Max potential</span>
+        </div>
+        <div class="gap-to-goal">
+          <strong>Overall score:</strong>
+          Current <span style="color:var(--white)">${overallCur}/100</span> →
+          Goal <span style="color:rgba(245,158,11,0.9)">${overallGoal}/100</span> →
+          Max potential <span style="color:var(--muted)">${overallMax}/100</span><br>
+          <span style="color:var(--muted)">
+            Gap to goal: <span style="color:var(--gold)">${overallGoal-overallCur} pts</span> ·
+            Remaining ceiling: <span style="color:var(--muted)">${overallMax-overallGoal} pts</span> ·
+            ${Math.round((overallCur/overallMax)*100)}% of maximum health potential achieved
+          </span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN COMPUTE
+// ═══════════════════════════════════════════════════════════════════════════
+function compute() {
+  const cur_vo2 = +document.getElementById('cur_vo2').value;
+  const cur_lbm = +document.getElementById('cur_lbm').value;
+  const cur_bf  = +document.getElementById('cur_bf').value;
+  const cur_str = +document.getElementById('cur_str').value;
+  const goal_vo2= +document.getElementById('goal_vo2').value;
+  const goal_lbm= +document.getElementById('goal_lbm').value;
+  const goal_bf = +document.getElementById('goal_bf').value;
+  const goal_str= +document.getElementById('goal_str').value;
+
+  // Compute individual scores
+  const score_vo2 = computeMetricScore(cur_vo2, MILESTONES.vo2.tiers, false);
+  const score_lbm = computeMetricScore(cur_lbm, MILESTONES.lbm.tiers, false);
+  const score_bf  = computeMetricScore(cur_bf,  MILESTONES.bf.tiers,  true);
+  const score_str = computeMetricScore(cur_str, MILESTONES.str.tiers, false);
+
+  // Weighted composite health score
+  const overall = Math.round(
+    score_vo2 * WEIGHTS.vo2 +
+    score_lbm * WEIGHTS.lbm +
+    score_bf  * WEIGHTS.bf  +
+    score_str * WEIGHTS.str
+  );
+
+  const hc = healthColor(overall);
+  const ht = healthTierLabel(overall);
+
+  // Total mortality shift estimate (weighted)
+  const ms_vo2 = getMilestoneStatus(cur_vo2, MILESTONES.vo2.tiers, false).filter(s=>s.achieved);
+  const ms_lbm = getMilestoneStatus(cur_lbm, MILESTONES.lbm.tiers, false).filter(s=>s.achieved);
+  const ms_bf  = getMilestoneStatus(cur_bf,  MILESTONES.bf.tiers,  true ).filter(s=>s.achieved);
+  const ms_str = getMilestoneStatus(cur_str, MILESTONES.str.tiers, false).filter(s=>s.achieved);
+  const topMs  = [ms_vo2,ms_lbm,ms_bf,ms_str].map(arr=>arr.length?arr[arr.length-1].mortalityShift:0);
+  const estMortality = Math.round(topMs[0]*WEIGHTS.vo2 + topMs[1]*WEIGHTS.lbm + topMs[2]*WEIGHTS.bf + topMs[3]*WEIGHTS.str);
+
+  // Potential panel
+  renderPotentialPanel(cur_vo2,cur_lbm,cur_bf,cur_str,goal_vo2,goal_lbm,goal_bf,goal_str,
+    {vo2:score_vo2,lbm:score_lbm,bf:score_bf,str:score_str});
+
+  // Hero panel
+  document.getElementById('healthHero').innerHTML = `
+    <div class="health-score-ring">
+      ${renderSVGRing(overall, hc)}
+      <div class="health-score-num" style="color:${hc}">${overall}</div>
+      <div class="health-score-label">/ 100</div>
+    </div>
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:2px;color:${hc};text-transform:uppercase;margin-bottom:4px">${ht.label}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted);margin-bottom:12px">${ht.sub} · est. −${estMortality}% all-cause mortality vs sedentary baseline</div>
+      <div class="health-breakdown">
+        ${[['VO₂ Max','vo2',score_vo2],['Lean Mass','lbm',score_lbm],['Body Fat','bf',score_bf],['Strength','str',score_str]].map(([n,k,s])=>`
+          <div class="health-bar-row">
+            <div class="health-bar-name" style="color:var(--${k})">${n}</div>
+            <div class="health-bar-wrap"><div class="health-bar" style="width:${s}%;background:var(--${k})"></div></div>
+            <div class="health-bar-pct" style="color:var(--${k})">${s}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="health-tier">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px">Weighted by</div>
+      ${[['VO₂','vo2'],['LBM','lbm'],['BF%','bf'],['STR','str']].map(([n,k])=>`
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--${k});margin-bottom:2px">${n} ${Math.round(WEIGHTS[k]*100)}%</div>`).join('')}
+    </div>`;
+
+  // Metric sections — ordered by highest marginal gain potential
+  const gainPotential = [
+    { key:'vo2', cur:cur_vo2, goal:goal_vo2, nextGain: MILESTONES.vo2.tiers.find(t=>cur_vo2<t.threshold)?.healthImpact||0, w:WEIGHTS.vo2 },
+    { key:'lbm', cur:cur_lbm, goal:goal_lbm, nextGain: MILESTONES.lbm.tiers.find(t=>cur_lbm<t.threshold)?.healthImpact||0, w:WEIGHTS.lbm },
+    { key:'bf',  cur:cur_bf,  goal:goal_bf,  nextGain: MILESTONES.bf.tiers.find(t=>cur_bf>t.threshold)?.healthImpact||0,  w:WEIGHTS.bf  },
+    { key:'str', cur:cur_str, goal:goal_str, nextGain: MILESTONES.str.tiers.find(t=>cur_str<t.threshold)?.healthImpact||0,w:WEIGHTS.str },
+  ].sort((a,b) => (b.nextGain*b.w) - (a.nextGain*a.w));
+
+  document.getElementById('metricSections').innerHTML =
+    gainPotential.map(g => renderMetricSection(g.key, g.cur, g.goal)).join('');
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+  sbaSave({vo2:score_vo2,lbm:score_lbm,bf:score_bf,str:score_str}, overall);
+}
+
+// Init
+updWeights();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOCALSTORAGE BRIDGE — auto-populate from workout + nutrition formulation
+// ─────────────────────────────────────────────────────────────────────────────
+function loadProfileFromStorage() {
+  try {
+    const data = JSON.parse(localStorage.getItem('sba_profile') || '{}');
+    if (!data.cur_bf && !data.cur_lbm && !data.cur_vo2 && !data.cur_str) return false;
+
+    // Populate hidden inputs
+    const set = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && val !== undefined && val !== null && val !== 0) el.value = val;
+    };
+    set('cur_bf',   data.cur_bf);
+    set('goal_bf',  data.goal_bf);
+    set('cur_lbm',  data.cur_lbm);
+    set('goal_lbm', data.goal_lbm);
+    set('cur_vo2',  data.cur_vo2);
+    set('goal_vo2', data.goal_vo2);
+    set('cur_str',  data.cur_str);
+    set('goal_str', data.goal_str);
+    if (data.bodyweight) set('mt_bw', data.bodyweight);
+
+    // Apply age/sex to milestone thresholds if available
+    window._sbaAge = data.age || 22;
+    window._sbaSex = data.sex || 'male';
+
+    // Render data source card
+    const wfTime = data.wf_saved ? new Date(data.wf_saved).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : null;
+    const nfTime = data.nf_saved ? new Date(data.nf_saved).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : null;
+
+    const card = document.getElementById('dataSourceCard');
+    if (card) {
+      card.innerHTML = `
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+          Data sourced from
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          ${wfTime ? `<div style="background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 10px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--lbm);margin-bottom:4px">Workout Formulation</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--muted)">${wfTime}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--dim);margin-top:3px">BF% · LBM · VO₂ · Strength · Goals</div>
+          </div>` : `<div style="background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;opacity:0.5">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px">Workout Formulation</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--dim)">Not yet generated</div>
+          </div>`}
+          ${nfTime ? `<div style="background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 10px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:4px">Nutrition Formulation</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--muted)">${nfTime}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--dim);margin-top:3px">Age ${data.age} · ${data.sex === 'male' ? 'Male' : 'Female'} · Threshold calibration</div>
+          </div>` : `<div style="background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;opacity:0.5">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px">Nutrition Formulation</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:var(--dim)">Not yet generated — age/sex defaults applied</div>
+          </div>`}
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          ${[
+            ['VO₂ Max', data.cur_vo2, data.goal_vo2, 'ml/kg/min', '#10b981'],
+            ['Lean Mass', data.cur_lbm, data.goal_lbm, 'lbs', '#3b82f6'],
+            ['Body Fat', data.cur_bf, data.goal_bf, '%', '#f97316'],
+            ['Strength', data.cur_str, data.goal_str, '× BW', '#a855f7'],
+          ].map(([n,cur,goal,unit,col]) => `
+            <div style="background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:7px 9px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:${col};margin-bottom:4px">${n}</div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:${col};line-height:1">${cur || '—'}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:var(--muted);margin-top:2px">${unit} · goal ${goal || '—'}</div>
+            </div>`).join('')}
+        </div>`;
+      card.style.display = 'block';
+    }
+
+    return true;
+  } catch(e) {
+    console.warn('localStorage read failed', e);
+    return false;
+  }
+}
+
+// Auto-compute if data available
+document.addEventListener('DOMContentLoaded', () => {
+  const hasData = loadProfileFromStorage();
+  if (hasData) {
+    // Small delay to let inputs settle
+    setTimeout(() => compute(), 80);
+  }
+});
+
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BF PICKER — global reusable module
+// Usage: bfPickerOpen('inputElementId', currentValue, sex)
+// On confirm: writes selected value back to input, dispatches 'input' event
+// ─────────────────────────────────────────────────────────────────────────────
+
+const BFP_TIERS = {
+  male: [
+    { max:6,  label:'Essential Fat',   color:'#10b981', desc:'Minimum fat required for organ function. Competition-lean. Not sustainable long-term — hormonal and immune suppression risk.' },
+    { max:9,  label:'Stage Ready',     color:'#14b8a6', desc:'Competition bodybuilding range. Visible striations on all muscle groups. Requires careful monitoring.' },
+    { max:12, label:'Athletic — Peak', color:'#3b82f6', desc:'Peak health composition. Maximum testosterone:estrogen ratio. Vascularity high. Optimal across all health markers.' },
+    { max:15, label:'Athletic',        color:'#60a5fa', desc:'Athletic body composition. All major muscle groups clearly visible. Excellent hormonal and cardiovascular profile.' },
+    { max:18, label:'Fitness',         color:'#f59e0b', desc:'Fit, healthy composition. Muscle definition visible. Good metabolic health. Minor visceral fat beginning.' },
+    { max:22, label:'Average — Active',color:'#f97316', desc:'Average active adult. Some abdominal fat. Hormonal and metabolic health still solid. Visible softness over muscle groups.' },
+    { max:26, label:'Average',         color:'#fb923c', desc:'Population average. Moderate visceral fat. Insulin sensitivity declining. Testosterone:estrogen ratio shifting.' },
+    { max:30, label:'Overweight',      color:'#ef4444', desc:'Elevated visceral fat. Insulin resistance likely. Aromatase increasing — testosterone converting to estrogen.' },
+    { max:40, label:'Obese',           color:'#dc2626', desc:'High visceral fat burden. Systemic chronic inflammation. Significant metabolic and cardiovascular disease risk.' },
+  ],
+  female: [
+    { max:14, label:'Essential Fat',   color:'#10b981', desc:'At or below essential fat for females. Hormonal disruption likely — estrogen suppression affects bone density.' },
+    { max:18, label:'Athletic — Peak', color:'#14b8a6', desc:'Athletic competition range. Excellent definition. Monitor — sustained periods below 16% may affect hormonal cycling.' },
+    { max:22, label:'Athletic',        color:'#3b82f6', desc:'Healthy athletic composition. Excellent cardiovascular and metabolic profile. Optimal health range for active females.' },
+    { max:26, label:'Fitness',         color:'#60a5fa', desc:'Fit composition. Good metabolic health. Muscle definition visible. Healthy hormonal profile maintained.' },
+    { max:30, label:'Average — Active',color:'#f59e0b', desc:'Healthy active female range. Minor fat accumulation but metabolically sound.' },
+    { max:34, label:'Average',         color:'#f97316', desc:'Population average. Moderate fat accumulation. Insulin sensitivity declining. Cardiovascular markers manageable.' },
+    { max:42, label:'Above Average',   color:'#ef4444', desc:'Elevated adiposity. Increasing visceral fat. Metabolic and cardiovascular risk rising.' },
+  ]
+};
+
+let _bfpTargetId = null;
+let _bfpSex = 'male';
+let _bfpVal = 14;
+
+
+window._bfOpen = function(inputId) {
+  var el = document.getElementById(inputId);
+  if (!el) return;
+  var sex = 'male';
+  try { var s = document.getElementById('sex'); if (s) sex = s.value; } catch(e) {}
+  bfPickerOpen(inputId, parseFloat(el.value) || 14, sex);
+};
+
+function bfPickerOpen(targetInputId, currentVal, sex) {
+  _bfpTargetId = targetInputId;
+  _bfpSex      = sex || 'male';
+  _bfpVal      = currentVal || 14;
+
+  // Set sex buttons
+  document.getElementById('bfpBtnMale').classList.toggle('active',   _bfpSex==='male');
+  document.getElementById('bfpBtnFemale').classList.toggle('active', _bfpSex==='female');
+
+  // Set slider range
+  const sl = document.getElementById('bfpSlider');
+  sl.min   = _bfpSex==='female' ? 10 : 4;
+  sl.max   = _bfpSex==='female' ? 42 : 40;
+  sl.value = _bfpVal;
+  _buildTicks();
+  bfpOnSlide(_bfpVal);
+
+  // Store starting BF% as baseline for marginal calculations
+  _bfpBaseBF = currentVal || 14;
+  document.getElementById('bfPickerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function bfPickerClose() {
+  document.getElementById('bfPickerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function bfPickerConfirm() {
+  if (_bfpTargetId) {
+    const el = document.getElementById(_bfpTargetId);
+    if (el) {
+      el.value = _bfpVal;
+      el.dispatchEvent(new Event('input', { bubbles:true }));
+      el.dispatchEvent(new Event('change',{ bubbles:true }));
+    }
+  }
+  bfPickerClose();
+}
+
+function bfpSetSex(sex) {
+  _bfpSex = sex;
+  document.getElementById('bfpBtnMale').classList.toggle('active',   sex==='male');
+  document.getElementById('bfpBtnFemale').classList.toggle('active', sex==='female');
+  const sl = document.getElementById('bfpSlider');
+  sl.min = sex==='female'?10:4;
+  sl.max = sex==='female'?42:40;
+  if (+sl.value < +sl.min) sl.value = +sl.min;
+  _buildTicks();
+  bfpOnSlide(sl.value);
+}
+
+function _buildTicks() {
+  const sl    = document.getElementById('bfpSlider');
+  const min   = +sl.min, max = +sl.max;
+  const steps = [min, Math.round(min+(max-min)*0.25), Math.round(min+(max-min)*0.5), Math.round(min+(max-min)*0.75), max];
+  document.getElementById('bfpTicks').innerHTML = steps.map(v=>`<span>${v}%</span>`).join('');
+}
+
+function bfpOnSlide(val) {
+  _bfpVal = +val;
+  const tiers = BFP_TIERS[_bfpSex];
+  const tier  = tiers.find(t => _bfpVal <= t.max) || tiers[tiers.length-1];
+
+  // Update big pct display
+  const bigEl = document.getElementById('bfpPctBig');
+  bigEl.textContent = (+val).toFixed(1);
+  bigEl.style.color = tier.color;
+
+  // Tier label
+  const tlEl = document.getElementById('bfpTierLabel');
+  tlEl.textContent   = tier.label;
+  tlEl.style.background = tier.color + '20';
+  tlEl.style.color   = tier.color;
+  tlEl.style.border  = `1px solid ${tier.color}40`;
+
+  // Tier description
+  document.getElementById('bfpTierDesc').textContent = tier.desc;
+  document.getElementById('bfpTierDesc').style.color = tier.color + 'cc';
+
+  // Confirm button
+  document.getElementById('bfpConfirmVal').textContent = (+val).toFixed(1);
+
+  // Health scores — bars show absolute level, label shows marginal delta vs start
+  const sc = _bfpScores(+val, _bfpSex);
+  // Bar width = absolute health score (where on the curve is this BF%)
+  // Label = marginal delta from starting point (positive = improvement)
+  _setBarMarginal('bfpBarH',    'bfpValH',    sc.hormonalAbs,  sc.hormonal,  100);
+  _setBarMarginal('bfpBarC',    'bfpValC',    sc.cardioAbs,    sc.cardio,    100);
+  _setBarMarginal('bfpBarM',    'bfpValM',    sc.metabolicAbs, sc.metabolic, 100);
+  _setBarMarginalMort('bfpBarMort','bfpValMort', sc.mortalityAbs, sc.mortality, 30);
+
+  // Redraw silhouette
+  _bfpDrawBody(+val, _bfpSex, tier.color);
+}
+
+function _setBar(barId, valId, val, max, prefix, suffix) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) b.style.width = Math.round(val/max*100)+'%';
+  if(v) v.textContent = (prefix||'')+val+(suffix||'');
+}
+
+// Bar width = absolute score position on curve
+// Label = marginal delta from starting BF% (+ good, - bad)
+function _setBarMarginal(barId, valId, absVal, delta, max) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) {
+    b.style.width = Math.round(absVal/max*100)+'%';
+    // Color shift: green if improving, orange if same, red if worse
+    b.style.background = delta > 2 ? '#10b981' : delta < -2 ? '#ef4444' : '#f59e0b';
+  }
+  if(v) {
+    const sign = delta > 0 ? '+' : '';
+    v.textContent = sign + delta;
+    v.style.color  = delta > 2 ? '#10b981' : delta < -2 ? '#ef4444' : '#f59e0b';
+  }
+}
+function _setBarMarginalMort(barId, valId, absVal, delta, max) {
+  const b = document.getElementById(barId);
+  const v = document.getElementById(valId);
+  if(b) {
+    b.style.width = Math.round(absVal/max*100)+'%';
+    b.style.background = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#f59e0b';
+  }
+  if(v) {
+    const sign = delta > 0 ? '-' : delta < 0 ? '+' : '';
+    v.textContent = sign + Math.abs(delta) + '%';
+    v.style.color  = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#f59e0b';
+  }
+}
+
+let _bfpBaseBF = 14; // set when picker opens
+
+// _bfpScores returns MARGINAL benefit scores relative to starting BF%
+// Bars show: how much does moving from _bfpBaseBF to 'bf' improve each category
+// Positive delta = improvement, negative = regression
+// Each category peaks at its optimal BF% — not at the leanest point
+function _bfpAbsScores(bf, sex) {
+  const male = sex === 'male';
+  // Hormonal — peaks at ~11% male, ~21% female (aromatase minimum)
+  // Drops on both sides: too lean suppresses hormones, too heavy converts T→E
+  const hormonalPeak = male ? 11 : 21;
+  const hormonal  = Math.max(5,  Math.min(100, 100 - Math.pow(Math.abs(bf - hormonalPeak)*3.5, 1.1)));
+  // Cardiovascular — monotonically better as BF falls (to a floor around essential fat)
+  // At 4% it's not the best — risk curve reverses at extremes
+  const cardioFloor = male ? 6 : 13;
+  const cardio = bf < cardioFloor
+    ? Math.max(40, 90 - (cardioFloor - bf) * 8)   // reversal below essential fat
+    : Math.max(10, Math.min(90, 100 - (bf - cardioFloor) * 2.6));
+  // Metabolic / insulin — best between 8-12% male, 16-20% female
+  const metPeak = male ? 10 : 18;
+  const metabolic = Math.max(8, Math.min(95,
+    bf < metPeak
+      ? 95 - Math.pow((metPeak - bf) * 2.5, 1.2)   // too lean impairs metabolic flexibility
+      : 95 - Math.max(0, bf - metPeak) * 3.0));
+  // Mortality — peaks around 10-12% male, nonlinear curve
+  // Very low BF reverses the mortality benefit
+  const mortPeak = male ? 11 : 20;
+  const mortality = Math.max(0, Math.min(30,
+    bf < mortPeak
+      ? 30 - Math.pow((mortPeak - bf) * 2, 1.3) * 0.5   // slight reversal at extremes
+      : Math.max(0, 30 - (bf - mortPeak) * 1.0)));
+  return {
+    hormonal:  Math.round(Math.max(0, Math.min(100, hormonal))),
+    cardio:    Math.round(Math.max(0, Math.min(100, cardio))),
+    metabolic: Math.round(Math.max(0, Math.min(100, metabolic))),
+    mortality: Math.round(Math.max(0, Math.min(30,  mortality))),
+  };
+}
+
+function _bfpScores(bf, sex) {
+  // Returns marginal delta vs the starting BF% when picker was opened
+  const base = _bfpAbsScores(_bfpBaseBF || bf, sex);
+  const curr = _bfpAbsScores(bf, sex);
+  return {
+    hormonal:  curr.hormonal  - base.hormonal,
+    cardio:    curr.cardio    - base.cardio,
+    metabolic: curr.metabolic - base.metabolic,
+    mortality: curr.mortality - base.mortality,
+    // Also expose absolute for bar width calculation
+    hormonalAbs:  curr.hormonal,
+    cardioAbs:    curr.cardio,
+    metabolicAbs: curr.metabolic,
+    mortalityAbs: curr.mortality,
+  };
+}
+
+// Procedural SVG body — same morphing logic as body-composition-visual.html
+function _bfpDrawBody(bf, sex, col) {
+  const svg = document.getElementById('bfpBodySvg');
+  if (!svg) return;
+  const isMale = sex === 'male';
+  const MIN = isMale ? 4 : 10, MAX = isMale ? 40 : 42;
+  const t = Math.max(0, Math.min(1, (bf - MIN) / (MAX - MIN)));
+  // t=0 → lean/shredded, t=1 → high BF
+  const L = (a, b) => a + (b - a) * t;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // ── Canvas: 220 wide × 480 tall ──────────────────────────────────────────
+  const cx = 110;
+
+  // ── Detail opacity curves ─────────────────────────────────────────────────
+  // Striations / vascularity: only below ~10% male
+  const vascOp   = clamp((0.12 - bf) / 0.08, 0, 0.9);   // peaks at 4%
+  // Muscle separation lines: 4–18%
+  const sepOp    = clamp(1 - t * 1.8, 0, 0.85);
+  // Abs definition: 4–16%
+  const absOp    = clamp(1 - t * 2.2, 0, 0.9);
+  // Chest/pec line: 4–20%
+  const pecOp    = clamp(1 - t * 1.6, 0, 0.85);
+  // Oblique lines: 4–18%
+  const oblOp    = clamp(1 - t * 1.9, 0, 0.8);
+
+  // ── Key measurements ──────────────────────────────────────────────────────
+  const headR    = 20;
+  const headCY   = 36;
+  const headW    = 19; // slightly oval
+
+  // Neck
+  const neckW    = L(isMale ? 11 : 9,  isMale ? 13 : 12);
+  const neckTop  = headCY + headR - 3;
+  const neckBot  = neckTop + 16;
+
+  // Trapezius sweep — wider at lean
+  const trapW    = L(isMale ? 10 : 7, isMale ? 6 : 4); // trap peak above shoulder
+  const shoulderY = neckBot + 5;
+  // Shoulder width — deltoid caps visible at lean
+  const shoulderW = L(isMale ? 57 : 50, isMale ? 65 : 62);
+  // Deltoid cap protrusion at lean
+  const deltCap   = L(isMale ? 6 : 4, isMale ? 2 : 1);
+
+  // Chest
+  const chestY   = shoulderY + 18;
+  const chestW   = L(isMale ? 44 : 38, isMale ? 56 : 54);
+  // Pec lower border Y
+  const pecBotY  = chestY + L(isMale ? 28 : 22, isMale ? 32 : 26);
+
+  // Waist
+  const waistW   = L(isMale ? 29 : 25, isMale ? 52 : 50);
+  const waistY   = pecBotY + L(isMale ? 20 : 18, isMale ? 26 : 22);
+
+  // Belly bulge — nonlinear, only appears above ~18%
+  const bellyT   = Math.max(0, (t - 0.3) / 0.7);
+  const belly    = bellyT * bellyT * (isMale ? 32 : 24);
+
+  // Hips / iliac crest
+  const hipsW    = L(isMale ? 40 : 48, isMale ? 58 : 68);
+  const hipsY    = waistY + L(18, 24);
+  // Iliac crest visible protrusion at lean
+  const iliacPop = L(isMale ? 4 : 3, 0);
+
+  // Crotch / legs
+  const crotchY  = hipsY + 20;
+  const thighTopW = L(isMale ? 24 : 28, isMale ? 34 : 42);
+  const thighMidW = L(isMale ? 20 : 23, isMale ? 29 : 36);
+  const kneeW     = L(isMale ? 14 : 13, isMale ? 20 : 19);
+  const calfPeakW = L(isMale ? 16 : 15, isMale ? 22 : 21);
+  const ankleW    = L(isMale ? 8 : 7,   isMale ? 12 : 11);
+  const kneeY     = crotchY + 80;
+  const calfPeakY = kneeY + 50;
+  const ankleY    = kneeY + 110;
+
+  // Arms
+  const shoulderCapY = shoulderY + 8;
+  const bicepPeakW   = L(isMale ? 14 : 10, isMale ? 18 : 14);
+  const forearmW     = L(isMale ? 10 : 8,  isMale ? 13 : 11);
+  const wristW       = L(isMale ? 6 : 5,   isMale ? 8 : 7);
+  const elbowY       = shoulderCapY + 75;
+  const wristY       = elbowY + 80;
+  const armOutX      = cx + shoulderW + deltCap;
+  const armInX       = cx + shoulderW - 8;
+
+  // ── BODY OUTLINE (right side, mirrored) ───────────────────────────────────
+  // Uses cubic bezier curves for organic shape
+  const bodyR = `
+    M ${cx + neckW} ${neckTop}
+    L ${cx + neckW} ${neckBot}
+    C ${cx + neckW + trapW} ${neckBot + 4}, ${cx + shoulderW - deltCap*2} ${shoulderY - 4}, ${cx + shoulderW} ${shoulderY}
+    C ${cx + shoulderW + deltCap} ${shoulderY + 6}, ${cx + shoulderW + deltCap} ${shoulderCapY + 6}, ${cx + shoulderW} ${shoulderCapY + 10}
+    C ${cx + chestW + 2} ${chestY}, ${cx + chestW} ${chestY + 10}, ${cx + chestW - 2} ${pecBotY}
+    C ${cx + chestW - 4} ${pecBotY + 8}, ${cx + waistW + belly + 4} ${waistY - 10}, ${cx + waistW + belly} ${waistY}
+    C ${cx + waistW + belly - 2} ${waistY + 8}, ${cx + hipsW - iliacPop} ${hipsY - 6}, ${cx + hipsW} ${hipsY}
+    C ${cx + hipsW + 2} ${hipsY + 8}, ${cx + thighTopW + 4} ${crotchY - 4}, ${cx + thighTopW} ${crotchY}
+    C ${cx + thighMidW + 3} ${crotchY + 30}, ${cx + thighMidW + 2} ${kneeY - 20}, ${cx + kneeW + 2} ${kneeY}
+    C ${cx + kneeW} ${kneeY + 10}, ${cx + calfPeakW + 3} ${calfPeakY}, ${cx + calfPeakW} ${calfPeakY + 8}
+    C ${cx + calfPeakW - 4} ${calfPeakY + 30}, ${cx + ankleW + 2} ${ankleY - 10}, ${cx + ankleW} ${ankleY}
+  `;
+  const bodyL = `
+    M ${cx - neckW} ${neckTop}
+    L ${cx - neckW} ${neckBot}
+    C ${cx - neckW - trapW} ${neckBot + 4}, ${cx - shoulderW + deltCap*2} ${shoulderY - 4}, ${cx - shoulderW} ${shoulderY}
+    C ${cx - shoulderW - deltCap} ${shoulderY + 6}, ${cx - shoulderW - deltCap} ${shoulderCapY + 6}, ${cx - shoulderW} ${shoulderCapY + 10}
+    C ${cx - chestW - 2} ${chestY}, ${cx - chestW} ${chestY + 10}, ${cx - chestW + 2} ${pecBotY}
+    C ${cx - chestW + 4} ${pecBotY + 8}, ${cx - waistW - belly - 4} ${waistY - 10}, ${cx - waistW - belly} ${waistY}
+    C ${cx - waistW - belly + 2} ${waistY + 8}, ${cx - hipsW + iliacPop} ${hipsY - 6}, ${cx - hipsW} ${hipsY}
+    C ${cx - hipsW - 2} ${hipsY + 8}, ${cx - thighTopW - 4} ${crotchY - 4}, ${cx - thighTopW} ${crotchY}
+    C ${cx - thighMidW - 3} ${crotchY + 30}, ${cx - thighMidW - 2} ${kneeY - 20}, ${cx - kneeW - 2} ${kneeY}
+    C ${cx - kneeW} ${kneeY + 10}, ${cx - calfPeakW - 3} ${calfPeakY}, ${cx - calfPeakW} ${calfPeakY + 8}
+    C ${cx - calfPeakW + 4} ${calfPeakY + 30}, ${cx - ankleW - 2} ${ankleY - 10}, ${cx - ankleW} ${ankleY}
+  `;
+  const bodyBase = `L ${cx - ankleW} ${ankleY} L ${cx + ankleW} ${ankleY}`;
+  const fullBody = bodyR + bodyBase + bodyL.split('M')[1].split('\n').reverse().join('\n') + ' Z';
+
+  // ── RIGHT ARM (hanging at side, slight bend) ──────────────────────────────
+  const rArm = `
+    M ${cx + shoulderW - 4} ${shoulderCapY + 8}
+    C ${armOutX + 4} ${shoulderCapY + 20}, ${armOutX + bicepPeakW} ${elbowY - 30}, ${armOutX + forearmW - 4} ${elbowY}
+    C ${armOutX + forearmW - 6} ${elbowY + 30}, ${armOutX + wristW} ${wristY - 10}, ${armOutX + wristW - 2} ${wristY}
+    L ${armOutX - wristW - 2} ${wristY}
+    C ${armOutX - wristW} ${wristY - 10}, ${armOutX - forearmW + 4} ${elbowY + 30}, ${armOutX - forearmW + 2} ${elbowY}
+    C ${armInX - 4} ${elbowY - 20}, ${armInX - 2} ${shoulderCapY + 24}, ${cx + shoulderW - 6} ${shoulderCapY + 12}
+    Z
+  `;
+  const lArm = `
+    M ${cx - shoulderW + 4} ${shoulderCapY + 8}
+    C ${cx - armOutX + cx - 4} ${shoulderCapY + 20}, ${cx - armOutX + cx - bicepPeakW} ${elbowY - 30}, ${cx - armOutX + cx - forearmW + 4} ${elbowY}
+    C ${cx - armOutX + cx - forearmW + 6} ${elbowY + 30}, ${cx - armOutX + cx - wristW} ${wristY - 10}, ${cx - armOutX + cx - wristW + 2} ${wristY}
+    L ${cx - armOutX + cx + wristW + 2} ${wristY}
+    C ${cx - armOutX + cx + wristW} ${wristY - 10}, ${cx - armOutX + cx + forearmW - 4} ${elbowY + 30}, ${cx - armOutX + cx + forearmW - 2} ${elbowY}
+    C ${cx - armInX + cx + 4} ${elbowY - 20}, ${cx - armInX + cx + 2} ${shoulderCapY + 24}, ${cx - shoulderW + 6} ${shoulderCapY + 12}
+    Z
+  `;
+
+  // ── MUSCLE DETAIL LINES ────────────────────────────────────────────────────
+  // All fade with increasing BF%
+
+  // Pec / chest lower border — curved shelf shape
+  const pecLine = `M ${cx - chestW + 6} ${pecBotY - 2}
+    Q ${cx - 12} ${pecBotY + 4} ${cx} ${pecBotY + 2}
+    Q ${cx + 12} ${pecBotY + 4} ${cx + chestW - 6} ${pecBotY - 2}`;
+
+  // Pec center line (sternal groove)
+  const sternalLine = `M ${cx} ${chestY + 4} L ${cx} ${pecBotY + 2}`;
+
+  // Pec upper border / clavicular head
+  const pecUpperR = `M ${cx + 4} ${chestY + 2} Q ${cx + 22} ${chestY - 2} ${cx + shoulderW - 16} ${shoulderCapY + 14}`;
+  const pecUpperL = `M ${cx - 4} ${chestY + 2} Q ${cx - 22} ${chestY - 2} ${cx - shoulderW + 16} ${shoulderCapY + 14}`;
+
+  // Serratus lines (saw-tooth at lateral ribcage, lean indicator)
+  const serratusR = [0,1,2].map(i =>
+    `M ${cx + chestW - 10} ${pecBotY + 4 + i*9} Q ${cx + chestW - 2} ${pecBotY + 8 + i*9} ${cx + chestW - 12} ${pecBotY + 14 + i*9}`
+  ).join(' ');
+  const serratusL = [0,1,2].map(i =>
+    `M ${cx - chestW + 10} ${pecBotY + 4 + i*9} Q ${cx - chestW + 2} ${pecBotY + 8 + i*9} ${cx - chestW + 12} ${pecBotY + 14 + i*9}`
+  ).join(' ');
+
+  // Rectus abdominis — 3 horizontal tendinous intersections + linea alba
+  const lineaAlba = `M ${cx} ${pecBotY + 4} L ${cx} ${waistY - 4}`;
+  const absLines  = [0,1,2].map(i => {
+    const y = pecBotY + 10 + i * 13;
+    return `M ${cx - 10} ${y} Q ${cx} ${y - 2} ${cx + 10} ${y}`;
+  }).join(' ');
+  // Oblique lines — diagonal sweep from ribs to hip
+  const obliqueR = `M ${cx + chestW - 8} ${pecBotY + 12} Q ${cx + waistW + 8} ${waistY - 8} ${cx + hipsW - 10} ${hipsY - 4}`;
+  const obliqueL = `M ${cx - chestW + 8} ${pecBotY + 12} Q ${cx - waistW - 8} ${waistY - 8} ${cx - hipsW + 10} ${hipsY - 4}`;
+
+  // Deltoid separation lines
+  const deltFrontR = `M ${cx + shoulderW - 4} ${shoulderY + 4} Q ${cx + shoulderW + deltCap - 2} ${shoulderY + 14} ${cx + chestW + 2} ${chestY + 6}`;
+  const deltFrontL = `M ${cx - shoulderW + 4} ${shoulderY + 4} Q ${cx - shoulderW - deltCap + 2} ${shoulderY + 14} ${cx - chestW - 2} ${chestY + 6}`;
+
+  // Bicep peak line (arm)
+  const bicepR = `M ${armOutX + 2} ${shoulderCapY + 30} Q ${armOutX + bicepPeakW - 2} ${elbowY - 40} ${armOutX + forearmW - 2} ${elbowY - 4}`;
+  const bicepL = `M ${cx-armOutX+cx - 2} ${shoulderCapY + 30} Q ${cx-armOutX+cx - bicepPeakW + 2} ${elbowY - 40} ${cx-armOutX+cx - forearmW + 2} ${elbowY - 4}`;
+
+  // Quad sweep — VMO teardrop at knee
+  const quadR = `M ${cx + thighTopW - 4} ${crotchY + 20} Q ${cx + thighMidW + 6} ${kneeY - 40} ${cx + kneeW + 6} ${kneeY - 6}`;
+  const quadL = `M ${cx - thighTopW + 4} ${crotchY + 20} Q ${cx - thighMidW - 6} ${kneeY - 40} ${cx - kneeW - 6} ${kneeY - 6}`;
+  // VMO teardrop
+  const vmoR = `M ${cx + kneeW + 4} ${kneeY - 14} Q ${cx + kneeW + 10} ${kneeY - 4} ${cx + kneeW + 2} ${kneeY + 2}`;
+  const vmoL = `M ${cx - kneeW - 4} ${kneeY - 14} Q ${cx - kneeW - 10} ${kneeY - 4} ${cx - kneeW - 2} ${kneeY + 2}`;
+
+  // Iliac crest line (V-cut / hip flexor line at very lean)
+  const iliacR = `M ${cx + waistW + belly - 2} ${waistY + 4} Q ${cx + hipsW - 2} ${hipsY - 10} ${cx + thighTopW + 2} ${crotchY - 2}`;
+  const iliacL = `M ${cx - waistW - belly + 2} ${waistY + 4} Q ${cx - hipsW + 2} ${hipsY - 10} ${cx - thighTopW - 2} ${crotchY - 2}`;
+  const vCutOp  = clamp((0.14 - bf) / 0.10, 0, 0.85); // only visible below ~14%
+
+  // ── VASCULAR LINES (only at very lean — below ~10%) ──────────────────────
+  // Bicep vein
+  const bvR = `M ${armOutX + bicepPeakW - 4} ${shoulderCapY + 25} Q ${armOutX + bicepPeakW - 3} ${elbowY - 30} ${armOutX + forearmW} ${elbowY + 10}`;
+  const bvL = `M ${cx-armOutX+cx - bicepPeakW + 4} ${shoulderCapY + 25} Q ${cx-armOutX+cx - bicepPeakW + 3} ${elbowY - 30} ${cx-armOutX+cx - forearmW} ${elbowY + 10}`;
+  // Forearm veins
+  const fvR  = `M ${armOutX + forearmW - 2} ${elbowY + 8} Q ${armOutX + forearmW - 3} ${elbowY + 50} ${armOutX + wristW} ${wristY - 8}`;
+  // Abdominal vein (linea semilunaris)
+  const abVR = `M ${cx + 12} ${pecBotY + 6} Q ${cx + 14} ${waistY - 10} ${cx + 10} ${waistY + 2}`;
+  const abVL = `M ${cx - 12} ${pecBotY + 6} Q ${cx - 14} ${waistY - 10} ${cx - 10} ${waistY + 2}`;
+
+  // ── SKIN TONE / GRADIENT ──────────────────────────────────────────────────
+  // Lean: more contrast, visible light/shadow gradient
+  // Heavy: flatter, softer gradient
+  const gradContrast = L(0.95, 0.70);
+  const shadowDepth  = L(0.55, 0.30);
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="bfpBodyGrad" x1="0.2" y1="0" x2="0.8" y2="1">
+        <stop offset="0%"   stop-color="${col}" stop-opacity="${gradContrast}"/>
+        <stop offset="45%"  stop-color="${col}" stop-opacity="${(gradContrast+shadowDepth)/2}"/>
+        <stop offset="100%" stop-color="${col}" stop-opacity="${shadowDepth}"/>
+      </linearGradient>
+      <linearGradient id="bfpArmGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="${col}" stop-opacity="${shadowDepth + 0.1}"/>
+        <stop offset="50%"  stop-color="${col}" stop-opacity="${gradContrast}"/>
+        <stop offset="100%" stop-color="${col}" stop-opacity="${shadowDepth}"/>
+      </linearGradient>
+      <filter id="bfpSoften">
+        <feGaussianBlur stdDeviation="${L(0, 0.8)}"/>
+      </filter>
+    </defs>
+
+    <!-- Ground shadow -->
+    <ellipse cx="${cx}" cy="${ankleY + 10}" rx="${L(28,44)}" ry="5"
+      fill="rgba(0,0,0,0.2)"/>
+
+    <!-- Body fill -->
+    <path d="${fullBody}" fill="url(#bfpBodyGrad)" filter="url(#bfpSoften)"/>
+
+    <!-- Arms -->
+    <path d="${rArm}" fill="url(#bfpArmGrad)" opacity="0.92"/>
+    <path d="${lArm}" fill="url(#bfpArmGrad)" opacity="0.92"/>
+
+    <!-- Body outline -->
+    <path d="${fullBody}" fill="none" stroke="${col}" stroke-width="0.8" opacity="0.5"/>
+    <path d="${rArm}"     fill="none" stroke="${col}" stroke-width="0.6" opacity="0.4"/>
+    <path d="${lArm}"     fill="none" stroke="${col}" stroke-width="0.6" opacity="0.4"/>
+
+    <!-- Neck trapezius shaping -->
+    <path d="M ${cx - neckW} ${neckBot} Q ${cx} ${neckBot - 4} ${cx + neckW} ${neckBot}"
+      fill="none" stroke="${col}" stroke-width="0.5" opacity="${sepOp * 0.4}"/>
+
+    <!-- Pec shelf and sternal groove -->
+    <path d="${pecLine}"    fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.2" opacity="${pecOp}"/>
+    <path d="${sternalLine}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.7" opacity="${pecOp * 0.8}"/>
+    <path d="${pecUpperR}"  fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${pecOp * 0.7}"/>
+    <path d="${pecUpperL}"  fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${pecOp * 0.7}"/>
+
+    <!-- Serratus anterior -->
+    <path d="${serratusR}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.7" opacity="${clamp(oblOp * 0.8, 0, 0.8)}"/>
+    <path d="${serratusL}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.7" opacity="${clamp(oblOp * 0.8, 0, 0.8)}"/>
+
+    <!-- Abs: linea alba + intersections -->
+    <path d="${lineaAlba}" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="0.8" opacity="${absOp}"/>
+    <path d="${absLines}"  fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="0.8" opacity="${absOp}"/>
+
+    <!-- Obliques -->
+    <path d="${obliqueR}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${oblOp}"/>
+    <path d="${obliqueL}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${oblOp}"/>
+
+    <!-- Deltoid separation -->
+    <path d="${deltFrontR}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${sepOp}"/>
+    <path d="${deltFrontL}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8" opacity="${sepOp}"/>
+
+    <!-- Bicep line -->
+    <path d="${bicepR}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.7" opacity="${sepOp * 0.9}"/>
+    <path d="${bicepL}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.7" opacity="${sepOp * 0.9}"/>
+
+    <!-- Quad sweep + VMO teardrop -->
+    <path d="${quadR}" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="0.8" opacity="${sepOp * 0.8}"/>
+    <path d="${quadL}" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="0.8" opacity="${sepOp * 0.8}"/>
+    <path d="${vmoR}"  fill="none" stroke="rgba(0,0,0,0.3)"  stroke-width="0.7" opacity="${absOp * 0.9}"/>
+    <path d="${vmoL}"  fill="none" stroke="rgba(0,0,0,0.3)"  stroke-width="0.7" opacity="${absOp * 0.9}"/>
+
+    <!-- Iliac V-cut -->
+    <path d="${iliacR}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.8" opacity="${vCutOp}"/>
+    <path d="${iliacL}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="0.8" opacity="${vCutOp}"/>
+
+    <!-- Vascularity — bicep vein -->
+    <path d="${bvR}" fill="none" stroke="${col}" stroke-width="1.2" opacity="${vascOp * 0.9}"
+      stroke-dasharray="none"/>
+    <path d="${bvL}" fill="none" stroke="${col}" stroke-width="1.2" opacity="${vascOp * 0.9}"
+      stroke-dasharray="none"/>
+    <!-- Forearm vein -->
+    <path d="${fvR}" fill="none" stroke="${col}" stroke-width="0.9" opacity="${vascOp * 0.7}"/>
+    <!-- Abdominal veins -->
+    <path d="${abVR}" fill="none" stroke="${col}" stroke-width="0.8" opacity="${vascOp * 0.6}"/>
+    <path d="${abVL}" fill="none" stroke="${col}" stroke-width="0.8" opacity="${vascOp * 0.6}"/>
+
+    <!-- Head -->
+    <ellipse cx="${cx}" cy="${headCY}" rx="${headW}" ry="${headR}"
+      fill="url(#bfpBodyGrad)" stroke="${col}" stroke-width="0.6" opacity="0.9"/>
+
+    <!-- BF% label on torso -->
+    <text x="${cx}" y="${waistY - 6}" text-anchor="middle"
+      font-family="'Barlow Condensed',sans-serif" font-size="15" font-weight="800"
+      fill="rgba(255,255,255,${L(0.9, 0.5)})">${bf.toFixed(1)}%</text>
+  `;
+}
+
+// Close on backdrop click
+(function(){ var _ov=document.getElementById('bfPickerOverlay'); if(_ov) _ov.addEventListener('click', function(e){ if(e.target===this) bfPickerClose(); }); })()
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') bfPickerClose();
+});
+
+// Init ticks
+_buildTicks();
+
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BIDIRECTIONAL LBM ↔ BF% AUTO-CALCULATION
+// Anchor: bodyweight. Change BF% → LBM updates. Change LBM → BF% updates.
+// ─────────────────────────────────────────────────────────────────────────────
+function _lbmFromBf(bw, bf)  { return Math.round((bw * (1 - bf/100)) * 10) / 10; }
+function _bfFromLbm(bw, lbm) { return Math.round(((1 - lbm/bw) * 100) * 10) / 10; }
+
+function _syncBfToLbm(bwId, bfId, lbmId) {
+  const bw  = +document.getElementById(bwId)?.value;
+  const bf  = +document.getElementById(bfId)?.value;
+  const lbmEl = document.getElementById(lbmId);
+  if (!bw || !bf || !lbmEl) return;
+  const lbm = _lbmFromBf(bw, bf);
+  if (lbm > 0 && lbm < bw) {
+    lbmEl.value = lbm;
+    lbmEl.dispatchEvent(new Event('change', { bubbles:true }));
+    _flashInput(lbmEl);
+  }
+}
+
+function _syncLbmToBf(bwId, bfId, lbmId) {
+  const bw   = +document.getElementById(bwId)?.value;
+  const lbm  = +document.getElementById(lbmId)?.value;
+  const bfEl = document.getElementById(bfId);
+  if (!bw || !lbm || !bfEl) return;
+  const bf = _bfFromLbm(bw, lbm);
+  if (bf > 2 && bf < 65) {
+    bfEl.value = bf;
+    bfEl.dispatchEvent(new Event('change', { bubbles:true }));
+    _flashInput(bfEl);
+  }
+}
+
+function _flashInput(el) {
+  if (!el) return;
+  el.style.transition = 'border-color 0.15s, box-shadow 0.15s';
+  el.style.borderColor = '#10b981';
+  el.style.boxShadow   = '0 0 0 2px rgba(16,185,129,0.18)';
+  setTimeout(() => {
+    el.style.borderColor = '';
+    el.style.boxShadow   = '';
+  }, 900);
+}
+
+// Wire all bidirectional pairs on the page
+// Format: [weightId, curBfId, curLbmId, goalBfId, goalLbmId]
+function _wireBidir(weightId, curBfId, curLbmId, goalBfId, goalLbmId, extraBfIds) {
+  const bwEl = document.getElementById(weightId);
+  if (bwEl) bwEl.addEventListener('input', () => {
+    if (document.activeElement === bwEl) {
+      // Recalc LBM from current BF% when weight changes
+      _syncBfToLbm(weightId, curBfId,  curLbmId);
+      if (goalBfId && goalLbmId) _syncBfToLbm(weightId, goalBfId, goalLbmId);
+    }
+  });
+
+  // cur_bf change → cur_lbm
+  const cbf = document.getElementById(curBfId);
+  if (cbf) cbf.addEventListener('change', () => _syncBfToLbm(weightId, curBfId, curLbmId));
+
+  // cur_lbm change → cur_bf
+  const clbm = document.getElementById(curLbmId);
+  if (clbm) {
+    // Make LBM editable (remove readonly if set)
+    clbm.removeAttribute('readonly');
+    clbm.style.cursor = '';
+    clbm.addEventListener('input', () => {
+      if (document.activeElement === clbm) _syncLbmToBf(weightId, curBfId, curLbmId);
+    });
+  }
+
+  // goal_bf change → goal_lbm
+  if (goalBfId && goalLbmId) {
+    const gbf = document.getElementById(goalBfId);
+    if (gbf) gbf.addEventListener('change', () => _syncBfToLbm(weightId, goalBfId, goalLbmId));
+
+    // goal_lbm change → goal_bf
+    const glbm = document.getElementById(goalLbmId);
+    if (glbm) {
+      glbm.removeAttribute('readonly');
+      glbm.style.cursor = '';
+      glbm.addEventListener('input', () => {
+        if (document.activeElement === glbm) _syncLbmToBf(weightId, goalBfId, goalLbmId);
+      });
+    }
+  }
+
+  // Extra BF% inputs (e.g. bf_pct in nutrition) that should also trigger LBM sync
+  if (extraBfIds) extraBfIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => _syncBfToLbm(weightId, id, curLbmId));
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  _wireBidir("mt_bw","cur_bf","cur_lbm","goal_bf","goal_lbm");
+  _syncBfToLbm("mt_bw","cur_bf","cur_lbm");
+  _syncBfToLbm("mt_bw","goal_bf","goal_lbm");
+});
+
+
+
+// ── Wire BF match buttons via addEventListener ────────────────────────────
+(function() {
+  function wireMatchBtns() {
+    document.querySelectorAll('[data-bf-input]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var inputId = btn.getAttribute('data-bf-input');
+        var el = document.getElementById(inputId);
+        var sex = 'male';
+        try { var s = document.getElementById('sex'); if (s) sex = s.value || 'male'; } catch(e2) {}
+        if (typeof bfPickerOpen === 'function') {
+          bfPickerOpen(inputId, parseFloat(el ? el.value : 14) || 14, sex);
+        } else if (typeof window._bfOpen === 'function') {
+          window._bfOpen(inputId);
+        }
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireMatchBtns);
+  } else {
+    wireMatchBtns();
+  }
+})();
+
+
+// ── Wire static picker + TDEE modal buttons ───────────────────────────────
+(function() {
+  function wireStaticBtns() {
+    // BF picker buttons
+    document.querySelectorAll('[data-picker-action="close"]').forEach(function(el) {
+      el.addEventListener('click', function() { if(typeof bfPickerClose==='function') bfPickerClose(); });
+    });
+    document.querySelectorAll('[data-picker-action="confirm"]').forEach(function(el) {
+      el.addEventListener('click', function() { if(typeof bfPickerConfirm==='function') bfPickerConfirm(); });
+    });
+    document.querySelectorAll('[data-picker-sex]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var sex = el.getAttribute('data-picker-sex');
+        if(typeof bfpSetSex==='function') bfpSetSex(sex);
+      });
+    });
+    // TDEE modal buttons
+    document.querySelectorAll('[data-tdee-action]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var action = el.getAttribute('data-tdee-action');
+        if(action==='close'   && typeof _tdeeClose==='function')   _tdeeClose();
+        if(action==='calc'    && typeof _tdeeCalc==='function')    _tdeeCalc();
+        if(action==='confirm' && typeof _tdeeConfirm==='function') _tdeeConfirm();
+      });
+    });
+    document.querySelectorAll('[data-action="compute"]').forEach(function(el) {
+      el.addEventListener('click', function() { if(typeof window.compute==='function') window.compute(); else if(typeof compute==='function') compute(); });
+    });
+    document.querySelectorAll('[data-oninput="updWeights"]').forEach(function(el) {
+      el.addEventListener('input', function() { if(typeof window.updWeights==='function') window.updWeights(); else if(typeof updWeights==='function') updWeights(); });
+    });
+    var bfpSliderEl = document.getElementById('bfpSlider');
+    if(bfpSliderEl) bfpSliderEl.addEventListener('input', function() {
+      if(typeof bfpOnSlide==='function') bfpOnSlide(this.value);
+    });
+    // Generic data-oninput
+    document.querySelectorAll('[data-oninput]').forEach(function(el) {
+      el.addEventListener('input', function() {
+        var fn = el.getAttribute('data-oninput');
+        if (fn === 'bfpOnSlide') { if(typeof bfpOnSlide==='function') bfpOnSlide(this.value); }
+        else if (fn === 'updWeights') { if(typeof window.updWeights==='function') window.updWeights(); else if(typeof updWeights==='function') updWeights(); }
+        else if (typeof window[fn]==='function') window[fn].call(this); 
+      });
+    });
+    // Backdrop close
+    var overlay = document.getElementById('bfPickerOverlay');
+    if(overlay) overlay.addEventListener('click', function(e) {
+      if(e.target===this && typeof bfPickerClose==='function') bfPickerClose();
+    });
+    var tdeeModal = document.getElementById('tdeeModal');
+    if(tdeeModal) tdeeModal.addEventListener('click', function(e) {
+      if(e.target===this && typeof _tdeeClose==='function') _tdeeClose();
+    });
+  }
+  if(document.readyState==='loading') {
+    document.addEventListener('DOMContentLoaded', wireStaticBtns);
+  } else {
+    wireStaticBtns();
+  }
+})();
+
+
+
+// ── Sandbox button wiring ─────────────────────────────────────────────────
+
+// Window assignments for sandbox scope
+window.compute = compute;
+window.updWeights = updWeights;
+window.bfPickerOpen = bfPickerOpen;
+window.bfPickerClose = bfPickerClose;
+window.bfpOnSlide = bfpOnSlide;
+
+(function() {
+  function wire() {
+    // Assign key functions to window for sandbox scope
+    if(typeof compute==='function')     window.compute     = compute;
+    if(typeof updWeights==='function')  window.updWeights  = updWeights;
+    if(typeof bfPickerOpen==='function') window.bfPickerOpen = bfPickerOpen;
+    if(typeof bfPickerClose==='function') window.bfPickerClose = bfPickerClose;
+    if(typeof bfPickerConfirm==='function') window.bfPickerConfirm = bfPickerConfirm;
+    if(typeof bfpSetSex==='function')   window.bfpSetSex   = bfpSetSex;
+    if(typeof bfpOnSlide==='function')  window.bfpOnSlide  = bfpOnSlide;
+
+    // Compute button
+    document.querySelectorAll('[data-action="compute"]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if(typeof window.compute==='function') window.compute();
+      });
+    });
+    // Weight sliders
+    document.querySelectorAll('[data-oninput="updWeights"]').forEach(function(el) {
+      el.addEventListener('input', function() {
+        if(typeof window.updWeights==='function') window.updWeights();
+      });
+    });
+    // BF picker buttons
+    document.querySelectorAll('[data-picker-action]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var a = el.getAttribute('data-picker-action');
+        if(a==='close'   && typeof window.bfPickerClose==='function')   window.bfPickerClose();
+        if(a==='confirm' && typeof window.bfPickerConfirm==='function') window.bfPickerConfirm();
+      });
+    });
+    document.querySelectorAll('[data-picker-sex]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if(typeof window.bfpSetSex==='function') window.bfpSetSex(el.getAttribute('data-picker-sex'));
+      });
+    });
+    // BF match buttons
+    document.querySelectorAll('[data-bf-input]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        var id = btn.getAttribute('data-bf-input');
+        var el = document.getElementById(id);
+        var sex = 'male';
+        if(typeof window.bfPickerOpen==='function')
+          window.bfPickerOpen(id, parseFloat(el?el.value:14)||14, sex);
+      });
+    });
+    // BF slider
+    var bfsl = document.getElementById('bfpSlider');
+    if(bfsl) bfsl.addEventListener('input', function() {
+      if(typeof window.bfpOnSlide==='function') window.bfpOnSlide(this.value);
+    });
+    // Backdrop close
+    var ov = document.getElementById('bfPickerOverlay');
+    if(ov) ov.addEventListener('click', function(e) {
+      if(e.target===this && typeof window.bfPickerClose==='function') window.bfPickerClose();
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+})();
+
+
+// ── Firebase save hook ────────────────────────────────────────────────────────
+function sbaSave(scores, overall) {
+  try {
+    const data = {
+      cur_vo2:  +document.getElementById('cur_vo2')?.value,
+      cur_lbm:  +document.getElementById('cur_lbm')?.value,
+      cur_bf:   +document.getElementById('cur_bf')?.value,
+      cur_str:  +document.getElementById('cur_str')?.value,
+      goal_vo2: +document.getElementById('goal_vo2')?.value,
+      goal_lbm: +document.getElementById('goal_lbm')?.value,
+      goal_bf:  +document.getElementById('goal_bf')?.value,
+      goal_str: +document.getElementById('goal_str')?.value,
+      scores:   scores || {},
+      overall:  overall || 0,
+      priorityWeights: {
+        vo2: +document.getElementById('pw_vo2')?.value,
+        lbm: +document.getElementById('pw_lbm')?.value,
+        bf:  +document.getElementById('pw_bf')?.value,
+        str: +document.getElementById('pw_str')?.value,
+      },
+      savedAt: new Date().toISOString(),
+    };
+    window.parent.postMessage({ type:'sba-save', module:'milestone', data }, '*');
+    // Log milestone snapshot for progression tracking
+    window.parent.postMessage({ type:'sba-log-metric', data:{
+      date:    new Date().toISOString().split('T')[0],
+      vo2:     data.cur_vo2,
+      lbm:     data.cur_lbm,
+      bf:      data.cur_bf,
+      str:     data.cur_str,
+      scores:  data.scores,
+      overall: data.overall,
+      source:  'milestone',
+    }}, '*');
+  } catch(e) { console.warn('sbaSave error', e); }
+}
+
+window.addEventListener('message', e => {
+  const d = e.data;
+  if (!d || d.type !== 'sba-load') return;
+  // Load milestone data
+  if (d.milestone) {
+    const m = d.milestone;
+    const set = (id, val) => { const el=document.getElementById(id); if(el&&val!=null&&val!==0) el.value=val; };
+    set('cur_vo2',  m.cur_vo2);  set('goal_vo2', m.goal_vo2);
+    set('cur_lbm',  m.cur_lbm);  set('goal_lbm', m.goal_lbm);
+    set('cur_bf',   m.cur_bf);   set('goal_bf',  m.goal_bf);
+    set('cur_str',  m.cur_str);  set('goal_str', m.goal_str);
+    if (m.priorityWeights) {
+      set('pw_vo2', m.priorityWeights.vo2);
+      set('pw_lbm', m.priorityWeights.lbm);
+      set('pw_bf',  m.priorityWeights.bf);
+      set('pw_str', m.priorityWeights.str);
+    }
+    if (typeof updWeights === 'function') updWeights();
+  }
+  // Load metric history for progression display
+  if (d.metricHistory && d.metricHistory.length > 1) {
+    window._sbaMetricHistory = d.metricHistory;
+    renderProgressionRates(d.metricHistory);
+  }
+});
+
+function renderProgressionRates(history) {
+  // Calculate rate of change per metric from history
+  if (!history || history.length < 2) return;
+  const latest = history[0];
+  const oldest = history[history.length-1];
+  const days = (new Date(latest.date) - new Date(oldest.date)) / 86400000 || 1;
+  const perMonth = v => ((v/days)*30).toFixed(2);
+
+  const rates = {
+    vo2: perMonth((latest.vo2||0) - (oldest.vo2||0)),
+    lbm: perMonth((latest.lbm||0) - (oldest.lbm||0)),
+    bf:  perMonth((latest.bf||0)  - (oldest.bf||0)),
+    str: perMonth((latest.str||0) - (oldest.str||0)),
+  };
+
+  // Inject rate panel if results are showing
+  const existing = document.getElementById('sba-progression-panel');
+  if (existing) existing.remove();
+  const panel = document.createElement('div');
+  panel.id = 'sba-progression-panel';
+  panel.style.cssText = 'background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:16px 20px;margin-bottom:20px;';
+  panel.innerHTML = `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+      Progression rates — based on ${history.length} logged entries over ${Math.round(days)} days
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      ${[['VO₂','vo2','#10b981','+ml/kg/min/mo'],['LBM','lbm','#3b82f6','+lbs/mo'],['BF%','bf','#f97316','pp/mo'],['Strength','str','#a855f7','×BW/mo']].map(([label,key,color,unit])=>`
+        <div style="text-align:center">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.48rem;text-transform:uppercase;letter-spacing:1px;color:${color};margin-bottom:4px">${label}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;color:${color}">${rates[key]>0?'+':''}${rates[key]}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:var(--muted)">${unit}</div>
+        </div>`).join('')}
+    </div>`;
+  const page = document.querySelector('.page');
+  if (page) page.insertBefore(panel, page.firstChild);
+}
+</script>
+</body>
+</html>
